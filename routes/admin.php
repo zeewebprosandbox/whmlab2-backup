@@ -218,6 +218,7 @@ Route::middleware(['admin', 'admin.permission'])->group(function () {
         Route::post('server/status/{id}', 'serverStatus')->name('server.status');
 
         Route::post('server/test/connection','testConnection')->name('server.test.connection');
+        Route::post('server/zodpanel/bootstrap/preview','zodPanelBootstrapPreview')->name('server.zodpanel.bootstrap.preview');
     });
 
     // Billing Setting

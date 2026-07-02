@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Server;
 use App\Models\ServerGroup;
+use App\Support\ZodPanelNodeBootstrapper;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ServerController extends Controller{
      
@@ -79,13 +81,45 @@ class ServerController extends Controller{
             'location' => 'nullable|max:120',
             'max_accounts' => 'nullable|integer|min:0',
             'ns1' => 'required',
-    		'ns1_ip' => 'required',
+    		'ns1_ip' => 'required_unless:bootstrap_zodpanel,1',
     		'ns2' => 'required',
-    		'ns2_ip' => 'required', 
+    		'ns2_ip' => 'required_unless:bootstrap_zodpanel,1', 
+            'bootstrap_zodpanel' => 'nullable|boolean',
+            'clean_server_confirmed' => 'nullable|boolean',
+            'ssh_port' => 'nullable|integer|min:1|max:65535',
+            'deployment_note' => 'nullable|max:255',
     	]);
 
         $serverGroup = ServerGroup::active()->findOrFail($request->server_group_id);
         $hostname = $request->protocol.$request->host.':'.$request->port;
+        $bootstrapResult = null;
+
+        if ($request->boolean('bootstrap_zodpanel')) {
+            if ($serverGroup->getType !== 'Whmpanel') {
+                $notify[] = ['error', 'Automated ZodPanel bootstrap is only available for ZodPanel server groups'];
+                return back()->withNotify($notify)->withInput();
+            }
+
+            $bootstrapResult = app(ZodPanelNodeBootstrapper::class)->bootstrap($this->bootstrapCredentials($request), [
+                'clean' => $request->boolean('clean_server_confirmed'),
+                'token' => $request->api_token ?: Str::random(64),
+            ]);
+
+            if (!$bootstrapResult['success']) {
+                $notify[] = ['error', $bootstrapResult['message']];
+                return back()->withNotify($notify)->withInput()->with('zodpanel_bootstrap_log', $bootstrapResult['log'] ?? []);
+            }
+
+            $request->merge([
+                'api_token' => $bootstrapResult['token'],
+                'protocol' => 'https://',
+                'port' => $request->port ?: 8083,
+                'ns1_ip' => $request->ns1_ip ?: data_get($bootstrapResult, 'data.ip_address', $request->host),
+                'ns2_ip' => $request->ns2_ip ?: data_get($bootstrapResult, 'data.ip_address', $request->host),
+            ]);
+
+            $hostname = $request->protocol.$request->host.':'.$request->port;
+        }
 
         $server = new Server();
         $server->type = $serverGroup->getType; 
@@ -110,7 +144,7 @@ class ServerController extends Controller{
 
         if(!$execute['success']){
             $notify[] = ['error', $execute['message']];
-            return back()->withNotify($notify);
+            return back()->withNotify($notify)->with('zodpanel_bootstrap_log', $bootstrapResult['log'] ?? []);
         }
 
         $server->ns1 = $request->ns1;
@@ -126,6 +160,12 @@ class ServerController extends Controller{
         $server->health_status = 'online';
         $server->health_message = $execute['message'] ?? 'Connection verified';
         $server->health_checked_at = now();
+        if ($bootstrapResult) {
+            $server->deployment_status = 'deployed';
+            $server->deployment_version = $request->deployment_note ?: 'ZodPanel bootstrap '.now()->format('Y-m-d H:i');
+            $server->deployment_log = implode("\n", $bootstrapResult['log'] ?? []);
+            $server->last_deployed_at = now();
+        }
         $server->status = 1;
         $server->save();
 
@@ -161,10 +201,27 @@ class ServerController extends Controller{
     		'ns1_ip' => 'required',
     		'ns2' => 'required',
     		'ns2_ip' => 'required', 
+            'sync_zodpanel_custom' => 'nullable|boolean',
+            'ssh_port' => 'nullable|integer|min:1|max:65535',
+            'deployment_note' => 'nullable|max:255',
     	]);
 
         $server = Server::findOrFail($request->id);
         $serverGroup = ServerGroup::findOrFail($request->server_group_id);
+        $syncResult = null;
+
+        if ($request->boolean('sync_zodpanel_custom')) {
+            if ($serverGroup->getType !== 'Whmpanel') {
+                $notify[] = ['error', 'Custom ZodPanel sync is only available for ZodPanel server groups'];
+                return back()->withNotify($notify);
+            }
+
+            $syncResult = app(ZodPanelNodeBootstrapper::class)->syncCustomLayer($this->bootstrapCredentials($request), $request->api_token ?: $server->api_token);
+            if (!$syncResult['success']) {
+                $notify[] = ['error', $syncResult['message']];
+                return back()->withNotify($notify)->with('zodpanel_bootstrap_log', $syncResult['log'] ?? []);
+            }
+        }
 
         $hostname = $request->protocol.$request->host.':'.$request->port;
         $server->server_group_id = $serverGroup->id;
@@ -202,6 +259,12 @@ class ServerController extends Controller{
         $server->health_status = 'online';
         $server->health_message = $execute['message'] ?? 'Connection verified';
         $server->health_checked_at = now();
+        if ($syncResult) {
+            $server->deployment_status = 'synced';
+            $server->deployment_version = $request->deployment_note ?: 'ZodPanel custom sync '.now()->format('Y-m-d H:i');
+            $server->deployment_log = implode("\n", $syncResult['log'] ?? []);
+            $server->last_deployed_at = now();
+        }
         $server->save();
 
         $notify[] = ['success', 'Server updated successfully'];
@@ -257,6 +320,22 @@ class ServerController extends Controller{
         ];
     }
 
+    public function zodPanelBootstrapPreview(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'host' => 'required',
+            'username' => 'required',
+            'password' => 'required',
+            'ssh_port' => 'nullable|integer|min:1|max:65535',
+        ]);
+
+        if (!$validator->passes()) {
+            return ['success' => false, 'message' => $validator->errors()->first()];
+        }
+
+        return app(ZodPanelNodeBootstrapper::class)->preview($this->bootstrapCredentials($request));
+    }
+
     public function serverLogin($id){
 
         $server = Server::with('group')->findOrFail($id);
@@ -291,6 +370,18 @@ class ServerController extends Controller{
 
     public function serverStatus($id){
         return Server::changeStatus($id);
+    }
+
+    private function bootstrapCredentials(Request $request): array
+    {
+        return [
+            'host' => $request->host,
+            'ssh_port' => $request->ssh_port ?: 22,
+            'ssh_username' => $request->username ?: 'root',
+            'ssh_password' => $request->password,
+            'panel_hostname' => $request->host,
+            'admin_email' => gs('email_from') ?: 'admin@'.$request->host,
+        ];
     }
 
 } 

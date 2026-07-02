@@ -77,7 +77,7 @@
                                         <label>@lang('Port')</label>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" name="port" required value="{{old('port')}}" placeholder="2087">
+                                <input type="text" class="form-control" name="port" required value="{{old('port', 8083)}}" placeholder="8083">
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -123,6 +123,13 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
+                                    <label>@lang('SSH Port')</label>
+                                    <input type="number" min="1" max="65535" class="form-control" name="ssh_port" value="{{ old('ssh_port', 22) }}">
+                                    <small class="text-muted">@lang('Used only for automated ZodPanel bootstrap/sync.')</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
                                     <div class="justify-content-between d-flex">
                                         <label>@lang('Test')</label>
                                         <div class="connection d-none">
@@ -136,6 +143,38 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 zodpanel-bootstrap-box d-none">
+                <div class="card border--primary">
+                    <div class="card-header bg--primary">
+                        <h5 class="text--white">@lang('Automated ZodPanel Bootstrap')</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">@lang('For a new ZodPanel node, enter only the VPS SSH login above, then let WHMLab install Hestia, sync the custom ZodPanel layer, generate the bridge token, and save the node.')</p>
+                        <div class="form-group">
+                            <label class="d-flex align-items-center gap-2">
+                                <input type="checkbox" name="bootstrap_zodpanel" value="1" @checked(old('bootstrap_zodpanel'))>
+                                <span>@lang('Install/sync customized ZodPanel on this VPS before saving')</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="d-flex align-items-center gap-2">
+                                <input type="checkbox" name="clean_server_confirmed" value="1" @checked(old('clean_server_confirmed'))>
+                                <span>@lang('If this VPS is not fresh, I authorize WHMLab to clean hosting stack packages first')</span>
+                            </label>
+                            <small class="text-danger d-block">@lang('This is destructive. Use it only on a VPS dedicated to becoming a ZodPanel node.')</small>
+                        </div>
+                        <div class="form-group">
+                            <label>@lang('Version Description')</label>
+                            <input type="text" class="form-control" name="deployment_note" value="{{ old('deployment_note') }}" placeholder="@lang('Initial EU node bootstrap, package sync update, etc.')">
+                        </div>
+                        <button type="button" class="btn btn-outline--primary w-100 h-45 previewZodPanel">
+                            @lang('Preview VPS Readiness')
+                        </button>
+                        <pre class="zodpanel-preview-log mt-3 d-none"></pre>
                     </div>
                 </div>
             </div>
@@ -213,6 +252,14 @@
         @endpermit
     </div>
 </form> 
+@if(session('zodpanel_bootstrap_log'))
+    <div class="card mt-3">
+        <div class="card-header bg--dark"><h5 class="text--white">@lang('ZodPanel Bootstrap Log')</h5></div>
+        <div class="card-body">
+            <pre class="mb-0">{{ implode("\n", session('zodpanel_bootstrap_log')) }}</pre>
+        </div>
+    </div>
+@endif
 @endsection
 
 @permit('admin.servers')
@@ -243,6 +290,12 @@
                 }else{
                     $('.cpanel-input').addClass('d-none');
                     $('.cpanel-input input').attr('disabled', true);
+                }
+
+                if(type == 'Whmpanel'){
+                    $('.zodpanel-bootstrap-box').removeClass('d-none');
+                }else{
+                    $('.zodpanel-bootstrap-box').addClass('d-none');
                 }
             }).change();
 
@@ -278,6 +331,63 @@
                         }
                     });
                 @endpermit
+            });
+
+            $('input[name=bootstrap_zodpanel], input[name=host]').on('change keyup', function(){
+                var enabled = $('input[name=bootstrap_zodpanel]').is(':checked');
+                if(!enabled){
+                    return;
+                }
+
+                var host = $('input[name=host]').val();
+                var nsBase = host || 'zodpanel.local';
+                $('select[name=protocol]').val('https://');
+                $('input[name=port]').val($('input[name=port]').val() || '8083');
+
+                if(!$('input[name=ns1]').val()){
+                    $('input[name=ns1]').val('ns1.' + nsBase);
+                }
+                if(!$('input[name=ns2]').val()){
+                    $('input[name=ns2]').val('ns2.' + nsBase);
+                }
+                if(!$('input[name=ns1_ip]').val()){
+                    $('input[name=ns1_ip]').val(host);
+                }
+                if(!$('input[name=ns2_ip]').val()){
+                    $('input[name=ns2_ip]').val(host);
+                }
+
+                $('input[name^=ns]').removeAttr('disabled');
+                $('button[type=submit]').removeAttr('disabled');
+            }).change();
+
+            $('.previewZodPanel').on('click', function(){
+                $.ajax({
+                    type:'POST',
+                    url:'{{ route("admin.server.zodpanel.bootstrap.preview") }}',
+                    data: $('.server-form').serialize(),
+                    beforeSend: function() {
+                        $('.zodpanel-preview-log').removeClass('d-none').text('Checking VPS readiness...');
+                    },
+                    success:function(response){
+                        var lines = [];
+                        lines.push(response.message || 'Preview finished');
+                        if(response.data){
+                            lines.push('');
+                            lines.push('Hostname: ' + (response.data.hostname || 'unknown'));
+                            lines.push('IP: ' + (response.data.ip_address || 'unknown'));
+                            lines.push('Hestia installed: ' + (response.data.hestia_installed ? 'yes' : 'no'));
+                            lines.push('ZodPanel bridge: ' + (response.data.zodpanel_bridge_installed ? 'yes' : 'no'));
+                            lines.push('Fresh VPS: ' + (response.data.fresh ? 'yes' : 'no'));
+                            lines.push('Detected stack: ' + ((response.data.detected_stack || []).join(', ') || 'none'));
+                        }
+                        if(response.log && response.log.length){
+                            lines.push('');
+                            lines = lines.concat(response.log);
+                        }
+                        $('.zodpanel-preview-log').text(lines.join("\n"));
+                    }
+                });
             });
         })(jQuery);
     </script> 

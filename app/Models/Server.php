@@ -13,6 +13,7 @@ class Server extends Model{
 
     protected $casts = [
         'health_checked_at' => 'datetime',
+        'last_deployed_at' => 'datetime',
     ];
 
     public function group(){
