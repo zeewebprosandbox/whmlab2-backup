@@ -1,0 +1,1 @@
+var firebaseConfig = {"apiKey":"AIzaSyDlnflv2y3tWjemP2iGM2nWM5mhyBWWMao","authDomain":"tradelab-f5e8b.firebaseapp.com","projectId":"tradelab-f5e8b","storageBucket":"tradelab-f5e8b.appspot.com","messagingSenderId":"33806775204","appId":"1:33806775204:web:a6ac63e125b860231d8731","measurementId":"G-DY0DRM5BJ9"}
