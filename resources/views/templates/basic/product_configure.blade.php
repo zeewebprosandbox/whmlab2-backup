@@ -1013,7 +1013,7 @@
                             $('.availability').html(`
                                 <div class="whm-domain-result">
                                     <h5>@lang('Checking domain')...</h5>
-                                    <p>@lang('We are checking registration availability and public nameserver records.')</p>
+                                    <p>@lang('We are checking live registrar API availability.')</p>
                                 </div>
 	                            `);
                         },
@@ -1084,7 +1084,7 @@
                                     </div>
                                 `);
                             }else{
-                                $('.availability').html(ownedDomainResult(response.domain, getResponse.current_nameservers || []));
+                                $('.availability').html(ownedDomainResult(response.domain));
                             }
 
                             renderDomainSuggestions(suggestions);
@@ -1159,22 +1159,11 @@
                     });
                 }
 
-                function ownedDomainResult(domain, currentNameservers) {
-                    var currentList = currentNameservers.length
-                        ? currentNameservers.map(function(ns) {
-                            return `<code>${ns}</code>`;
-                        }).join('')
-                        : `<span class="whm-domain-empty-ns">@lang('No public nameservers found. You can still continue if this domain belongs to you.')</span>`;
-
+                function ownedDomainResult(domain) {
                     return `
                         <div class="whm-domain-result whm-domain-result--owned">
                             <h5>@lang('Domain already registered')</h5>
                             <p><span class="whm-domain-result__domain">${domain}</span> @lang('is not available to register. If this is your domain, you can attach it to this hosting order and point it to ZodHost after payment.')</p>
-
-                            <div class="mt-3">
-                                <p class="fw-bold mb-1">@lang('Current public nameservers')</p>
-                                <div class="whm-domain-ns-list">${currentList}</div>
-                            </div>
 
                             <label class="whm-domain-owned-check">
                                 <input type="checkbox" class="ownedDomainCheck">

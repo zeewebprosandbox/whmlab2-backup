@@ -41,6 +41,7 @@ class Register{
 			'ResellerClub'=>ResellerClub::class,
 			'NetEarthOne'=>NetEarthOne::class,
 			'LogicBoxes'=>LogicBoxes::class,
+			'Porkbun'=>Porkbun::class,
 		];
 
 		if (!isset($methods[$alias])) {

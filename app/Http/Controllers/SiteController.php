@@ -318,24 +318,6 @@ class SiteController extends Controller
         return [
             'success' => true,
             'result' => $execute,
-            'current_nameservers' => $this->lookupNameservers($domain),
         ];
-    }
-
-    private function lookupNameservers(string $domain): array
-    {
-        $records = @dns_get_record($domain, DNS_NS);
-
-        if (!$records) {
-            return [];
-        }
-
-        return collect($records)
-            ->pluck('target')
-            ->filter()
-            ->map(fn ($nameserver) => strtolower(rtrim($nameserver, '.')))
-            ->unique()
-            ->values()
-            ->all();
     }
 }

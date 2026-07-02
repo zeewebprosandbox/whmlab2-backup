@@ -424,7 +424,8 @@ INSERT INTO `domain_registers` (`id`, `name`, `alias`, `ns1`, `ns2`, `ns3`, `ns4
 (5, 'NameSilo', 'NameSilo', 'ns1.dnsowl.com', 'ns2.dnsowl.com', 'ns3.dnsowl.com', NULL, '{\"api_key\":{\"title\":\"API Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
 (6, 'ResellerClub', 'ResellerClub', 'ns1.resellerclub.com', 'ns2.resellerclub.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
 (7, 'NetEarthOne', 'NetEarthOne', 'ns1.netearthone.com', 'ns2.netearthone.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
-(8, 'LogicBoxes', 'LogicBoxes', 'ns1.logicboxes.com', 'ns2.logicboxes.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL);
+(8, 'LogicBoxes', 'LogicBoxes', 'ns1.logicboxes.com', 'ns2.logicboxes.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
+(9, 'Porkbun', 'Porkbun', 'curitiba.ns.porkbun.com', 'fortaleza.ns.porkbun.com', 'maceio.ns.porkbun.com', 'salvador.ns.porkbun.com', '{\"api_key\":{\"title\":\"API Key\",\"required\":true,\"value\":\"\"},\"secret_api_key\":{\"title\":\"Secret API Key\",\"required\":true,\"value\":\"\"}}', 0, 0, 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2056,7 +2057,7 @@ ALTER TABLE `domain_pricings`
 -- AUTO_INCREMENT for table `domain_registers`
 --
 ALTER TABLE `domain_registers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `domain_setups`

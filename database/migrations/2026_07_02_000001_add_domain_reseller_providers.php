@@ -20,7 +20,7 @@ return new class extends Migration
     public function down(): void
     {
         DB::table('domain_registers')
-            ->whereIn('alias', ['NameSilo', 'ResellerClub', 'NetEarthOne', 'LogicBoxes'])
+            ->whereIn('alias', ['NameSilo', 'ResellerClub', 'NetEarthOne', 'LogicBoxes', 'Porkbun'])
             ->delete();
     }
 
@@ -100,6 +100,32 @@ return new class extends Migration
                 'ns4' => null,
                 'params' => $logicBoxesParams,
                 'test_mode' => 1,
+                'default' => 0,
+                'status' => 0,
+                'setup_done' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'name' => 'Porkbun',
+                'alias' => 'Porkbun',
+                'ns1' => 'curitiba.ns.porkbun.com',
+                'ns2' => 'fortaleza.ns.porkbun.com',
+                'ns3' => 'maceio.ns.porkbun.com',
+                'ns4' => 'salvador.ns.porkbun.com',
+                'params' => json_encode([
+                    'api_key' => [
+                        'title' => 'API Key',
+                        'required' => true,
+                        'value' => '',
+                    ],
+                    'secret_api_key' => [
+                        'title' => 'Secret API Key',
+                        'required' => true,
+                        'value' => '',
+                    ],
+                ]),
+                'test_mode' => 0,
                 'default' => 0,
                 'status' => 0,
                 'setup_done' => 0,
