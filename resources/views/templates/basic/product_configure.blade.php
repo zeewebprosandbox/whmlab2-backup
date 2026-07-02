@@ -976,13 +976,12 @@
                 var hideElement = $('.hideElement');
                 var domainArea = $('.domainArea');
                 var domainSearchInProgress = false;
+                var domainSearchTimer = null;
+                var domainSearchRequest = null;
+                var domainSearchSequence = 0;
 
                 $('.domain_lookup_form').on('submit', function(e) {
                     e.preventDefault();
-
-                    if (domainSearchInProgress) {
-                        return false;
-                    }
 
                     var domain = normalizeDomain($(this).find('.domain_lookup_input').val());
 
@@ -993,24 +992,54 @@
                     $('.showAvailability').empty();
                     $('.availability').empty();
 
-                    checkDomain(domain, $(this));
+                    checkDomain(domain, $(this), true);
                 });
 
-                function checkDomain(domain, form) {
+                $('.domain_lookup_input').on('input', function() {
+                    var input = $(this);
+                    var form = input.closest('.domain_lookup_form');
+                    var domain = normalizeDomain(input.val());
+
+                    clearTimeout(domainSearchTimer);
+
+                    if (domain.length < 2) {
+                        $('.showAvailability').empty();
+                        $('.availability').empty();
+                        if (domainSearchRequest) {
+                            domainSearchRequest.abort();
+                            domainSearchRequest = null;
+                        }
+                        return;
+                    }
+
+                    domainSearchTimer = setTimeout(function() {
+                        checkDomain(domain, form, false);
+                    }, 450);
+                });
+
+                function checkDomain(domain, form, force) {
                     var button = form.find('button[type=submit]');
                     var originalButtonHtml = button.data('original-html') || button.html();
+                    var sequence = ++domainSearchSequence;
                     button.data('original-html', originalButtonHtml);
 
-                    $.ajax({
+                    if (domainSearchRequest) {
+                        domainSearchRequest.abort();
+                    }
+
+                    domainSearchRequest = $.ajax({
                         url: "{{ route('search.domain') }}",
                         data: {
-                            domain: domain
+                            domain: domain,
+                            live: force ? 0 : 1
                         },
 
                         beforeSend: function(){
                             domainSearchInProgress = true;
                             $('.showAvailability').empty();
-                            button.prop('disabled', true).html(`<span class="whm-domain-btn-spinner"></span>@lang('Checking')`);
+                            if (force) {
+                                button.prop('disabled', true).html(`<span class="whm-domain-btn-spinner"></span>@lang('Checking')`);
+                            }
                             $('.availability').html(`
                                 <div class="whm-domain-result">
                                     <h5>@lang('Checking domain')...</h5>
@@ -1020,6 +1049,9 @@
                         },
                         
                         success: function(getResponse) {
+                            if (sequence !== domainSearchSequence) {
+                                return;
+                            }
                  
                             if (!getResponse['success']) {
                                 $('.availability').html(``);
@@ -1095,6 +1127,10 @@
                             }
                         },
                         error: function(error) {
+                            if (error.statusText === 'abort') {
+                                return;
+                            }
+
                             var errorMessage = error.responseJSON && error.responseJSON.messages ? error.responseJSON.messages : '@lang('Please try again.')';
 
                             $('.availability').html(`
@@ -1105,8 +1141,11 @@
                             `);
                         },
                         complete: function() {
-                            domainSearchInProgress = false;
-                            button.prop('disabled', false).html(originalButtonHtml);
+                            if (sequence === domainSearchSequence) {
+                                domainSearchInProgress = false;
+                                button.prop('disabled', false).html(originalButtonHtml);
+                                domainSearchRequest = null;
+                            }
                         }
                     });
 

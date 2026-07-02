@@ -305,6 +305,7 @@ class SiteController extends Controller
         $register = new Register($defaultDomainRegister->alias); //The Register is a class
         $register->command = 'searchDomain';
         $register->domain = $domain;
+        $register->request = $request;
         $execute = $register->run();
 
         if (!$execute['success']) {

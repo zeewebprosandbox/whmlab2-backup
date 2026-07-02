@@ -285,7 +285,8 @@ class Porkbun
         $domain = normalizeDomainSearchDomain($domain, $domainSetup);
         $sld = getSld($domain);
         $tld = getTld($domain);
-        $searchDomains = domainSearchCandidates($this->domain, $domainSetup, $this->singleSearch, 8);
+        $limit = $this->request && $this->request->boolean('live') ? 5 : 8;
+        $searchDomains = domainSearchCandidates($this->domain, $domainSetup, $this->singleSearch, $limit);
 
         try {
             if ($this->singleSearch) {
