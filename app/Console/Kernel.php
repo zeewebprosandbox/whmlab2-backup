@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel
         Commands\UpdatePermissions::class,
         Commands\CreateRolePermission::class,
         Commands\PushZodPanelVersion::class,
+        Commands\PullLiveZodPanelCustom::class,
     ];
     
     /**

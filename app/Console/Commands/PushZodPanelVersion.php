@@ -10,7 +10,12 @@ class PushZodPanelVersion extends Command
     protected $signature = 'zodpanel:version-push
         {description : Human-readable version description}
         {--whmlab-only : Push only the WHMLab Laravel repository}
-        {--zodpanel-only : Push only the ZodPanel custom Hestia repository}';
+        {--zodpanel-only : Push only the ZodPanel custom Hestia repository}
+        {--pull-live-zodpanel : Pull live zodpanel.zodhost.com custom files before committing}
+        {--zodpanel-host= : Live ZodPanel SSH host for --pull-live-zodpanel}
+        {--zodpanel-user= : Live ZodPanel SSH user for --pull-live-zodpanel}
+        {--zodpanel-password= : Live ZodPanel SSH password for --pull-live-zodpanel}
+        {--zodpanel-port= : Live ZodPanel SSH port for --pull-live-zodpanel}';
 
     protected $description = 'Commit and push WHMLab/ZodPanel custom repositories with one version description';
 
@@ -20,6 +25,15 @@ class PushZodPanelVersion extends Command
         if ($description === '') {
             $this->error('A version description is required.');
             return self::FAILURE;
+        }
+
+        if ($this->option('pull-live-zodpanel') && !$this->option('whmlab-only')) {
+            $this->call('zodpanel:pull-live', [
+                '--host' => $this->option('zodpanel-host') ?: null,
+                '--port' => $this->option('zodpanel-port') ?: null,
+                '--user' => $this->option('zodpanel-user') ?: null,
+                '--password' => $this->option('zodpanel-password') ?: null,
+            ]);
         }
 
         $repos = [];
