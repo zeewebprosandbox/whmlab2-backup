@@ -5,6 +5,7 @@ namespace App\DomainRegisters;
 use App\Models\AdminNotification;
 use App\Models\DomainRegister;
 use App\Models\DomainSetup;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class Porkbun
@@ -25,20 +26,49 @@ class Porkbun
 
     protected function api($endpoint, array $payload = [])
     {
-        $response = Http::asJson()->post($this->url.'/'.$endpoint, array_merge([
-            'apikey' => $this->porkbunAcc->api_key->value,
-            'secretapikey' => $this->porkbunAcc->secret_api_key->value,
-        ], $payload));
+        $apiKey = trim((string) ($this->porkbunAcc->api_key->value ?? ''));
+        $secretApiKey = trim((string) ($this->porkbunAcc->secret_api_key->value ?? ''));
 
-        if (!$response->successful()) {
-            return ['success' => false, 'message' => 'Porkbun API responded with HTTP '.$response->status()];
+        if ($apiKey === '' || $secretApiKey === '') {
+            return [
+                'success' => false,
+                'message' => 'Porkbun API key and secret API key are required. Add both credentials in Admin > Domain Registers.',
+                'code' => 'MISSING_CREDENTIALS',
+            ];
         }
 
+        $response = Http::asJson()
+            ->timeout(20)
+            ->post($this->url.'/'.$endpoint, array_merge([
+                'apikey' => $apiKey,
+                'secretapikey' => $secretApiKey,
+            ], $payload));
+
         $body = $response->json();
+        if (!is_array($body)) {
+            $body = [];
+        }
+
+        if (!$response->successful()) {
+            $message = $body['message'] ?? 'Porkbun API responded with HTTP '.$response->status();
+            $code = $body['code'] ?? 'HTTP_'.$response->status();
+            $hint = data_get($body, 'next_action.hint');
+
+            return [
+                'success' => false,
+                'message' => trim('Porkbun: '.$message.($hint ? ' '.$hint : '')),
+                'code' => $code,
+                'http_status' => $response->status(),
+                'retry_after' => $body['ttlRemaining'] ?? $response->header('X-RateLimit-Reset'),
+                'response' => $body,
+            ];
+        }
+
         if (($body['status'] ?? null) !== 'SUCCESS') {
             return [
                 'success' => false,
-                'message' => $body['message'] ?? $body['code'] ?? 'Porkbun API request failed',
+                'message' => 'Porkbun: '.($body['message'] ?? $body['code'] ?? 'Porkbun API request failed'),
+                'code' => $body['code'] ?? 'PORKBUN_ERROR',
                 'response' => $body,
             ];
         }
@@ -68,14 +98,25 @@ class Porkbun
         return array_values(array_filter([$this->register->ns1, $this->register->ns2, $this->register->ns3, $this->register->ns4]));
     }
 
-    protected function checkDomain($domain, $priceType = null)
+    protected function checkDomain($domain, $priceType = null, $cacheSeconds = 0)
     {
         $payload = [];
         if ($priceType) {
             $payload['priceType'] = $priceType;
         }
 
-        return $this->api('domain/checkDomain/'.$domain, $payload);
+        $callback = fn () => $this->api('domain/checkDomain/'.$domain, $payload);
+        if (!$cacheSeconds) {
+            return $callback();
+        }
+
+        return Cache::remember('porkbun.check.'.md5($domain.'|'.$priceType), $cacheSeconds, $callback);
+    }
+
+    protected function isRateLimitResponse(array $response)
+    {
+        return ($response['code'] ?? null) === 'RATE_LIMIT_EXCEEDED'
+            || ($response['http_status'] ?? null) === 429;
     }
 
     protected function availabilityFromResponse(array $response)
@@ -285,12 +326,13 @@ class Porkbun
         $domain = normalizeDomainSearchDomain($domain, $domainSetup);
         $sld = getSld($domain);
         $tld = getTld($domain);
-        $limit = $this->request && $this->request->boolean('live') ? 5 : 8;
+        $liveSearch = $this->request && $this->request->boolean('live');
+        $limit = 1;
         $searchDomains = domainSearchCandidates($this->domain, $domainSetup, $this->singleSearch, $limit);
 
         try {
             if ($this->singleSearch) {
-                $response = $this->checkDomain($domain);
+                $response = $this->checkDomain($domain, null, 300);
                 if (!$response['success']) {
                     return $response;
                 }
@@ -312,11 +354,17 @@ class Porkbun
             }
 
             $result = [];
+            $deferred = false;
             foreach ($searchDomains as $dataDomain) {
                 $dataTld = getTld($dataDomain);
-                $response = $this->checkDomain($dataDomain);
+                $response = $this->checkDomain($dataDomain, null, 300);
 
                 if (!$response['success']) {
+                    if ($this->isRateLimitResponse($response) && $liveSearch) {
+                        $deferred = true;
+                        break;
+                    }
+
                     return $response;
                 }
 
@@ -335,6 +383,8 @@ class Porkbun
                 'sld' => $sld,
                 'tld' => $tld,
                 'isSupported' => $isSupported,
+                'deferred' => $deferred,
+                'message' => $deferred ? 'Porkbun is rate-limited for live checks. Pause briefly or press Search for a full check.' : null,
                 'data' => $result,
             ];
         } catch (\Exception $error) {

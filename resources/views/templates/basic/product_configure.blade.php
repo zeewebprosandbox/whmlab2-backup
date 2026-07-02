@@ -1073,6 +1073,17 @@
                             }
 
                             var response = getResponse.result;
+                            if (response.deferred) {
+                                $('.availability').html(`
+                                    <div class="whm-domain-result">
+                                        <h5>@lang('Still checking')...</h5>
+                                        <p>${response.message || '@lang('Please pause briefly or press Search for a full availability check.')'}</p>
+                                    </div>
+                                `);
+                                $('.showAvailability').empty();
+                                return;
+                            }
+
                             var available = false;
 
                             var suggestions = [];

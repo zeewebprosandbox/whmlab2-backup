@@ -33,6 +33,17 @@
 
             function renderLiveRows(form, response) {
                 var box = form.find('.whm-live-domain-results');
+
+                if (response && response.result && response.result.deferred) {
+                    box.html(`
+                        <div class="domain-row whm-domain-result-row mt-3">
+                            <span>${response.result.message || '@lang('Please pause briefly or press Search for a full availability check.')'}</span>
+                            <small class="whm-domain-status whm-domain-status--available">@lang('Live')</small>
+                        </div>
+                    `);
+                    return;
+                }
+
                 var data = response && response.result && response.result.data ? response.result.data : [];
                 var rows = Array.isArray(data) ? data : Object.keys(data).map(function(domain) {
                     return {
