@@ -598,6 +598,56 @@ function getSld($domain){
     return explode('.', $domain)[0];
 }
 
+function domainSearchPrimaryExtension($domainSetup, $requestedTld = null)
+{
+    if ($requestedTld && $domainSetup->where('extension', $requestedTld)->first()) {
+        return $requestedTld;
+    }
+
+    $preferred = $domainSetup->where('extension', '.com')->first();
+    if ($preferred) {
+        return '.com';
+    }
+
+    return optional($domainSetup->first())->extension;
+}
+
+function normalizeDomainSearchDomain($domain, $domainSetup)
+{
+    $domain = strtolower(trim($domain));
+    $tld = getTld($domain);
+
+    if ($tld) {
+        return $domain;
+    }
+
+    $extension = domainSearchPrimaryExtension($domainSetup);
+    return $extension ? getSld($domain).$extension : $domain;
+}
+
+function domainSearchCandidates($domain, $domainSetup, $singleSearch = false, $limit = null)
+{
+    $domain = strtolower(trim($domain));
+    $sld = getSld($domain);
+    $primaryDomain = normalizeDomainSearchDomain($domain, $domainSetup);
+
+    if ($singleSearch) {
+        return [$primaryDomain];
+    }
+
+    $domains = [$primaryDomain];
+    foreach ($domainSetup as $setup) {
+        $domains[] = $sld.$setup->extension;
+    }
+
+    $domains = array_values(array_unique(array_filter($domains)));
+    if ($limit) {
+        $domains = array_slice($domains, 0, $limit);
+    }
+
+    return $domains;
+}
+
 function productType() {
     $array = [
         1 => 'Shared Hosting',

@@ -471,13 +471,15 @@ class Resell{
         $isSupported = true;
         $tlds = null;
 
-        $sld = getSld($domain);
-        $tld = getTld($domain);
-
         $domainSetup = DomainSetup::active()->with('pricing')->get(['id', 'extension']);
-        if($tld && !$domainSetup->where('extension', $tld)->first()){
+        $requestedTld = getTld($domain);
+        if($requestedTld && !$domainSetup->where('extension', $requestedTld)->first()){
             $isSupported = false;
         }
+
+        $domain = normalizeDomainSearchDomain($domain, $domainSetup);
+        $sld = getSld($domain);
+        $tld = getTld($domain);
 
         if($this->singleSearch){
             $tlds = substr($tld, 1);

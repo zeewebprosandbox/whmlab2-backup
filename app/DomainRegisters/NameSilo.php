@@ -403,23 +403,18 @@ class NameSilo
     public function searchDomain()
     {
         $domain = $this->domain;
-        $sld = getSld($domain);
-        $tld = getTld($domain);
         $isSupported = true;
 
         $domainSetup = DomainSetup::active()->with('pricing')->get(['id', 'extension']);
-        if ($tld && !$domainSetup->where('extension', $tld)->first()) {
+        $requestedTld = getTld($domain);
+        if ($requestedTld && !$domainSetup->where('extension', $requestedTld)->first()) {
             $isSupported = false;
         }
 
-        $searchDomains = [];
-        if ($this->singleSearch) {
-            $searchDomains[] = $domain;
-        } else {
-            foreach ($domainSetup as $setup) {
-                $searchDomains[] = $sld.$setup->extension;
-            }
-        }
+        $domain = normalizeDomainSearchDomain($domain, $domainSetup);
+        $sld = getSld($domain);
+        $tld = getTld($domain);
+        $searchDomains = domainSearchCandidates($this->domain, $domainSetup, $this->singleSearch);
 
         try {
             $response = $this->api('checkRegisterAvailability', [

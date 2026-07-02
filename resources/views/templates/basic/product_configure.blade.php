@@ -1009,11 +1009,12 @@
 
                         beforeSend: function(){
                             domainSearchInProgress = true;
+                            $('.showAvailability').empty();
                             button.prop('disabled', true).html(`<span class="whm-domain-btn-spinner"></span>@lang('Checking')`);
                             $('.availability').html(`
                                 <div class="whm-domain-result">
                                     <h5>@lang('Checking domain')...</h5>
-                                    <p>@lang('We are checking live registrar API availability.')</p>
+                                    <p>@lang('We are checking live registrar API availability and matching useful extensions.')</p>
                                 </div>
 	                            `);
                         },
@@ -1052,11 +1053,11 @@
                                 var setup = data.setup;
                                 var match = data.match;
 
-                                if(response.domain == domain && data.available){ 
+                                if(response.domain == domain && data.available && data.setup){ 
                                     available = true;
                                 }
 
-                                if(data.available && !match){  
+                                if(data.available && data.setup && !match){  
                                     suggestions.push(data);
                                 }
                             });
@@ -1134,7 +1135,7 @@
                         return;
                     }
 
-                    $('.showAvailability').append(`<p class="whm-domain-suggestion-title">@lang('Available alternatives')</p>`);
+                    $('.showAvailability').append(`<p class="whm-domain-suggestion-title">@lang('Available domain suggestions')</p>`);
 
                     suggestions.slice(0, 5).forEach(function(data) {
                         var priceValue = data.setup && data.setup.pricing && data.setup.pricing.firstPrice ? data.setup.pricing.firstPrice.price : 0;

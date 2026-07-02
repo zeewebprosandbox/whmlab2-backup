@@ -274,16 +274,18 @@ class Porkbun
     public function searchDomain()
     {
         $domain = $this->domain;
-        $sld = getSld($domain);
-        $tld = getTld($domain);
         $isSupported = true;
 
         $domainSetup = DomainSetup::active()->with('pricing')->get(['id', 'extension']);
-        if ($tld && !$domainSetup->where('extension', $tld)->first()) {
+        $requestedTld = getTld($domain);
+        if ($requestedTld && !$domainSetup->where('extension', $requestedTld)->first()) {
             $isSupported = false;
         }
 
-        $searchDomains = $this->singleSearch ? [$domain] : [$domain];
+        $domain = normalizeDomainSearchDomain($domain, $domainSetup);
+        $sld = getSld($domain);
+        $tld = getTld($domain);
+        $searchDomains = domainSearchCandidates($this->domain, $domainSetup, $this->singleSearch, 8);
 
         try {
             if ($this->singleSearch) {

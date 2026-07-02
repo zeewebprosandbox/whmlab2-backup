@@ -46,7 +46,7 @@
                     <div class="domain-row whm-domain-result-row">
                         <span>{{ @$data['domain'] }}</span>
                         <div class="text-end">
-                            @if(@$data['available'])
+                            @if(@$data['available'] && @$data['setup'])
                                 <small class="whm-domain-status whm-domain-status--available">@lang('Available')</small>
                                 <strong class="fw-bold text-end">
                                     {{ showAmount(@$data['setup']->pricing->firstPrice['price'] ?? 0) }}

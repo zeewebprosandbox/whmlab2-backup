@@ -500,21 +500,18 @@ class Namecheap{
         $domains = null;
         
         $isSupported = true;
-        $sld = getSld($domain);
-        $tld = getTld($domain);
-
         $domainSetup = DomainSetup::active()->with('pricing')->get(['id', 'extension']);
-        if($tld && !$domainSetup->where('extension', $tld)->first()){
+        $requestedTld = getTld($domain);
+        if($requestedTld && !$domainSetup->where('extension', $requestedTld)->first()){
             $isSupported = false;
         }
 
-        if($this->singleSearch){
-            $domains = $domain;
-        }else{
-            foreach($domainSetup as $data){
-                $domains .= "$sld$data->extension,";
-            }
-        }
+        $domain = normalizeDomainSearchDomain($domain, $domainSetup);
+        $sld = getSld($domain);
+        $tld = getTld($domain);
+        $searchDomains = domainSearchCandidates($this->domain, $domainSetup, $this->singleSearch);
+
+        $domains = implode(',', $searchDomains);
 
         try{
             $response = Http::get($this->url, [
