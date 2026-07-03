@@ -976,7 +976,6 @@
                 var hideElement = $('.hideElement');
                 var domainArea = $('.domainArea');
                 var domainSearchInProgress = false;
-                var domainSearchTimer = null;
                 var domainSearchRequest = null;
                 var domainSearchSequence = 0;
 
@@ -995,28 +994,6 @@
                     checkDomain(domain, $(this), true);
                 });
 
-                $('.domain_lookup_input').on('input', function() {
-                    var input = $(this);
-                    var form = input.closest('.domain_lookup_form');
-                    var domain = normalizeDomain(input.val());
-
-                    clearTimeout(domainSearchTimer);
-
-                    if (domain.length < 2) {
-                        $('.showAvailability').empty();
-                        $('.availability').empty();
-                        if (domainSearchRequest) {
-                            domainSearchRequest.abort();
-                            domainSearchRequest = null;
-                        }
-                        return;
-                    }
-
-                    domainSearchTimer = setTimeout(function() {
-                        checkDomain(domain, form, false);
-                    }, 450);
-                });
-
                 function checkDomain(domain, form, force) {
                     var button = form.find('button[type=submit]');
                     var originalButtonHtml = button.data('original-html') || button.html();
@@ -1031,7 +1008,7 @@
                         url: "{{ route('search.domain') }}",
                         data: {
                             domain: domain,
-                            live: force ? 0 : 1
+                            live: 0
                         },
 
                         beforeSend: function(){
