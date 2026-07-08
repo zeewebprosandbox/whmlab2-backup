@@ -17,6 +17,19 @@
 
     $firstCategory = $categories->first();
 
+    $heroMetrics = [
+        ['value' => $categories->count() ?: '6+', 'label' => __('service lanes')],
+        ['value' => $tlds->count() ?: '24+', 'label' => __('domain zones')],
+        ['value' => __('24/7'), 'label' => __('support flow')],
+    ];
+
+    $heroPills = $categories->take(4)->map(function ($category) {
+        return [
+            'name' => __($category->name),
+            'icon' => str_contains($category->slug, 'domain') ? 'globe-2' : (str_contains($category->slug, 'vps') || str_contains($category->slug, 'dedicated') ? 'server-cog' : 'box'),
+        ];
+    })->values();
+
     $opsCards = [
         ['icon' => 'cpu', 'label' => __('Compute'), 'value' => __('VPS nodes'), 'tone' => 'blue'],
         ['icon' => 'globe-2', 'label' => __('Domains'), 'value' => __('DNS ready'), 'tone' => 'teal'],
@@ -36,27 +49,49 @@
     <section class="zod-home-hero">
         <div class="zod-hero-copy">
             <div class="zod-hero-kicker">
-                <i data-lucide="sparkles"></i>
-                @lang('Cloud hosting control room')
+                <i data-lucide="shield-check"></i>
+                @lang('Production-ready hosting workspace')
             </div>
-            <h1>@lang('Launch hosting, VPS, domains, and support from one sharp workspace.')</h1>
-            <p>@lang('ZodHost turns ordering, provisioning, renewals, domains, and helpdesk work into one clean path for customers and admins.')</p>
+            <h1>@lang('Hosting made clear, fast, and ready to sell.')</h1>
+            <p>@lang('Bring hosting, VPS, domains, billing, SSL visibility, and support into one polished customer workspace built for clean purchasing and confident service management.')</p>
             <div class="zod-hero-actions">
                 @if($firstCategory)
                     <a href="{{ route('service.category', $firstCategory->slug) }}" class="zod-btn zod-btn-primary">
-                        <i data-lucide="rocket"></i> @lang('Start a Service')
+                        <i data-lucide="rocket"></i> @lang('Browse Services')
                     </a>
                 @endif
                 <a href="{{ route('register.domain') }}" class="zod-btn zod-btn-ghost">
                     <i data-lucide="scan-search"></i> @lang('Search Domain')
                 </a>
             </div>
+            <div class="zod-hero-metrics" aria-label="@lang('ZodHost platform highlights')">
+                @foreach($heroMetrics as $metric)
+                    <div>
+                        <strong>{{ $metric['value'] }}</strong>
+                        <span>{{ $metric['label'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+            @if($heroPills->count())
+                <div class="zod-hero-pills" aria-label="@lang('Available service categories')">
+                    @foreach($heroPills as $pill)
+                        <span><i data-lucide="{{ $pill['icon'] }}"></i>{{ $pill['name'] }}</span>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         <div class="zod-hero-console" aria-label="@lang('ZodHost operations console preview')">
             <div class="zod-console-top">
                 <span></span><span></span><span></span>
-                <strong>@lang('ZodHost Ops')</strong>
+                <strong>@lang('Live Service Desk')</strong>
+            </div>
+            <div class="zod-console-command">
+                <div>
+                    <span>@lang('Command center')</span>
+                    <strong>@lang('New hosting order')</strong>
+                </div>
+                <b>@lang('In progress')</b>
             </div>
             <div class="zod-console-grid">
                 @foreach($opsCards as $card)
@@ -75,9 +110,13 @@
                 <div class="zod-flow-node"><i data-lucide="smile"></i></div>
             </div>
             <div class="zod-console-list">
-                <div><span>@lang('Next order')</span><strong>@lang('VPS package approval')</strong><b>@lang('Ready')</b></div>
-                <div><span>@lang('Panel')</span><strong>@lang('WHMPanel / ZodPanel')</strong><b>@lang('Synced')</b></div>
-                <div><span>@lang('Client')</span><strong>@lang('Invoices, services, tickets')</strong><b>@lang('Live')</b></div>
+                <div><span>@lang('Checkout')</span><strong>@lang('Service, domain, invoice attached')</strong><b>@lang('Clean')</b></div>
+                <div><span>@lang('Panel')</span><strong>@lang('WHMPanel / ZodPanel access ready')</strong><b>@lang('Synced')</b></div>
+                <div><span>@lang('Support')</span><strong>@lang('Tickets linked to active products')</strong><b>@lang('Live')</b></div>
+            </div>
+            <div class="zod-console-footer">
+                <span><i data-lucide="lock-keyhole"></i>@lang('Secure client area')</span>
+                <span><i data-lucide="refresh-cw"></i>@lang('Renewals visible')</span>
             </div>
         </div>
     </section>
@@ -99,9 +138,8 @@
         </div>
 
         <div class="zod-billing-strip" role="group" aria-label="@lang('Billing period')">
-            <button type="button" data-billing-period="daily">@lang('Daily view')</button>
             <button type="button" class="active" data-billing-period="monthly">@lang('Monthly')</button>
-            <button type="button" data-billing-period="annually">@lang('Yearly value')</button>
+            <button type="button" data-billing-period="weekly">@lang('Weekly')</button>
         </div>
 
         <div class="zod-lane-panels">
@@ -117,11 +155,10 @@
                     </div>
 
                     <div class="zod-plan-strip">
-                        @foreach($category->products->take(4) as $product)
+                        @foreach($category->products->take(3) as $product)
                             @php
                                 $monthly = (float) $product->price->monthly;
-                                $annually = (float) $product->price->annually;
-                                $yearlyMonthly = $annually > 0 ? $annually / 12 : $monthly;
+                                $weekly = $monthly > 0 ? $monthly / 4.33 : 0;
                                 $features = collect(explode("\n", strip_tags($product->description)))->filter()->take(4);
                             @endphp
                             <article class="zod-plan-tile">
@@ -131,9 +168,8 @@
                                 </div>
                                 <div class="zod-plan-price">
                                     <strong
-                                        data-daily="{{ getAmount($monthly / 30) }}"
                                         data-monthly="{{ getAmount($monthly) }}"
-                                        data-annually="{{ getAmount($yearlyMonthly) }}"
+                                        data-weekly="{{ getAmount($weekly) }}"
                                     >{{ gs('cur_sym') }}{{ getAmount($monthly) }}</strong>
                                     <small data-period-label>@lang('/month')</small>
                                 </div>
@@ -234,13 +270,7 @@
                     $(this).text('{{ gs('cur_sym') }}' + value);
                 });
 
-                var label = '{{ __('/month') }}';
-                if (period === 'daily') {
-                    label = '{{ __('/day estimate') }}';
-                }
-                if (period === 'annually') {
-                    label = '{{ __('/month, billed yearly') }}';
-                }
+                var label = period === 'weekly' ? '{{ __('/week') }}' : '{{ __('/month') }}';
                 $('[data-period-label]').text(label);
             });
         })(jQuery);

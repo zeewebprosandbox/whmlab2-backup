@@ -115,7 +115,13 @@
                                         @elseif($moduleKey === 'file_manager')
                                             <a class="btn secondary" href="{{ route('whmpanel.websites.show', $website->domain) }}"><i data-lucide="folder-open"></i>Open root</a>
                                         @elseif($moduleKey === 'terminal')
-                                            <span class="badge planned">Live terminal policy pending</span>
+                                            <form method="post" action="{{ route('whmpanel.terminal.open') }}" target="_blank">
+                                                @csrf
+                                                <input type="hidden" name="website_id" value="{{ $website->id }}">
+                                                <input type="hidden" name="path" value="public_html">
+                                                <input type="hidden" name="mode" value="open">
+                                                <button class="btn secondary" type="submit"><i data-lucide="square-terminal"></i>Open terminal</button>
+                                            </form>
                                         @else
                                             <a class="btn secondary" href="{{ route('whmpanel.websites.show', $website->domain) }}"><i data-lucide="settings-2"></i>Open</a>
                                         @endif
@@ -131,7 +137,36 @@
         </div>
 
         <aside class="card">
-            @if($isCreateModule)
+            @if($moduleKey === 'terminal')
+                <div class="card-head">
+                    <div>
+                        <h3>Run website command</h3>
+                        <p>Commands run as the hosting account inside the selected website directory on the VPS.</p>
+                    </div>
+                </div>
+                <form method="post" action="{{ route('whmpanel.terminal.open') }}" class="grid">
+                    @csrf
+                    <input type="hidden" name="mode" value="run">
+                    <div class="field">
+                        <label for="terminal_website_id">Domain</label>
+                        <select id="terminal_website_id" name="website_id" required>
+                            <option value="">Select domain</option>
+                            @foreach($websites as $website)
+                                <option value="{{ $website->id }}">{{ $website->domain }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="terminal_path">Directory</label>
+                        <input id="terminal_path" name="path" value="public_html" placeholder="public_html">
+                    </div>
+                    <div class="field">
+                        <label for="terminal_command">Command</label>
+                        <input id="terminal_command" name="command" placeholder="php artisan cache:clear" required>
+                    </div>
+                    <button class="btn" type="submit"><i data-lucide="play"></i>Run command</button>
+                </form>
+            @elseif($isCreateModule)
                 <div class="card-head">
                     <div>
                         <h3>{{ $serviceModule['primaryAction'] }}</h3>
@@ -175,11 +210,6 @@
                             <label for="startup">Startup command</label>
                             <input id="startup" name="startup" placeholder="{{ $moduleKey === 'python' ? 'gunicorn app:app' : 'npm start' }}">
                         </div>
-                    @elseif($moduleKey === 'terminal')
-                        <div class="field">
-                            <label for="path">Safe path</label>
-                            <input id="path" name="path" placeholder="/home/user/web/example.com/public_html">
-                        </div>
                     @elseif($moduleKey === 'security')
                         <div class="field">
                             <label for="target">Target</label>
@@ -217,6 +247,19 @@
             @endif
         </aside>
     </section>
+
+    @if(session('terminal_output'))
+        @php($terminalOutput = session('terminal_output'))
+        <section class="card" style="margin-top:18px">
+            <div class="card-head">
+                <div>
+                    <h3>Terminal output</h3>
+                    <p>{{ $terminalOutput['domain'] ?? '' }} · {{ $terminalOutput['path'] ?? '' }} · exit {{ $terminalOutput['exit_code'] ?? 'n/a' }}</p>
+                </div>
+            </div>
+            <pre style="white-space:pre-wrap;overflow:auto;max-height:420px;background:#0f172a;color:#e5e7eb;border-radius:10px;padding:16px">{{ $terminalOutput['output'] ?? '' }}</pre>
+        </section>
+    @endif
 
     <section class="card" style="margin-top:18px">
         <div class="card-head">

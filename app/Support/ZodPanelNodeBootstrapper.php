@@ -197,7 +197,7 @@ class ZodPanelNodeBootstrapper
 
     private function finalizeNode(): void
     {
-        $this->runOrFail('chown -R root:root /usr/local/hestia/bin/v-zodpanel-save-package-features /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-add-user-pma-temp-user 2>/dev/null || true');
+        $this->runOrFail('chown -R root:root /usr/local/hestia/bin/v-zodpanel-save-package-features /usr/local/hestia/bin/v-zodpanel-run-domain-command /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-add-user-pma-temp-user 2>/dev/null || true');
         $this->runOrFail('systemctl restart hestia 2>/dev/null || service hestia restart 2>/dev/null || true');
     }
 

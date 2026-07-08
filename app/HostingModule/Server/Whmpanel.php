@@ -964,13 +964,56 @@ class Whmpanel implements HostingManagerInterface
                 $hosting->server,
                 'get',
                 'users/' . $hosting->username . '/terminal',
-                ['path' => $data['path'] ?? null]
+                [
+                    'domain' => $data['domain'] ?? $hosting->domain,
+                    'path' => $data['path'] ?? null,
+                ]
             );
         }
 
         return [
             'success' => false,
             'message' => 'Live terminal URLs require a ZodPanel bridge server',
+        ];
+    }
+
+    public function runTerminalCommand($data): array
+    {
+        $hosting = $data['hosting'] ?? $data;
+        $domain = $data['domain'] ?? $hosting?->domain;
+        $command = trim((string) ($data['command'] ?? ''));
+
+        if (!$hosting || !$domain || $command === '') {
+            return [
+                'success' => false,
+                'message' => 'A ZodPanel service, domain, and command are required',
+            ];
+        }
+
+        if ($this->usesBridge($hosting->server) && $hosting->username) {
+            $response = $this->bridgeRequest(
+                $hosting->server,
+                'post',
+                'users/' . $hosting->username . '/terminal/run/' . $domain,
+                [
+                    'command' => $command,
+                    'path' => $data['path'] ?? 'public_html',
+                    'timeout' => $data['timeout'] ?? 30,
+                ],
+                140
+            );
+
+            if (array_key_exists('success', (array) ($response['data'] ?? []))) {
+                $response['success'] = (bool) $response['data']['success'];
+                $response['message'] = $response['data']['message'] ?? $response['message'];
+            }
+
+            return $response;
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Live terminal commands require a ZodPanel bridge server',
         ];
     }
 

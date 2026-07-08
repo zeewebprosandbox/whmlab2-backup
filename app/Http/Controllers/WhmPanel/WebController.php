@@ -227,27 +227,65 @@ class WebController extends Controller
     public function openTerminal(Request $request)
     {
         $request->validate([
-            'website_id' => 'nullable|exists:whm_panel_websites,id',
+            'website_id' => 'required|exists:whm_panel_websites,id',
             'path' => 'nullable|string|max:255',
+            'command' => 'nullable|string|max:4000',
+            'mode' => 'nullable|in:open,run',
         ]);
 
-        $website = $request->website_id ? WhmPanelWebsite::with('account')->findOrFail($request->website_id) : null;
+        $website = WhmPanelWebsite::with('account.hosting.server.group')->findOrFail($request->website_id);
+        $hosting = $this->hostingForWebsite($website);
+
+        if (!$hosting) {
+            return back()->with('status', 'This domain is not attached to a live ZodPanel hosting service.');
+        }
+
+        $path = $request->path ?: 'public_html';
+        $mode = $request->input('mode', $request->filled('command') ? 'run' : 'open');
+        $execute = $mode === 'run'
+            ? $this->zodPanelAction($hosting, 'runTerminalCommand', [
+                'domain' => $website->domain,
+                'path' => $path,
+                'command' => (string) $request->command,
+            ])
+            : $this->zodPanelAction($hosting, 'terminalUrl', [
+                'domain' => $website->domain,
+                'path' => $path,
+            ]);
+
+        if (!@$execute['success'] && $mode !== 'run') {
+            return back()->with('status', @$execute['message'] ?: 'Live terminal is not available for this package.');
+        }
 
         WhmPanelServiceItem::create([
             'account_id' => $website?->account_id,
             'website_id' => $website?->id,
             'module' => 'terminal',
-            'type' => 'open',
+            'type' => $mode,
             'name' => 'Terminal session' . ($website ? ' for ' . $website->domain : ''),
-            'status' => 'recorded',
+            'status' => @$execute['success'] ? 'completed' : 'failed',
             'config' => [
-                'path' => $request->path ?: ($website?->document_root ?: '/home'),
+                'path' => $path,
+                'command' => $mode === 'run' ? $request->command : null,
+                'live_response' => $this->redactSecrets($execute['data'] ?? null),
                 'policy' => 'non-root browser terminal audit',
             ],
             'last_checked_at' => now(),
         ]);
 
-        return back()->with('status', 'Terminal audit recorded. Live terminal opens on eligible non-root packages only.');
+        if ($mode === 'open' && @$execute['data']['url']) {
+            return redirect()->away($execute['data']['url']);
+        }
+
+        return back()
+            ->with('status', @$execute['message'] ?: 'Terminal command completed.')
+            ->with('terminal_output', [
+                'domain' => $website->domain,
+                'path' => data_get($execute, 'data.path', $path),
+                'command' => $request->command,
+                'exit_code' => data_get($execute, 'data.exit_code'),
+                'output' => data_get($execute, 'data.output', @$execute['message']),
+            ]);
     }
 
     public function sso(Request $request)
