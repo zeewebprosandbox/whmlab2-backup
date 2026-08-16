@@ -201,6 +201,9 @@ class ZodPanelNodeBootstrapper
                 "Hestia installer failed (Exit code {$status}).\n\n" . $output
             );
         }
+
+        $this->run('/usr/local/hestia/bin/v-change-sys-config-value ENFORCE_SUBDOMAIN_OWNERSHIP no 2>/dev/null || true');
+        $this->run('sed -i \'s/ENFORCE_SUBDOMAIN_OWNERSHIP=.*/ENFORCE_SUBDOMAIN_OWNERSHIP="no"/\' /usr/local/hestia/conf/hestia.conf 2>/dev/null || true');
     }
 
     private function syncCustomFiles(): void
