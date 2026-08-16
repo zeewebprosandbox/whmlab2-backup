@@ -98,6 +98,7 @@ class ZodPanelNodeBootstrapper
             }
 
             $this->syncCustomFiles();
+            $this->installNodejs();
 
             if ($token) {
                 $this->writeNodeEnvironment($token);
@@ -352,6 +353,13 @@ class ZodPanelNodeBootstrapper
     private function line(string $message): void
     {
         $this->log[] = '[' . now()->format('Y-m-d H:i:s') . '] ' . $message;
+    }
+
+    private function installNodejs(): void
+    {
+        $this->line('Installing Node.js 22 LTS and PM2 process manager...');
+        $this->run('which node && node -v || (curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs build-essential)');
+        $this->run('which pm2 || npm install -g pm2 yarn pnpm');
     }
 
     private function fail(string $message, array $extra = []): array
