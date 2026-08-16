@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# zodpanel-ssl-sync — ZodPanel Continuous Auto-SSL Engine
+# Triggers instant 0-second SAN SSL, Force HTTPS, and background Let's Encrypt certificate resolution.
+
+USER="$1"
+DOMAIN="$2"
+
+SCRIPT_PATH="/usr/local/hestia/bin/v-configure-zodpanel-ssl-automation"
+if [ ! -f "$SCRIPT_PATH" ]; then
+    SCRIPT_PATH="/tmp/v-configure-zodpanel-ssl-automation"
+fi
+
+if [ -f "$SCRIPT_PATH" ]; then
+    bash "$SCRIPT_PATH" "$USER" "$DOMAIN"
+else
+    echo "Error: SSL provisioner script not found at $SCRIPT_PATH" >&2
+    exit 1
+fi

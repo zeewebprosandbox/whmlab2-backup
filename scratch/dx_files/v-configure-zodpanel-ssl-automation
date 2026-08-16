@@ -1,40 +1,110 @@
 #!/usr/bin/env bash
 # ZodPanel 100% Instant Auto-SSL Provisioner Engine
-# Stage 1: Instantly provisions SSL & Force HTTPS for all domains (0 seconds wait time)
+# Stage 1: Instantly provisions SSL with Subject Alternative Names (SANs) & Force HTTPS for all domains/subdomains (0 seconds wait time)
 # Stage 2: Upgrades to official Let's Encrypt SSL as soon as ACME challenge validates
 
-for user_conf in /usr/local/hestia/data/users/*/web.conf; do
-    [ -f "$user_conf" ] || continue
-    USER=$(echo "$user_conf" | awk -F'/' '{print $7}')
-    
-    while IFS= read -r line; do
-        DOMAIN=$(echo "$line" | grep -oP "DOMAIN='\K[^']+")
-        SSL=$(echo "$line" | grep -oP "SSL='\K[^']+")
-        LETSENCRYPT=$(echo "$line" | grep -oP "LETSENCRYPT='\K[^']+")
-        
-        if [ -n "$DOMAIN" ]; then
-            # Stage 1: Instant SSL & Force HTTPS if SSL='no'
-            if [ "$SSL" = "no" ]; then
-                echo "Stage 1 Instant SSL for $USER -> $DOMAIN..."
-                rm -rf "/tmp/ssl_$DOMAIN"
-                mkdir -p "/tmp/ssl_$DOMAIN"
-                openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-                    -keyout "/tmp/ssl_$DOMAIN/$DOMAIN.key" \
-                    -out "/tmp/ssl_$DOMAIN/$DOMAIN.crt" \
-                    -subj "/C=US/ST=California/L=San Francisco/O=ZodPanel/CN=$DOMAIN" >/dev/null 2>&1
-                
-                if [ -f "/tmp/ssl_$DOMAIN/$DOMAIN.crt" ]; then
-                    /usr/local/hestia/bin/v-add-web-domain-ssl "$USER" "$DOMAIN" "/tmp/ssl_$DOMAIN" 'yes' >/dev/null 2>&1
-                    /usr/local/hestia/bin/v-add-web-domain-ssl-force "$USER" "$DOMAIN" >/dev/null 2>&1
-                    rm -rf "/tmp/ssl_$DOMAIN"
-                fi
-            fi
-            
-            # Stage 2: Attempt Let's Encrypt upgrade if LETSENCRYPT='no'
-            if [ "$LETSENCRYPT" = "no" ]; then
-                echo "Stage 2 Let's Encrypt upgrade for $USER -> $DOMAIN..."
-                /usr/local/hestia/bin/v-add-letsencrypt-domain "$USER" "$DOMAIN" '' 'yes' >/dev/null 2>&1
-            fi
+TARGET_USER="$1"
+TARGET_DOMAIN="$2"
+
+process_domain() {
+    local USER="$1"
+    local DOMAIN="$2"
+    local SSL="$3"
+    local LETSENCRYPT="$4"
+    local ALIASES="$5"
+
+    [ -n "$DOMAIN" ] || return 0
+
+    # Stage 1: Instant SAN SSL & Force HTTPS if SSL='no' or cert missing
+    if [ "$SSL" = "no" ] || [ ! -f "/usr/local/hestia/data/users/$USER/ssl/$DOMAIN.crt" ]; then
+        echo "[Stage 1] Instant Auto-SSL with SAN for $USER -> $DOMAIN..."
+        rm -rf "/tmp/ssl_$DOMAIN"
+        mkdir -p "/tmp/ssl_$DOMAIN"
+
+        cat <<EOF > "/tmp/ssl_$DOMAIN/san.cnf"
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Francisco
+O = ZodPanel AutoSSL
+CN = $DOMAIN
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = $DOMAIN
+DNS.2 = *.$DOMAIN
+DNS.3 = www.$DOMAIN
+DNS.4 = mail.$DOMAIN
+DNS.5 = webmail.$DOMAIN
+EOF
+
+        openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+            -config "/tmp/ssl_$DOMAIN/san.cnf" \
+            -keyout "/tmp/ssl_$DOMAIN/$DOMAIN.key" \
+            -out "/tmp/ssl_$DOMAIN/$DOMAIN.crt" >/dev/null 2>&1
+
+        if [ -f "/tmp/ssl_$DOMAIN/$DOMAIN.crt" ]; then
+            /usr/local/hestia/bin/v-add-web-domain-ssl "$USER" "$DOMAIN" "/tmp/ssl_$DOMAIN" 'yes' >/dev/null 2>&1
+            /usr/local/hestia/bin/v-add-web-domain-ssl-force "$USER" "$DOMAIN" >/dev/null 2>&1
+            echo "[Stage 1 Success] SAN SSL & Force HTTPS active for $DOMAIN"
         fi
-    done < "$user_conf"
-done
+        rm -rf "/tmp/ssl_$DOMAIN"
+    fi
+
+    # Ensure Force HTTPS is always enabled
+    /usr/local/hestia/bin/v-add-web-domain-ssl-force "$USER" "$DOMAIN" >/dev/null 2>&1
+
+    # Stage 2: Attempt Let's Encrypt upgrade if LETSENCRYPT='no'
+    if [ "$LETSENCRYPT" = "no" ]; then
+        echo "[Stage 2] Let's Encrypt upgrade for $USER -> $DOMAIN..."
+        LE_ALIASES="${ALIASES//,/ }"
+        /usr/local/hestia/bin/v-add-letsencrypt-domain "$USER" "$DOMAIN" "$LE_ALIASES" 'yes' >/dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "[Stage 2 Success] Official Let's Encrypt SSL active for $DOMAIN"
+        else
+            echo "[Stage 2 Pending] Retrying Let's Encrypt challenge on next run for $DOMAIN"
+        fi
+    fi
+}
+
+if [ -n "$TARGET_USER" ] && [ -n "$TARGET_DOMAIN" ]; then
+    USER_CONF="/usr/local/hestia/data/users/$TARGET_USER/web.conf"
+    if [ -f "$USER_CONF" ]; then
+        while IFS= read -r line; do
+            DOMAIN=$(echo "$line" | grep -oP "DOMAIN='\K[^']+")
+            if [ "$DOMAIN" = "$TARGET_DOMAIN" ]; then
+                SSL=$(echo "$line" | grep -oP "SSL='\K[^']+")
+                LETSENCRYPT=$(echo "$line" | grep -oP "LETSENCRYPT='\K[^']+")
+                ALIASES=$(echo "$line" | grep -oP "ALIAS='\K[^']+")
+                process_domain "$TARGET_USER" "$DOMAIN" "$SSL" "$LETSENCRYPT" "$ALIASES"
+            fi
+        done < "$USER_CONF"
+    fi
+else
+    for user_conf in /usr/local/hestia/data/users/*/web.conf; do
+        [ -f "$user_conf" ] || continue
+        USER=$(echo "$user_conf" | awk -F'/' '{print $7}')
+        
+        while IFS= read -r line; do
+            DOMAIN=$(echo "$line" | grep -oP "DOMAIN='\K[^']+")
+            SSL=$(echo "$line" | grep -oP "SSL='\K[^']+")
+            LETSENCRYPT=$(echo "$line" | grep -oP "LETSENCRYPT='\K[^']+")
+            ALIASES=$(echo "$line" | grep -oP "ALIAS='\K[^']+")
+            
+            if [ -n "$DOMAIN" ]; then
+                process_domain "$USER" "$DOMAIN" "$SSL" "$LETSENCRYPT" "$ALIASES"
+            fi
+        done < "$user_conf"
+    done
+fi
+
+# Reload web server configurations
+systemctl reload nginx 2>/dev/null || service nginx reload 2>/dev/null || true
+systemctl reload apache2 2>/dev/null || service apache2 reload 2>/dev/null || true
+
