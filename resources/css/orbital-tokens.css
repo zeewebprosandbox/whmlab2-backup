@@ -1,0 +1,132 @@
+/* ============================================================
+   Orbital Minimalism — Design Tokens & CSS Variables
+   WHM/cPanel Billing Platform Redesign
+   ============================================================ */
+
+:root {
+  /* Color Palette */
+  --bg-primary: #0A0A0B;
+  --bg-secondary: #141416;
+  --bg-tertiary: #1C1C1F;
+  --bg-elevated: #242429;
+
+  --border-primary: rgba(255, 255, 255, 0.06);
+  --border-secondary: rgba(255, 255, 255, 0.10);
+  --border-hover: rgba(255, 255, 255, 0.16);
+
+  --text-primary: #F5F5F7;
+  --text-secondary: #8E8E93;
+  --text-tertiary: #48484F;
+
+  --accent-primary: #6366F1;   /* Indigo */
+  --accent-secondary: #22D3EE; /* Cyan */
+  --accent-tertiary: #FB7185;  /* Rose */
+  --accent-quaternary: #FBBF24;/* Amber */
+
+  --gradient-accent: linear-gradient(135deg, #6366F1 0%, #22D3EE 100%);
+  --gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+  --glass-overlay: rgba(20, 20, 22, 0.80);
+
+  /* Geometry & Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.40);
+  --shadow-elevation-3: 0 12px 40px rgba(0, 0, 0, 0.50);
+  --shadow-glow-accent: 0 0 20px rgba(99, 102, 241, 0.20);
+  --shadow-glow-cyan: 0 0 20px rgba(34, 211, 238, 0.20);
+  --shadow-glow-rose: 0 0 20px rgba(251, 113, 133, 0.20);
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Physics Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Dark Mode Base Overrides */
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  color-scheme: dark;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--bg-primary);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Shimmer Skeleton Animation */
+@keyframes orbital-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: orbital-shimmer 1.5s infinite linear;
+}
+
+/* Mesh Gradient background animation */
+@keyframes orbital-mesh-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+.mesh-blob-1 {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(99, 102, 241, 0) 70%);
+  filter: blur(60px);
+  animation: orbital-mesh-float 18s ease-in-out infinite;
+}
+
+.mesh-blob-2 {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, rgba(34, 211, 238, 0) 70%);
+  filter: blur(60px);
+  animation: orbital-mesh-float 14s ease-in-out infinite reverse;
+}
+
+/* Status Orb pulse */
+@keyframes orb-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.9); }
+}
+
+.orb-pulse {
+  animation: orb-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

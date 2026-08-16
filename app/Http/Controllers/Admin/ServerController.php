@@ -100,10 +100,15 @@ class ServerController extends Controller{
                 return back()->withNotify($notify)->withInput();
             }
 
-            $bootstrapResult = app(ZodPanelNodeBootstrapper::class)->bootstrap($this->bootstrapCredentials($request), [
-                'clean' => $request->boolean('clean_server_confirmed'),
-                'token' => $request->api_token ?: Str::random(64),
-            ]);
+            try {
+                $bootstrapResult = app(ZodPanelNodeBootstrapper::class)->bootstrap($this->bootstrapCredentials($request), [
+                    'clean' => $request->boolean('clean_server_confirmed'),
+                    'token' => $request->api_token ?: Str::random(64),
+                ]);
+            } catch (\Throwable $e) {
+                $notify[] = ['error', 'ZodPanel Bootstrap Exception: ' . $e->getMessage()];
+                return back()->withNotify($notify)->withInput();
+            }
 
             if (!$bootstrapResult['success']) {
                 $notify[] = ['error', $bootstrapResult['message']];
@@ -216,7 +221,12 @@ class ServerController extends Controller{
                 return back()->withNotify($notify);
             }
 
-            $syncResult = app(ZodPanelNodeBootstrapper::class)->syncCustomLayer($this->bootstrapCredentials($request), $request->api_token ?: $server->api_token);
+            try {
+                $syncResult = app(ZodPanelNodeBootstrapper::class)->syncCustomLayer($this->bootstrapCredentials($request), $request->api_token ?: $server->api_token);
+            } catch (\Throwable $e) {
+                $notify[] = ['error', 'ZodPanel Sync Exception: ' . $e->getMessage()];
+                return back()->withNotify($notify);
+            }
             if (!$syncResult['success']) {
                 $notify[] = ['error', $syncResult['message']];
                 return back()->withNotify($notify)->with('zodpanel_bootstrap_log', $syncResult['log'] ?? []);

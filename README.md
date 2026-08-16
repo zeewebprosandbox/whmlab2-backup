@@ -1,39 +1,116 @@
-# WHMLab
+# WHM/cPanel Billing Platform — Next.js 14 & Laravel 11 Workspace
 
-WHMLab is a Laravel-based hosting billing and management system. The public website, client area, cart, invoices, support, and admin control panel are served by the same app, with optional subdomain routing for the control panel.
+A high-performance, modern WHM/cPanel Billing & Server Management Platform featuring an ultra-clean **Next.js 14+ (App Router)** client frontend with a **shadcn/ui** design system, paired with a robust **Laravel** backend and WHMPanel control layer.
 
-## Requirements
+---
 
-- PHP 8.3 or newer
-- Composer
-- MySQL or MariaDB
-- A web server pointing to the `public` directory
+## 🚀 Key Features & UI Surface
 
-## Local Setup
+- **Aesthetic Direction**: "Orbital Minimalism" — Dark-mode Linear meets Vercel meets Stripe aesthetic (`#09090b` zinc canvas, `#18181b` card surfaces, subtle `border-zinc-800` structural borders, electric indigo `#6366F1` & cyan `#22D3EE` accents).
+- **Dual Typography**: **Inter** for clean technical reading and **JetBrains Mono** for IPs, server specs, DNS records, and terminal logs.
+- **Server Health Telemetry**: Live CPU load, RAM usage, and NVMe disk gauges with cluster status badges.
+- **cPanel Replacement Console (`/services/[id]`)**:
+  1. **Overview**: Resource usage circular progress gauges & Quick Utilities grid (phpMyAdmin, Mailboxes, SSL, Backups, Subdomains).
+  2. **Files & Databases**: MySQL database management table.
+  3. **Email**: Mailbox list with quota usage bars and "Create Account" modal with password generator.
+  4. **Domains & DNS**: Inline DNS Zone editor table (A, CNAME, MX records).
+  5. **Security**: Let's Encrypt Wildcard AutoSSL status and one-click installer.
+  6. **Advanced**: PHP Version selector (PHP 8.2, 8.1, 8.0) and php.ini settings.
+- **Domain Portfolio (`/domains`)**: Domain table with auto-renew switches, WHOIS privacy toggle, and bulk nameserver toolbar.
+- **Financial Core (`/billing`)**: Credit balance card, spending analytics, filterable invoice list, and clean receipt view.
+- **Support Center (`/support`)**: Support tickets center with priority badges (High/Low) and 6-digit Support PIN verification.
+- **Account & Settings (`/settings`)**: Profile avatar, API key manager table, 2FA setup, and granular notification matrix.
+
+---
+
+## 📦 Directory Structure
+
+```text
+whmlab2.0/
+├── frontend/                 # Next.js 14+ (App Router) + shadcn/ui Frontend
+│   ├── src/
+│   │   ├── app/              # App Router routes (/dashboard, /services, /domains, /billing, /support, /settings, /login)
+│   │   ├── components/       # shadcn/ui primitives & layout components (sidebar, header)
+│   │   └── lib/              # Utility helpers (cn class merger)
+│   ├── package.json
+│   └── next.config.ts
+├── app/                      # Laravel Controllers, Models, Middleware & Services
+├── config/                   # Laravel Configurations
+├── database/                 # Migrations & Seeders
+├── public/                   # Web Server Document Root
+├── resources/                # Blade Templates & Tailwind CSS Design System Core
+└── routes/                   # Web, User & API Route Definitions
+```
+
+---
+
+## ⚡ Quick Start: Running the Platform
+
+### 1. Start Next.js Frontend (Port 3000)
 
 ```bash
-cp .env.example .env
+# Navigate to the Next.js frontend directory
+cd frontend
+
+# Install UI dependencies (if not already installed)
+npm install
+
+# Run Next.js in Development Mode
+npm run dev
+```
+
+Open your browser at **`http://localhost:3000`** to view the clean Next.js + shadcn/ui frontend.
+
+#### Building Frontend for Production
+
+```bash
+# Inside the frontend directory
+cd frontend
+
+# Run optimized production build
+npm run build
+
+# Start production server
+npm start
+```
+
+---
+
+### 2. Start Laravel Backend & WHMPanel (Port 8000)
+
+```bash
+# From the project root
 composer install
+cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
+
+# Start Laravel development server
 php artisan serve
 ```
 
-Open the app at:
+The backend API and admin control panel will be available at **`http://127.0.0.1:8000`** (or `/admin`).
 
-```text
-http://127.0.0.1:8000
-```
+---
 
-## Control Panel Subdomain
+## 🗺️ Next.js App Router Map
 
-By default, the admin/control panel is available at:
+| Route | Description | Component Surface |
+| :--- | :--- | :--- |
+| `/dashboard` | Main Client Console | Telemetry cluster meters, active instances, balance snapshot, support PIN |
+| `/services` | Hosting Services | Grid of running cPanel, WordPress & VPS instances |
+| `/services/[id]` | cPanel Replacement | 6-tab console (Overview, Files & DB, Email, DNS Zone Editor, SSL, Advanced) |
+| `/domains` | Domain Portfolio | Domains table, auto-renew switches, bulk nameserver toolbar |
+| `/billing` | Financial Core | Credit balance, deposit funds, itemized invoice list & receipt view |
+| `/support` | Support Center | Ticket threads, priority dot badges, create ticket trigger |
+| `/settings` | Account & Security | Profile details, API tokens table, 2FA QR code modal, notification matrix |
+| `/login` | Auth Layer | Split-screen layout with animated mesh background & SSL trust footer |
 
-```text
-/admin
-```
+---
 
-To serve it from a subdomain such as `panel.example.com`, set:
+## ⚙️ Control Panel Subdomain Routing (Optional)
+
+To serve WHMPanel from a dedicated subdomain such as `panel.example.com`:
 
 ```env
 APP_URL=https://example.com
@@ -41,163 +118,16 @@ WHMPANEL_DOMAIN=panel.example.com
 SESSION_DOMAIN=.example.com
 ```
 
-Then refresh cached configuration and routes:
+Clear cached configuration:
 
 ```bash
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
 ```
 
-When `WHMPANEL_DOMAIN` is set:
+---
 
-- `https://panel.example.com` serves the WHMPanel/admin routes.
-- `https://example.com/admin` redirects to the configured panel subdomain.
-- Leaving `WHMPANEL_DOMAIN` empty keeps the panel on `/admin`.
+## 🛡️ License & Credits
 
-## DNS
-
-Create an `A` or `CNAME` record for the control panel hostname:
-
-```text
-panel.example.com -> your server IP
-```
-
-For local testing, add a hosts entry:
-
-```text
-127.0.0.1 panel.whmlab.test
-127.0.0.1 whmlab.test
-```
-
-Then use:
-
-```env
-APP_URL=http://whmlab.test
-WHMPANEL_DOMAIN=panel.whmlab.test
-SESSION_DOMAIN=.whmlab.test
-```
-
-## Web Server
-
-Both the main domain and panel subdomain should point to the same Laravel `public` directory.
-
-Example Nginx server block:
-
-```nginx
-server {
-    listen 80;
-    server_name example.com panel.example.com;
-    root /path/to/whmlab2.0/public;
-
-    index index.php index.html;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        fastcgi_param DOCUMENT_ROOT $realpath_root;
-    }
-}
-```
-
-## Important Notes
-
-- The `public` folder must be the web root.
-- Use HTTPS in production for both the main domain and panel subdomain.
-- If users need to stay logged in across the main app and panel subdomain, set `SESSION_DOMAIN` to the root domain with a leading dot, for example `.example.com`.
-- Do not commit `.env` because it contains database credentials and app secrets.
-
-## Local WHMPanel Test Harness
-
-WHMLab includes a local WHMPanel foundation for development. It is not the full system daemon yet, but it provides the same integration surface that the future HestiaCP-derived node will use.
-
-Open the local panel:
-
-```text
-http://127.0.0.1:8000/whmpanel
-```
-
-Useful API endpoints:
-
-```text
-GET  /whmpanel/api/v1/server/info
-GET  /whmpanel/api/v1/server/stats
-GET  /whmpanel/api/v1/users
-POST /whmpanel/api/v1/users
-GET  /whmpanel/api/v1/websites
-POST /whmpanel/api/v1/auth/sso
-```
-
-Example user provisioning request:
-
-```bash
-curl -X POST http://127.0.0.1:8000/whmpanel/api/v1/users \
-  -H "Accept: application/json" \
-  -d "username=demo" \
-  -d "email=demo@example.com" \
-  -d "package=starter" \
-  -d "domain=demo.test"
-```
-
-To require API auth locally, set:
-
-```env
-WHMPANEL_API_TOKEN=change-this-token
-```
-
-Then send requests with:
-
-```text
-Authorization: Bearer change-this-token
-```
-
-Billing automation can use WHMPanel by creating a server group with type `WHMPanel` in the admin area, then assigning products to that server group.
-
-## HestiaCP-Derived WHMPanel Node
-
-The HestiaCP fork scaffold lives in:
-
-```text
-whmpanel/
-```
-
-Important paths:
-
-```text
-whmpanel/upstream      HestiaCP source checkout on branch whmlab-main
-whmpanel/bin           WHMPanel install/sync/overlay scripts
-whmpanel/config        Node environment example
-whmpanel/fork.json     Fork metadata
-```
-
-Install a WHMPanel node on a clean Ubuntu/Debian server:
-
-```bash
-sudo WHMPANEL_ADMIN_EMAIL=admin@example.com \
-  WHMPANEL_ADMIN_PASSWORD='change-me-fast' \
-  WHMPANEL_HOSTNAME=panel.example.com \
-  WHMPANEL_MASTER_URL=https://example.com \
-  WHMPANEL_NODE_TOKEN='shared-node-token' \
-  ./whmpanel/bin/install-node.sh
-```
-
-After install, set the same shared token in the WHMLab admin server record as the WHMPanel `API Token`.
-
-Bridge endpoints exposed by the node:
-
-```text
-GET  /api/whmlab/index.php?endpoint=server/info
-GET  /api/whmlab/index.php?endpoint=server/stats
-POST /api/whmlab/index.php?endpoint=users
-GET  /api/whmlab/index.php?endpoint=users/{username}
-POST /api/whmlab/index.php?endpoint=users/{username}/suspend
-POST /api/whmlab/index.php?endpoint=users/{username}/unsuspend
-```
-
-WHMLab uses this bridge automatically when a `WHMPanel` server has an API token configured. Without a token, it uses the local simulator for development.
+Built for high-performance server administration & hosting billing. Built with Next.js 14, shadcn/ui, Tailwind CSS, Lucide Icons, and Laravel.

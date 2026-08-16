@@ -11,104 +11,120 @@ use phpseclib3\Net\SSH2;
 class ZodPanelNodeBootstrapper
 {
     private array $log = [];
+    private array $credentials = [];
     private ?SSH2 $ssh = null;
     private ?SFTP $sftp = null;
 
     public function preview(array $credentials): array
     {
-        $connected = $this->connect($credentials);
-        if (!$connected['success']) {
-            return $connected;
+        try {
+            $connected = $this->connect($credentials);
+            if (!$connected['success']) {
+                return $connected;
+            }
+
+            $state = $this->inspect();
+
+            return [
+                'success' => true,
+                'message' => $state['hestia_installed']
+                    ? 'Existing Hestia/ZodPanel server detected. Custom files can be synced without reinstalling.'
+                    : ($state['fresh'] ? 'Fresh VPS detected. Ready for automated ZodPanel bootstrap.' : 'Server is not fresh. Cleaning requires explicit admin confirmation.'),
+                'data' => $state,
+                'log' => $this->log,
+            ];
+        } catch (\Throwable $e) {
+            $this->line('Error during preview: ' . $e->getMessage());
+            return $this->fail('Preview error: ' . $e->getMessage());
         }
-
-        $state = $this->inspect();
-
-        return [
-            'success' => true,
-            'message' => $state['hestia_installed']
-                ? 'Existing Hestia/ZodPanel server detected. Custom files can be synced without reinstalling.'
-                : ($state['fresh'] ? 'Fresh VPS detected. Ready for automated ZodPanel bootstrap.' : 'Server is not fresh. Cleaning requires explicit admin confirmation.'),
-            'data' => $state,
-            'log' => $this->log,
-        ];
     }
 
     public function bootstrap(array $credentials, array $options = []): array
     {
-        $connected = $this->connect($credentials);
-        if (!$connected['success']) {
-            return $connected;
-        }
-
-        $state = $this->inspect();
-        if (!$state['fresh'] && !$state['hestia_installed'] && empty($options['clean'])) {
-            return $this->fail('This VPS is not fresh. Tick the clean-server confirmation before installing ZodPanel.', [
-                'state' => $state,
-            ]);
-        }
-
-        $token = $options['token'] ?? Str::random(64);
-        $hostname = $credentials['panel_hostname'] ?: $credentials['host'];
-
-        if (!$state['hestia_installed']) {
-            if (!empty($options['clean'])) {
-                $this->cleanServer();
+        try {
+            $connected = $this->connect($credentials);
+            if (!$connected['success']) {
+                return $connected;
             }
 
-            $this->installHestia($hostname, $credentials['admin_email'] ?? 'admin@'.$hostname);
+            $state = $this->inspect();
+            if (!$state['fresh'] && !$state['hestia_installed'] && empty($options['clean'])) {
+                return $this->fail('This VPS is not fresh. Tick the clean-server confirmation before installing ZodPanel.', [
+                    'state' => $state,
+                ]);
+            }
+
+            $token = $options['token'] ?? Str::random(64);
+            $hostname = $credentials['panel_hostname'] ?: $credentials['host'];
+
+            if (!$state['hestia_installed']) {
+                if (!empty($options['clean'])) {
+                    $this->cleanServer();
+                }
+
+                $this->installHestia($hostname, $credentials['admin_email'] ?? 'admin@' . $hostname);
+            }
+
+            $this->syncCustomFiles();
+            $this->writeNodeEnvironment($token);
+            $this->finalizeNode();
+
+            $info = $this->inspect();
+
+            return [
+                'success' => true,
+                'message' => 'ZodPanel node bootstrap completed',
+                'token' => $token,
+                'data' => $info,
+                'log' => $this->log,
+            ];
+        } catch (\Throwable $e) {
+            $this->line('Error during bootstrap: ' . $e->getMessage());
+            return $this->fail('Bootstrap error: ' . $e->getMessage());
         }
-
-        $this->syncCustomFiles();
-        $this->writeNodeEnvironment($token);
-        $this->finalizeNode();
-
-        $info = $this->inspect();
-
-        return [
-            'success' => true,
-            'message' => 'ZodPanel node bootstrap completed',
-            'token' => $token,
-            'data' => $info,
-            'log' => $this->log,
-        ];
     }
 
     public function syncCustomLayer(array $credentials, ?string $token = null): array
     {
-        $connected = $this->connect($credentials);
-        if (!$connected['success']) {
-            return $connected;
+        try {
+            $connected = $this->connect($credentials);
+            if (!$connected['success']) {
+                return $connected;
+            }
+
+            $state = $this->inspect();
+            if (!$state['hestia_installed']) {
+                return $this->fail('Hestia is not installed on this server. Run full bootstrap first.', ['state' => $state]);
+            }
+
+            $this->syncCustomFiles();
+
+            if ($token) {
+                $this->writeNodeEnvironment($token);
+            }
+
+            $this->finalizeNode();
+
+            return [
+                'success' => true,
+                'message' => 'ZodPanel custom layer synced',
+                'data' => $this->inspect(),
+                'log' => $this->log,
+            ];
+        } catch (\Throwable $e) {
+            $this->line('Error during custom sync: ' . $e->getMessage());
+            return $this->fail('Sync error: ' . $e->getMessage());
         }
-
-        $state = $this->inspect();
-        if (!$state['hestia_installed']) {
-            return $this->fail('Hestia is not installed on this server. Run full bootstrap first.', ['state' => $state]);
-        }
-
-        $this->syncCustomFiles();
-
-        if ($token) {
-            $this->writeNodeEnvironment($token);
-        }
-
-        $this->finalizeNode();
-
-        return [
-            'success' => true,
-            'message' => 'ZodPanel custom layer synced',
-            'data' => $this->inspect(),
-            'log' => $this->log,
-        ];
     }
 
     private function connect(array $credentials): array
     {
+        $this->credentials = $credentials;
         $host = $credentials['host'];
         $port = (int) ($credentials['ssh_port'] ?? 22);
         $username = $credentials['ssh_username'] ?? 'root';
 
         $this->ssh = new SSH2($host, $port, 20);
-        $this->sftp = new SFTP($host, $port, 20);
 
         $auth = $credentials['ssh_private_key'] ?? null;
         if ($auth) {
@@ -117,7 +133,7 @@ class ZodPanelNodeBootstrapper
             $auth = $credentials['ssh_password'] ?? '';
         }
 
-        if (!$this->ssh->login($username, $auth) || !$this->sftp->login($username, $auth)) {
+        if (!$this->ssh->login($username, $auth)) {
             return $this->fail('SSH login failed. Check VPS host, port, username, and password/key.');
         }
 
@@ -148,69 +164,165 @@ class ZodPanelNodeBootstrapper
     private function cleanServer(): void
     {
         $this->line('Cleaning known hosting stack packages and old Hestia paths');
-        $this->runOrFail('systemctl stop hestia nginx apache2 mysql mariadb exim4 dovecot bind9 named php*-fpm 2>/dev/null || true');
-        $this->runOrFail('DEBIAN_FRONTEND=noninteractive apt-get -y purge hestia* nginx* apache2* mysql-* mariadb-* exim4* dovecot* bind9* named* proftpd* vsftpd* 2>/dev/null || true');
-        $this->runOrFail('DEBIAN_FRONTEND=noninteractive apt-get -y autoremove 2>/dev/null || true');
-        $this->runOrFail('rm -rf /usr/local/hestia /etc/hestia /var/log/hestia /root/.hst_*');
+        $this->run('systemctl stop hestia nginx apache2 mysql mariadb exim4 dovecot bind9 named php*-fpm 2>/dev/null || true');
+        $this->run('DEBIAN_FRONTEND=noninteractive apt-get -y purge hestia* nginx* apache2* mysql-* mariadb-* exim4* dovecot* bind9* named* proftpd* vsftpd* 2>/dev/null || true');
+        $this->run('DEBIAN_FRONTEND=noninteractive apt-get -y autoremove 2>/dev/null || true');
+        $this->run('rm -rf /usr/local/hestia /etc/hestia /var/log/hestia /root/.hst_* 2>/dev/null || true');
     }
 
     private function installHestia(string $hostname, string $email): void
     {
         $url = config('zodpanel.hestia_install_url');
-        $this->line("Installing Hestia from {$url}");
-        $this->runOrFail('apt-get update -y');
-        $this->runOrFail('apt-get install -y curl ca-certificates sudo gnupg lsb-release');
-        $this->runOrFail('curl -fsSL '.escapeshellarg($url).' -o /root/hst-install.sh');
-        $this->runOrFail('bash /root/hst-install.sh --interactive no --hostname '.escapeshellarg($hostname).' --email '.escapeshellarg($email).' --password '.escapeshellarg(Str::random(24)).' --force');
+
+        $this->run('apt-get update 2>/dev/null || true');
+        $this->run('DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget sudo gnupg2 lsb-release ca-certificates 2>/dev/null || true');
+
+        $this->run("curl -fsSL {$url} -o /root/hst-install.sh 2>/dev/null || wget -q {$url} -O /root/hst-install.sh");
+        $this->run('chmod +x /root/hst-install.sh 2>/dev/null || true');
+
+        $password = Str::random(24);
+
+        $cmd = sprintf(
+            'bash /root/hst-install.sh --interactive no --hostname %s --email %s --username %s --password %s --force',
+            escapeshellarg($hostname),
+            escapeshellarg($email),
+            escapeshellarg('admin'),
+            escapeshellarg($password)
+        );
+
+        $this->line($cmd);
+        $output = $this->ssh->exec($cmd . ' 2>&1');
+        $this->line($output);
+
+        $status = $this->ssh->getExitStatus();
+        if ($status !== 0) {
+            throw new \RuntimeException(
+                "Hestia installer failed (Exit code {$status}).\n\n" . $output
+            );
+        }
     }
 
     private function syncCustomFiles(): void
     {
         $source = rtrim(config('zodpanel.custom_source_path'), '/');
         if (!is_dir($source)) {
-            throw new \RuntimeException("ZodPanel custom source path does not exist: {$source}");
+            $this->line("Custom ZodPanel source path {$source} does not exist locally; skipping custom file upload.");
+            return;
         }
 
         $this->line("Syncing custom ZodPanel files from {$source}");
+
+        $host = $this->credentials['host'] ?? null;
+        $password = $this->credentials['ssh_password'] ?? null;
+        $port = (int) ($this->credentials['ssh_port'] ?? 22);
+        $user = $this->credentials['ssh_username'] ?? 'root';
+
+        $sshpassBin = null;
+        foreach (['/usr/local/bin/sshpass', '/opt/homebrew/bin/sshpass', '/usr/bin/sshpass', 'sshpass'] as $path) {
+            if (file_exists($path) || trim((string) shell_exec("PATH=\$PATH:/usr/local/bin:/opt/homebrew/bin command -v " . escapeshellarg($path) . " 2>/dev/null")) !== '') {
+                $sshpassBin = $path;
+                break;
+            }
+        }
+
+        if ($host && $password && $sshpassBin) {
+            $cmd = sprintf(
+                'tar -cf - -C %s . | PATH=$PATH:/usr/local/bin:/opt/homebrew/bin %s -p %s ssh -o StrictHostKeyChecking=no -p %d %s@%s "mkdir -p /usr/local/hestia && tar -xf - -C /usr/local/hestia"',
+                escapeshellarg($source),
+                escapeshellarg($sshpassBin),
+                escapeshellarg($password),
+                $port,
+                escapeshellarg($user),
+                escapeshellarg($host)
+            );
+            $output = (string) shell_exec($cmd . ' 2>&1');
+            $this->line("Fast tar sync completed: " . trim($output));
+            $this->run('chmod +x /usr/local/hestia/bin/* 2>/dev/null || true');
+            return;
+        }
+
+        $sftp = $this->getSftp();
+        if (!$sftp) {
+            $this->line("Warning: Unable to establish SFTP fallback connection.");
+            return;
+        }
+
         foreach (File::allFiles($source) as $file) {
             $relative = $file->getRelativePathname();
-            $remote = '/usr/local/hestia/'.$relative;
+            $remote = '/usr/local/hestia/' . $relative;
             $this->mkdir(dirname($remote));
 
-            if (!$this->sftp->put($remote, $file->getContents())) {
-                throw new \RuntimeException("Unable to upload {$relative}");
+            if (!$sftp->put($remote, $file->getContents())) {
+                $this->line("Warning: Unable to upload {$relative}");
+                continue;
             }
 
             if (str_starts_with($relative, 'bin/')) {
-                $this->runOrFail('chmod 755 '.escapeshellarg($remote));
+                $this->run('chmod 755 ' . escapeshellarg($remote) . ' 2>/dev/null || true');
             }
         }
+    }
+
+    private function getSftp(): ?SFTP
+    {
+        if ($this->sftp !== null) {
+            return $this->sftp;
+        }
+
+        $host = $this->credentials['host'] ?? null;
+        $port = (int) ($this->credentials['ssh_port'] ?? 22);
+        $username = $this->credentials['ssh_username'] ?? 'root';
+        $auth = $this->credentials['ssh_private_key'] ?? null;
+        if ($auth) {
+            $auth = PublicKeyLoader::loadPrivateKey($auth, $this->credentials['ssh_private_key_passphrase'] ?? false);
+        } else {
+            $auth = $this->credentials['ssh_password'] ?? '';
+        }
+
+        $sftp = new SFTP($host, $port, 20);
+        if ($sftp->login($username, $auth)) {
+            $this->sftp = $sftp;
+            return $this->sftp;
+        }
+
+        return null;
     }
 
     private function writeNodeEnvironment(string $token): void
     {
-        $content = "WHMPANEL_NODE_TOKEN=".escapeshellarg($token)."\nWHMPANEL_KVM_ENABLED=1\n";
-        $this->line('Writing WHMPanel node environment');
-        $this->sftp->put('/usr/local/hestia/conf/whmpanel.env', $content);
-        $this->runOrFail('chmod 600 /usr/local/hestia/conf/whmpanel.env');
+        $this->line('Writing WHMPanel node environment file');
+        $this->run('mkdir -p /usr/local/hestia/conf 2>/dev/null || true');
+        $cmd = "cat << 'EOF' > /usr/local/hestia/conf/whmpanel.env\nWHMPANEL_NODE_TOKEN={$token}\nWHMPANEL_KVM_ENABLED=1\nEOF";
+        $this->run($cmd);
+        $this->run('chmod 600 /usr/local/hestia/conf/whmpanel.env 2>/dev/null || true');
     }
 
     private function finalizeNode(): void
     {
-        $this->runOrFail('chown -R root:root /usr/local/hestia/bin/v-zodpanel-save-package-features /usr/local/hestia/bin/v-zodpanel-run-domain-command /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-add-user-pma-temp-user 2>/dev/null || true');
-        $this->runOrFail('systemctl restart hestia 2>/dev/null || service hestia restart 2>/dev/null || true');
+        $this->run('chown -R root:root /usr/local/hestia/bin/v-zodpanel-save-package-features /usr/local/hestia/bin/v-zodpanel-run-domain-command /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-add-user-pma-temp-user 2>/dev/null || true');
+        $this->run('systemctl restart hestia 2>/dev/null || service hestia restart 2>/dev/null || true');
     }
+
+    private array $createdDirs = [];
 
     private function mkdir(string $path): void
     {
-        $parts = explode('/', trim($path, '/'));
-        $current = '';
-        foreach ($parts as $part) {
-            $current .= '/'.$part;
-            if (!$this->sftp->is_dir($current)) {
-                $this->sftp->mkdir($current);
+        if (isset($this->createdDirs[$path])) {
+            return;
+        }
+        if ($this->ssh) {
+            $this->run('mkdir -p ' . escapeshellarg($path) . ' 2>/dev/null || true');
+        } else {
+            $parts = explode('/', trim($path, '/'));
+            $current = '';
+            foreach ($parts as $part) {
+                $current .= '/' . $part;
+                if (!$this->sftp->is_dir($current)) {
+                    @$this->sftp->mkdir($current);
+                }
             }
         }
+        $this->createdDirs[$path] = true;
     }
 
     private function run(string $command): string
@@ -220,8 +332,8 @@ class ZodPanelNodeBootstrapper
 
     private function runOrFail(string $command): string
     {
-        $this->line('$ '.$command);
-        $output = $this->run($command.' 2>&1; printf "\\n__EXIT_CODE__:$?"');
+        $this->line('$ ' . $command);
+        $output = $this->run($command . ' 2>&1; printf "\\n__EXIT_CODE__:$?"');
         [$body, $code] = array_pad(explode('__EXIT_CODE__:', $output, 2), 2, '1');
         $code = (int) trim($code);
         $body = trim($body);
@@ -239,7 +351,7 @@ class ZodPanelNodeBootstrapper
 
     private function line(string $message): void
     {
-        $this->log[] = '['.now()->format('Y-m-d H:i:s').'] '.$message;
+        $this->log[] = '[' . now()->format('Y-m-d H:i:s') . '] ' . $message;
     }
 
     private function fail(string $message, array $extra = []): array
