@@ -247,6 +247,8 @@ class ZodPanelNodeBootstrapper
             if (!str_contains($gitOutput, 'fatal:') && !str_contains($gitOutput, 'Error:')) {
                 $this->line("Synced custom layer from private GitHub repository");
                 $this->run('chmod +x /usr/local/hestia/bin/* 2>/dev/null || true');
+                $this->run('cp /usr/local/hestia/bin/zodctl /usr/local/bin/zodctl 2>/dev/null || ln -sf /usr/local/hestia/bin/zodctl /usr/local/bin/zodctl 2>/dev/null || true');
+                $this->run('chmod +x /usr/local/bin/zodctl 2>/dev/null || true');
                 return;
             }
         }
