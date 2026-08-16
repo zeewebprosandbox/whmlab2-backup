@@ -4184,50 +4184,6 @@ h1, h2, h3, h4, h5, h6, strong, b, .font-extrabold, .font-black, .font-bold, .fw
   letter-spacing: 0.03em !important;
 }
 
-/* ── Domain Page Cards, Badges & Pill Buttons Styling ── */
-.domain-card-box {
-  background-color: #141416 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 16px !important;
-  padding: 24px !important;
-  color: #ffffff !important;
-}
-
-.tld-row-item {
-  padding: 16px 0 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-}
-
-.tld-row-item:last-child {
-  border-bottom: none !important;
-}
-
-.btn-add-cart-pill {
-  padding: 8px 24px !important;
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 9999px !important;
-  color: #ffffff !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
-  cursor: pointer !important;
-  text-decoration: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.btn-add-cart-pill:hover {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
-}
-
 .whm-billing-switch,
 .whm-category-tabs button {
   border-radius: 10px !important;

@@ -13,8 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <link href="{{ asset('assets/global/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/global/css/all.min.css') }}" rel="stylesheet" />
 
