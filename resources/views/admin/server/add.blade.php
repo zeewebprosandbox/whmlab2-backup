@@ -3,6 +3,34 @@
 @section('panel')
 <form class="form-horizontal server-form" method="post" action="{{ route('admin.server.add') }}">
     @csrf 
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border--primary shadow-sm">
+                <div class="card-header bg--primary d-flex justify-content-between align-items-center flex-wrap">
+                    <h5 class="text-white mb-0"><i class="las la-bolt text-warning"></i> @lang('1-Click Quick VPS Auto-Merge')</h5>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="quickAutoMergeToggle" name="quick_vps_automerge" value="1" @checked(old('quick_vps_automerge', '1') == '1')>
+                        <label class="form-check-label text-white font-weight-bold" for="quickAutoMergeToggle">@lang('Enable 1-Click Auto-Merge Mode')</label>
+                    </div>
+                </div>
+                <div class="card-body bg--light" id="quickAutoMergeSection">
+                    <p class="text-muted mb-3"><i class="las la-info-circle text--info"></i> @lang('Enter the IP Address and Root Password of any fresh Ubuntu 24.04 VPS. WHMLab will automatically install HestiaCP 1.10.2, sync the ZodPanel template layer, configure nameservers ns1/ns2.zodserver.cloud, setup Auto-SSL, and merge it into your cluster automatically.')</p>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold">@lang('VPS IP Address') <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="vps_ip" placeholder="e.g. 169.58.176.53" value="{{ old('vps_ip') }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="font-weight-bold">@lang('Root SSH Password') <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control form-control-lg" name="password" placeholder="@lang('VPS Root Password')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-6 form-group">
             <div class="card">

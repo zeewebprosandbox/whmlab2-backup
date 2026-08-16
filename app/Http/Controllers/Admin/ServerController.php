@@ -67,6 +67,40 @@ class ServerController extends Controller{
  
     public function addServer(Request $request){
 
+        if ($request->boolean('quick_vps_automerge')) {
+            $request->validate([
+                'vps_ip' => 'required',
+                'password' => 'required',
+            ]);
+
+            $vpsIp = trim($request->vps_ip);
+            $group = ServerGroup::active()->where('type', 2)->first() ?? ServerGroup::first();
+            if (!$group) {
+                $group = new ServerGroup();
+                $group->name = 'ZodPanel Cluster';
+                $group->type = 2;
+                $group->save();
+            }
+
+            $request->merge([
+                'name' => $request->name ?: "ZodPanel VPS Node ({$vpsIp})",
+                'host' => $request->host ?: $vpsIp,
+                'protocol' => 'https://',
+                'port' => $request->port ?: 8083,
+                'username' => 'root',
+                'server_group_id' => $group->id,
+                'service_role' => $request->service_role ?: 'shared',
+                'location' => $request->location ?: 'Auto-Merged VPS',
+                'ns1' => $request->ns1 ?: 'ns1.zodserver.cloud',
+                'ns1_ip' => $vpsIp,
+                'ns2' => $request->ns2 ?: 'ns2.zodserver.cloud',
+                'ns2_ip' => $vpsIp,
+                'bootstrap_zodpanel' => 1,
+                'clean_server_confirmed' => 1,
+                'ssh_port' => $request->ssh_port ?: 22,
+            ]);
+        }
+
         $request->validate([
     		'name' => 'required|max:255',
     		'host' => 'required',
