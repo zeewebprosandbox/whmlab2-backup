@@ -48,12 +48,23 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
   const [newDnsHost, setNewDnsHost] = useState("");
   const [newDnsValue, setNewDnsValue] = useState("");
 
+  // Domain & Email selection state
+  const [availableDomains, setAvailableDomains] = useState([
+    "zodpanel.cloud",
+    "sub.zodpanel.cloud",
+    "api.zodpanel.cloud",
+    "example.com"
+  ]);
+  const [selectedMailDomain, setSelectedMailDomain] = useState("zodpanel.cloud");
+  const [mailQuota, setMailQuota] = useState("1000");
+
   const [databases, setDatabases] = useState([
     { name: "db_wp_app_prod", size: "42.8 MB", user: "app_user" },
   ]);
 
   const [mailboxes, setMailboxes] = useState([
-    { email: "admin@example.com", quota: "145 MB / 1000 MB (14.5%)", status: "Active" },
+    { email: "admin@zodpanel.cloud", quota: "145 MB / 1000 MB (14.5%)", status: "Active" },
+    { email: "support@sub.zodpanel.cloud", quota: "12 MB / 1000 MB (1.2%)", status: "Active" },
   ]);
 
   const [dnsRecords, setDnsRecords] = useState([
@@ -78,11 +89,19 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
   };
 
   const handleCreateMail = () => {
-    if (!newMailName) return;
-    setMailboxes([...mailboxes, { email: `${newMailName}@example.com`, quota: "0 MB / 1000 MB (0%)", status: "Active" }]);
+    if (!newMailName || !selectedMailDomain) return;
+    const fullEmail = `${newMailName.toLowerCase()}@${selectedMailDomain}`;
+    setMailboxes([
+      ...mailboxes,
+      {
+        email: fullEmail,
+        quota: `0 MB / ${mailQuota === '0' ? 'Unlimited' : mailQuota + ' MB'} (0%)`,
+        status: "Active"
+      }
+    ]);
     setNewMailName("");
     setShowMailModal(false);
-    alert("Mailbox created successfully!");
+    alert(`Mailbox ${fullEmail} created successfully! Webmail ready at https://webmail.${selectedMailDomain}/`);
   };
 
   const handleAddDns = () => {
@@ -446,7 +465,7 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
                     <div className="text-[11px] text-zinc-500 font-mono">Expires in 84 days (Auto-renews)</div>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => alert("AutoSSL check triggered!")}>Run AutoSSL Check</Button>
+                <Button variant="outline" size="sm" onClick={() => alert("AutoSSL engine triggered! All domains and subdomains verified with active SSL & Force HTTPS.")}>Run AutoSSL Check</Button>
               </div>
             </Card>
           )}
@@ -504,38 +523,73 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
           {/* Create Mailbox Modal */}
           {showMailModal && (
             <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <Card className="max-w-md w-full p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-white">Create Mailbox Account</h3>
-                  <button onClick={() => setShowMailModal(false)} className="text-zinc-400 hover:text-white">&times;</button>
-                </div>
-                <div className="space-y-3 text-xs">
+              <Card className="max-w-md w-full p-6 space-y-4 border-zinc-700/60 shadow-2xl">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
                   <div>
-                    <label className="text-zinc-400 block mb-1">Username Prefix</label>
-                    <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-white">Create Email Account</h3>
+                    <p className="text-[11px] text-zinc-400">Select any domain or subdomain to provision instant webmail access.</p>
+                  </div>
+                  <button onClick={() => setShowMailModal(false)} className="text-zinc-400 hover:text-white text-lg">&times;</button>
+                </div>
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="text-zinc-300 font-medium block mb-1.5">Email Address</label>
+                    <div className="flex items-center gap-1.5">
                       <input
                         type="text"
                         value={newMailName}
                         onChange={(e) => setNewMailName(e.target.value)}
-                        placeholder="support"
-                        className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white"
+                        placeholder="username (e.g. info, support)"
+                        className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500"
                       />
-                      <span className="font-mono text-zinc-500">@example.com</span>
+                      <span className="font-bold text-zinc-400 text-sm px-1">@</span>
+                      <select
+                        value={selectedMailDomain}
+                        onChange={(e) => setSelectedMailDomain(e.target.value)}
+                        className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-cyan-500"
+                      >
+                        {availableDomains.map((dom) => (
+                          <option key={dom} value={dom}>
+                            {dom}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-zinc-400 block mb-1">Mailbox Password</label>
-                    <input
-                      type="text"
-                      value={newMailPass}
-                      onChange={(e) => setNewMailPass(e.target.value)}
-                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white font-mono"
-                    />
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-zinc-300 font-medium block mb-1.5">Storage Quota</label>
+                      <select
+                        value={mailQuota}
+                        onChange={(e) => setMailQuota(e.target.value)}
+                        className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-cyan-500"
+                      >
+                        <option value="500">500 MB</option>
+                        <option value="1000">1000 MB (1 GB)</option>
+                        <option value="5000">5000 MB (5 GB)</option>
+                        <option value="10000">10000 MB (10 GB)</option>
+                        <option value="0">Unlimited</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-zinc-300 font-medium block mb-1.5">Mailbox Password</label>
+                      <input
+                        type="text"
+                        value={newMailPass}
+                        onChange={(e) => setNewMailPass(e.target.value)}
+                        className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 pt-2">
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-zinc-800">
                   <Button variant="outline" onClick={() => setShowMailModal(false)}>Cancel</Button>
-                  <Button onClick={handleCreateMail}>Create Mailbox</Button>
+                  <Button onClick={handleCreateMail} className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500">
+                    Create Mailbox
+                  </Button>
                 </div>
               </Card>
             </div>

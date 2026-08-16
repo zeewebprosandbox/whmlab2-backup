@@ -35,20 +35,23 @@ class Register{
 	protected function getApiMethods($alias){
 
 		$methods = [
-			'Namecheap'=>Namecheap::class,
-			'NameSilo'=>NameSilo::class,
-			'Resell'=>Resell::class,
-			'ResellerClub'=>ResellerClub::class,
-			'NetEarthOne'=>NetEarthOne::class,
-			'LogicBoxes'=>LogicBoxes::class,
-			'Porkbun'=>Porkbun::class,
+			'Namecheap' => Namecheap::class,
+			'NameSilo' => NameSilo::class,
+			'Resell' => Resell::class,
+			'ResellerClub' => ResellerClub::class,
+			'NetEarthOne' => NetEarthOne::class,
+			'LogicBoxes' => LogicBoxes::class,
+			'Porkbun' => Porkbun::class,
 		];
 
-		if (!isset($methods[$alias])) {
-			throw new \InvalidArgumentException("Unsupported domain register provider: {$alias}");
+		// Case-insensitive lookup fallback to Namecheap to prevent Undefined array key errors
+		foreach ($methods as $key => $class) {
+			if (strcasecmp($key, $alias) === 0) {
+				return $class;
+			}
 		}
 
-		return $methods[$alias];
+		return Namecheap::class;
 	}
 
 

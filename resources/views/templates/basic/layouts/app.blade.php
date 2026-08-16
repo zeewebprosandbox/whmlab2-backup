@@ -11,7 +11,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <link href="{{ asset('assets/global/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/global/css/all.min.css') }}" rel="stylesheet" />
@@ -21,6 +23,17 @@
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}" />
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}" />
     @vite('resources/css/app.css')
+
+    <style>
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, .nav-link, .btn, .card, .menu-title {
+            font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+        code, pre, .font-mono, .ip-address, .domain-name {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+    </style>
 
     @stack('style-lib')
     @stack('style')

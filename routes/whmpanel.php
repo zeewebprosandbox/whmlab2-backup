@@ -31,6 +31,7 @@ Route::middleware('whmpanel.api')->prefix('api/v1')->name('api.')->controller('A
     Route::delete('/users/{username}', 'deleteUser')->name('users.delete');
 
     Route::get('/websites', 'websites')->name('websites');
+    Route::get('/domains/list', 'listDomains')->name('domains.list');
     Route::post('/websites', 'createWebsite')->name('websites.create');
     Route::get('/websites/{domain}/diagnostics', 'websiteDiagnostics')->name('websites.diagnostics');
     Route::get('/websites/{domain}/php', 'websitePhp')->name('websites.php');

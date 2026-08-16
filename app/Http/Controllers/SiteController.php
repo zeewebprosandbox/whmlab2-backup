@@ -189,45 +189,157 @@ class SiteController extends Controller
     }
 
     public function registerDomain(Request $request) {
+        $pageTitle = 'Register Domain';
+        $searchDomain = strtolower(trim((string) $request->domain));
+        $primaryResult = null;
+        $tldSuggestions = [];
+        $variantSuggestions = [];
 
-        $pageTitle = 'Register New Domain';
-        $domain = strtolower($request->domain);
-        $result = [];   
+        $domainSetups = DomainSetup::active()->orderBy('id', 'ASC')->with('pricing')->get();
+        $tldPricingMap = [];
 
-        if ($domain) { 
-            $request->validate([
-                'domain'=> ['regex:/^[a-zA-Z0-9.-]+$/']
-            ]);
+        foreach ($domainSetups as $setup) {
+            $tldClean = '.' . ltrim(strtolower($setup->name), '.');
+            $pricing = $setup->pricing;
+            $firstPrice = $pricing ? $pricing->firstPrice : null;
+            $regPrice = isset($firstPrice['price']) ? (float)$firstPrice['price'] : 12.99;
+            $renewPrice = $pricing && isset($pricing->one_year_renew) && $pricing->one_year_renew >= 0 ? (float)$pricing->one_year_renew : $regPrice;
 
-            $defaultDomainRegister = DomainRegister::getDefault();
-            if (!$defaultDomainRegister) {
-                $notify[] = ['info', 'There is no default domain register, please setup default domain register'];
-                return redirect()->route('register.domain')->withNotify($notify);
-            }
-            $request->merge(['domain'=>$domain]);
-
-            $register = new Register($defaultDomainRegister->alias); //The Register is a class
-            $register->command = 'searchDomain';
-            $register->domain = $domain;
-            $execute = $register->run();
-
-            if (!$execute['success']) {
-                $notify = [];
-                foreach((array) $execute['message'] as $message){
-                    $notify[] = ['error', $message];
-                }
-                return redirect()->route('register.domain')->withNotify($notify);
-            }
-
-            if (@$execute['data']['status'] == 'ERROR') {
-                $notify[] = ['error', $execute['data']['message']];
-                return redirect()->route('register.domain')->withNotify($notify);
-            }
-
-            $result = $execute;
+            $tldPricingMap[$tldClean] = [
+                'setup' => $setup,
+                'price' => $regPrice,
+                'renew' => $renewPrice,
+            ];
         }
 
-        return view('Template::register_domain', compact('pageTitle', 'result'));
+        if ($searchDomain) {
+            $parsed = $this->parseDomainName($searchDomain);
+            $rootName = $parsed['root'];
+            $extension = $parsed['tld'];
+            $fullDomain = $rootName . $extension;
+
+            // 1. Live check primary domain on justcheckdomain.com
+            $primaryResult = $this->checkSingleDomainLive($fullDomain, $tldPricingMap);
+
+            // 2. Smart Alternate TLD Suggestions
+            $popularTlds = ['.com', '.store', '.cloud', '.net', '.org', '.tech', '.io', '.co', '.online'];
+            $tldPool = [];
+            foreach ($popularTlds as $tld) {
+                if ($tld !== $extension) {
+                    $tldPool[] = $rootName . $tld;
+                }
+            }
+
+            $tldCheckResults = $this->checkMultipleDomainsLive($tldPool, $tldPricingMap);
+            $tldSuggestions = array_filter($tldCheckResults, fn($item) => $item['available']);
+
+            // 3. Smart Name Variant Suggestions
+            $variantPool = [
+                'get' . $rootName . '.com',
+                $rootName . 'cloud.com',
+                $rootName . 'app.com',
+                'try' . $rootName . '.com',
+                $rootName . 'hub.com',
+            ];
+            $variantCheckResults = $this->checkMultipleDomainsLive($variantPool, $tldPricingMap);
+            $variantSuggestions = array_filter($variantCheckResults, fn($item) => $item['available']);
+        }
+
+        return view('Template::register_domain', compact(
+            'pageTitle', 
+            'searchDomain', 
+            'primaryResult', 
+            'tldSuggestions', 
+            'variantSuggestions', 
+            'domainSetups',
+            'tldPricingMap'
+        ));
+    }
+
+    private function checkSingleDomainLive(string $domain, array $tldPricingMap): array
+    {
+        $parsed = $this->parseDomainName($domain);
+        $tld = $parsed['tld'];
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://justcheckdomain.com/api/check', [
+                'domain' => $domain,
+            ]);
+
+            if ($response->successful()) {
+                $json = $response->json();
+                $isAvailable = isset($json['available']) ? (bool) $json['available'] : false;
+
+                return [
+                    'domain' => $domain,
+                    'available' => $isAvailable,
+                    'tld' => $tld,
+                    'pricing' => $tldPricingMap[$tld] ?? ['price' => 12.99, 'renew' => 12.99, 'setup' => null],
+                ];
+            }
+        } catch (\Throwable $e) {
+            // Fallback
+        }
+
+        return [
+            'domain' => $domain,
+            'available' => true,
+            'tld' => $tld,
+            'pricing' => $tldPricingMap[$tld] ?? ['price' => 12.99, 'renew' => 12.99, 'setup' => null],
+        ];
+    }
+
+    private function checkMultipleDomainsLive(array $domains, array $tldPricingMap): array
+    {
+        try {
+            $responses = \Illuminate\Support\Facades\Http::pool(function ($pool) use ($domains) {
+                return collect($domains)->map(function ($domain) use ($pool) {
+                    return $pool->as($domain)->timeout(4)->get('https://justcheckdomain.com/api/check', [
+                        'domain' => $domain,
+                    ]);
+                })->all();
+            });
+
+            $results = [];
+            foreach ($domains as $domain) {
+                $parsed = $this->parseDomainName($domain);
+                $tld = $parsed['tld'];
+                $isAvailable = false;
+
+                if (isset($responses[$domain]) && $responses[$domain]->successful()) {
+                    $json = $responses[$domain]->json();
+                    $isAvailable = isset($json['available']) ? (bool) $json['available'] : false;
+                }
+
+                $results[] = [
+                    'domain' => $domain,
+                    'available' => $isAvailable,
+                    'tld' => $tld,
+                    'pricing' => $tldPricingMap[$tld] ?? ['price' => 12.99, 'renew' => 12.99, 'setup' => null],
+                ];
+            }
+
+            return $results;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    private function parseDomainName(string $domain): array
+    {
+        $domain = strtolower(trim($domain));
+        if (str_contains($domain, '.')) {
+            $parts = explode('.', $domain, 2);
+            return [
+                'root' => $parts[0],
+                'tld' => '.' . $parts[1],
+            ];
+        }
+
+        return [
+            'root' => $domain,
+            'tld' => '.com',
+        ];
     }
 
     public function serviceCategory($slug = null) {
@@ -282,43 +394,61 @@ class SiteController extends Controller
     }
 
     public function searchDomain(Request $request) {
-
         $validator = Validator::make($request->all(), [
-            'domain' => ['required', 'regex:/^[a-zA-Z0-9.-]+$/']
+            'domain' => ['required', 'string']
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status'=>false,
-                'message'=>[$validator->errors()->all()],
+                'status' => false,
+                'message' => $validator->errors()->all(),
             ]);
         }
 
-        $domain = strtolower($request->domain);
-        $request->merge(['domain'=> $domain]);
+        $domain = strtolower(trim($request->domain));
+        $domainSetups = DomainSetup::active()->orderBy('id', 'ASC')->with('pricing')->get();
+        $tldPricingMap = [];
 
-        $defaultDomainRegister = DomainRegister::getDefault();
-        if (!$defaultDomainRegister) {
-            return ['success' => false, 'message' => 'There is no default domain register, Please setup default domain register'];
+        foreach ($domainSetups as $setup) {
+            $tldClean = '.' . ltrim(strtolower($setup->name), '.');
+            $pricing = $setup->pricing;
+            $firstPrice = $pricing ? $pricing->firstPrice : null;
+            $regPrice = isset($firstPrice['price']) ? (float)$firstPrice['price'] : 12.99;
+            $renewPrice = $pricing && isset($pricing->one_year_renew) && $pricing->one_year_renew >= 0 ? (float)$pricing->one_year_renew : $regPrice;
+
+            $tldPricingMap[$tldClean] = [
+                'setup' => $setup,
+                'price' => $regPrice,
+                'renew' => $renewPrice,
+            ];
         }
 
-        $register = new Register($defaultDomainRegister->alias); //The Register is a class
-        $register->command = 'searchDomain';
-        $register->domain = $domain;
-        $register->request = $request;
-        $execute = $register->run();
+        $parsed = $this->parseDomainName($domain);
+        $rootName = $parsed['root'];
+        $extension = $parsed['tld'];
+        $fullDomain = $rootName . $extension;
 
-        if (!$execute['success']) {
-            return ['success' => false, 'message' => $execute['message']];
-        }
+        // Query justcheckdomain.com API exclusively
+        $primaryResult = $this->checkSingleDomainLive($fullDomain, $tldPricingMap);
 
-        if (@$execute['data']['status'] == 'ERROR') {
-            return ['success' => false, 'message' => $execute['data']['message']];
+        // Smart Alternate TLD Suggestions
+        $popularTlds = ['.com', '.store', '.cloud', '.net', '.org', '.tech', '.io', '.co', '.online'];
+        $tldPool = [];
+        foreach ($popularTlds as $tld) {
+            if ($tld !== $extension) {
+                $tldPool[] = $rootName . $tld;
+            }
         }
-  
-        return [
+        $tldSuggestions = array_values(array_filter($this->checkMultipleDomainsLive($tldPool, $tldPricingMap), fn($i) => $i['available']));
+
+        return response()->json([
             'success' => true,
-            'result' => $execute,
-        ];
+            'result' => [
+                'domain' => $fullDomain,
+                'available' => $primaryResult['available'],
+                'pricing' => $primaryResult['pricing'],
+                'suggestions' => $tldSuggestions,
+            ],
+        ]);
     }
 }

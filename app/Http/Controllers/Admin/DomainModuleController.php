@@ -23,6 +23,12 @@ class DomainModuleController extends Controller{
  
         $domain = Domain::findOrFail($request->domain_id);
 
+        if ($request->register_id) {
+            $domain->domain_register_id = $request->register_id;
+            $domain->save();
+            $domain->refresh();
+        }
+
         if(!$domain->domain_register_id){
             $notify[] = ['error', 'Select register before running the module command'];
             return back()->withNotify($notify);

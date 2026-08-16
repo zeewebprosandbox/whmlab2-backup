@@ -6113,16 +6113,93 @@ body:has(.whm-auth-shell) {
   background: var(--studio-rail-2) !important;
 }
 
+/* ── Barlow Condensed Typography Weights & Spacing (Lighter & Clean) ── */
+body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title {
+  font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.03em !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+h1, h2, h3, h4, h5, h6, strong, b, .font-extrabold, .font-black, .font-bold, .fw-bold, .fw-semibold, .font-semibold {
+  font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ── Domain Page Cards, Badges & Pill Buttons Styling ── */
+.domain-card-box {
+  background-color: #141416 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  color: #ffffff !important;
+}
+
+.tld-row-item {
+  padding: 16px 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.tld-row-item:last-child {
+  border-bottom: none !important;
+}
+
+.btn-add-cart-pill {
+  padding: 8px 24px !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9999px !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-add-cart-pill:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
 body:has(.whm-client-main) {
   background: var(--studio-bg) !important;
 }
 
 .whm-client-sidebar,
 .whm-app-sidebar.whm-client-sidebar {
-  width: 248px !important;
+  width: 220px !important;
   border-right: 0 !important;
   background: var(--studio-rail) !important;
   box-shadow: none !important;
+}
+
+@media (min-width: 992px) {
+  .whm-client-sidebar,
+  .whm-app-sidebar.whm-client-sidebar {
+    width: 220px !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 1020 !important;
+  }
+  .whm-client-main {
+    margin-left: 220px !important;
+    width: calc(100% - 220px) !important;
+    max-width: calc(100% - 220px) !important;
+    box-sizing: border-box !important;
+  }
 }
 
 .whm-client-sidebar .whm-sidebar-brand {

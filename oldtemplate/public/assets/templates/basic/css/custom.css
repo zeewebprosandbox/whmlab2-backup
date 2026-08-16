@@ -1,0 +1,4954 @@
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 40px;
+	text-align: center;
+	font-size: 14px;
+	cursor: pointer;
+	-webkit-transition: all .3s;
+	-o-transition: all .3s;
+	transition: all .3s;
+  }
+  
+  .copied::after {
+	position: absolute;
+	top: 8px;
+	right: 12%;
+	width: 100px;
+	display: block;
+	content: "COPIED";
+	font-size: 1em;
+	padding: 5px 5px;
+	color: #fff;
+	background-color: #FF7000;
+	border-radius: 3px;
+	opacity: 0;
+	will-change: opacity, transform;
+	animation: showcopied 1.5s ease;
+  }
+  
+  @keyframes showcopied {
+	0% {
+		opacity: 0;
+		transform: translateX(100%);
+	}
+	50% {
+		opacity: 0.7;
+		transform: translateX(40%);
+	}
+	70% {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	100% {
+		opacity: 0;
+	}
+  }
+
+
+
+
+  .cookies-card {
+	width: 520px;
+	padding: 30px;
+	color: #1E2337;
+	position:  fixed;
+	bottom: 15px;  
+	left: 15px;
+	z-index: 999999;
+	transition: all .5s;
+	background: #d1d1d1;
+    border-radius: 5px;
+  }
+  
+  .cookies-card.hide{
+	bottom: -500px !important;
+  }
+  .radius--10px {
+	border-radius: 10px;
+  }
+  
+  .cookies-card__icon {
+	width: 55px;
+	height: 55px;
+	border-radius: 50%;
+	background-color: #6e6f70;
+    color: #fff;
+	font-size: 32px;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+  }
+  
+  .cookies-card__content {
+	margin-bottom: 0;
+  }
+  
+  .cookies-btn {
+	color: #363636;
+	text-decoration: none;
+	padding: 10px 35px;
+	margin: 3px 5px;
+	display: inline-block;
+	border-radius:  999px;
+  }
+  
+  .cookies-btn:hover {
+	color: #363636;
+  }
+
+  
+  @media (max-width: 767px) {
+	  .cookies-card {
+		  width:  100%;
+		  left: 0;
+		  bottom:  0;
+		  font-size:  14px;
+		  padding:  15px;
+	  }
+  }
+
+
+
+
+.hover-input-popup {
+        position: relative;
+    }
+    .input-popup {
+        display: none;
+    }
+    .hover-input-popup .input-popup {
+        display: block;
+        position: absolute;
+        bottom: 130%;
+        left: 50%;
+        width: 280px;
+        background-color: #1a1a1a;
+        color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        -ms-border-radius: 5px;
+        -o-border-radius: 5px;
+        -webkit-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        transform: translateX(-50%);
+        -webkit-transition: all 0.3s;
+        -o-transition: all 0.3s;
+        transition: all 0.3s;
+    }
+    .input-popup::after {
+        position: absolute;
+        content: '';
+        bottom: -19px;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 10px 10px 10px 10px;
+        border-style: solid;
+        border-color: transparent transparent #1a1a1a transparent;
+        -webkit-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+    .input-popup p {
+        padding-left: 20px;
+        position: relative;
+    }
+    .input-popup p::before {
+        position: absolute;
+        content: '';
+        font-family: 'Line Awesome Free';
+        font-weight: 900;
+        left: 0;
+        top: 4px;
+        line-height: 1;
+        font-size: 18px;
+    }
+    .input-popup p.error {
+        text-decoration: line-through;
+    }
+    .input-popup p.error::before {
+        content: "\f057";
+        color: #ea5455;
+    }
+    .input-popup p.success::before {
+        content: "\f058";
+        color: #28c76f;
+    }
+
+
+
+ .show-filter{
+  display: none;
+}
+@media(max-width:767px){
+  .responsive-filter-card{
+      display: none;
+      transition: none;
+  }
+  .show-filter{
+      display: block;
+  }
+}
+
+/* Sleek storefront refresh */
+:root {
+  --ui-bg: #f6f8fb;
+  --ui-surface: #ffffff;
+  --ui-surface-soft: #f9fafc;
+  --ui-heading: #111827;
+  --ui-body: #536174;
+  --ui-muted: #7a8798;
+  --ui-border: #e4e8f0;
+  --ui-border-strong: #d5dbe7;
+  --ui-dark: #101828;
+  --ui-dark-2: #172033;
+  --ui-shadow: 0 14px 40px rgba(16, 24, 40, 0.08);
+  --ui-shadow-sm: 0 8px 22px rgba(16, 24, 40, 0.06);
+  --ui-radius: 8px;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  color: var(--ui-body);
+  background:
+    radial-gradient(circle at top left, hsl(var(--base) / 0.08), transparent 26rem),
+    linear-gradient(180deg, #ffffff 0%, var(--ui-bg) 22rem) !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--ui-heading);
+  letter-spacing: 0;
+}
+
+p {
+  color: var(--ui-body);
+}
+
+.container {
+  max-width: 1180px;
+}
+
+.bg--light {
+  background: transparent !important;
+}
+
+.bg-dark-two,
+.bg--dark,
+.header {
+  background: var(--ui-dark) !important;
+}
+
+.header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.12);
+}
+
+.header-bottom {
+  padding: 12px 0;
+}
+
+.logo img {
+  max-height: 38px;
+  object-fit: contain;
+}
+
+.menu {
+  gap: 4px;
+}
+
+.menu li a {
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 600;
+  padding: 8px 11px;
+}
+
+.menu li a:hover,
+.menu li a.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.menu-btn a {
+  min-height: 38px;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (min-width: 1200px) {
+  .sub-menu {
+    background: #ffffff !important;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    box-shadow: var(--ui-shadow);
+    margin-top: 10px;
+    padding: 8px;
+  }
+
+  .sub-menu li a {
+    color: var(--ui-body) !important;
+    border-radius: 6px;
+    padding: 9px 12px;
+  }
+
+  .sub-menu li a:hover {
+    background: hsl(var(--base) / 0.08);
+    color: hsl(var(--base)) !important;
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .menu {
+    background: var(--ui-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--ui-radius);
+    box-shadow: var(--ui-shadow);
+  }
+
+  .menu li {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.header-trigger__icon {
+  color: #ffffff;
+}
+
+.btn,
+.cmn--btn {
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.btn--base,
+.cmn--btn {
+  box-shadow: 0 10px 22px hsl(var(--base) / 0.22) !important;
+}
+
+.btn--base:hover,
+.cmn--btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn--base-outline {
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.card,
+.custom--card,
+.contact-card,
+.domain-card-wrapper,
+.gateway-card {
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border) !important;
+  border-radius: var(--ui-radius) !important;
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.card {
+  overflow: hidden;
+}
+
+.card-header,
+.custom--card .card-header,
+.custom--card .card-footer {
+  background: var(--ui-surface-soft) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--ui-heading) !important;
+  font-weight: 700;
+}
+
+.card-body {
+  color: var(--ui-body);
+}
+
+.service-card .card,
+.service-category .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.service-card .card:hover,
+.service-category .card:hover {
+  border-color: hsl(var(--base) / 0.35) !important;
+  box-shadow: var(--ui-shadow);
+  transform: translateY(-3px);
+}
+
+.service-card .card-header,
+.service-category .card-header {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+}
+
+.service-category {
+  padding: 42px 0 64px;
+}
+
+.service-category h3 {
+  font-size: 1.75rem;
+  margin-bottom: 6px;
+}
+
+.service-category .card-text {
+  line-height: 1.7;
+}
+
+.sidebar {
+  border: 1px solid var(--ui-border) !important;
+  border-radius: var(--ui-radius);
+  box-shadow: var(--ui-shadow-sm);
+  overflow: hidden;
+}
+
+.sidebar > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  background: var(--ui-dark) !important;
+  border-bottom: 0 !important;
+}
+
+.sidebar .list-group-item {
+  border-color: var(--ui-border);
+  color: var(--ui-body);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  line-height: 1.35;
+  padding: 13px 14px !important;
+}
+
+.sidebar .list-group-item i {
+  color: hsl(var(--base));
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+
+.sidebar .list-group-item:hover {
+  background: hsl(var(--base) / 0.07);
+  color: hsl(var(--base));
+}
+
+.sidebar .list-group-item.bg--base,
+.sidebar .list-group-item.bg--base i {
+  color: #ffffff !important;
+}
+
+.show-sidebar-bar {
+  background: #ffffff;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  box-shadow: var(--ui-shadow-sm);
+  padding: 6px 10px;
+}
+
+.form--control,
+.form-control,
+.form-select,
+.select2-container--default .select2-selection--single {
+  background-color: #ffffff;
+  border: 1px solid var(--ui-border-strong) !important;
+  border-radius: 6px !important;
+  color: var(--ui-heading);
+  min-height: 45px;
+}
+
+.form--control:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: hsl(var(--base)) !important;
+  box-shadow: 0 0 0 4px hsl(var(--base) / 0.12) !important;
+}
+
+label {
+  color: var(--ui-heading);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.pricing {
+  background: linear-gradient(180deg, var(--ui-surface-soft), #ffffff);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  margin-bottom: 18px;
+  padding: 15px;
+}
+
+.pricing-header__price {
+  color: var(--ui-heading);
+  font-size: 1.7rem;
+}
+
+.pricing-header__price .text,
+.pricing-header__time,
+.pricing-header__setup {
+  color: var(--ui-muted);
+}
+
+.product-name {
+  font-size: 1.08rem;
+  margin-bottom: 14px;
+}
+
+.prcing-availble {
+  border-radius: 0 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.domain-row {
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  box-shadow: var(--ui-shadow-sm);
+  margin-bottom: 12px;
+  padding: 16px;
+}
+
+.table {
+  --bs-table-bg: #ffffff;
+  border-color: var(--ui-border);
+}
+
+.table thead th {
+  background: var(--ui-surface-soft);
+  color: var(--ui-heading);
+  font-weight: 700;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.breadcrumb-bg {
+  background: #ffffff;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.breadcrumb-bg .breadcrumb {
+  margin-bottom: 0;
+}
+
+.footer {
+  background: var(--ui-dark) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.footer p,
+.footer-text {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.footer .anchor-decoration {
+  color: rgba(255, 255, 255, 0.86) !important;
+  text-decoration: none;
+}
+
+.footer .anchor-decoration:hover {
+  color: #ffffff !important;
+}
+
+.cookies-card {
+  background: #ffffff;
+  border: 1px solid var(--ui-border);
+  box-shadow: var(--ui-shadow);
+  border-radius: var(--ui-radius);
+}
+
+@media (max-width: 991px) {
+  .service-category {
+    padding: 24px 0 42px;
+  }
+
+  .collapable-sidebar {
+    box-shadow: var(--ui-shadow);
+  }
+}
+
+@media (max-width: 575px) {
+  body {
+    font-size: 14px;
+  }
+
+  .service-category h3 {
+    font-size: 1.45rem;
+  }
+
+  .pricing-header__price {
+    font-size: 1.45rem;
+  }
+}
+
+/* ZolaHost interaction polish */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.whm-btn-loading {
+  pointer-events: none;
+  opacity: 0.86;
+}
+
+.whm-btn-loading,
+.whm-btn-loading span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.whm-btn-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 999px;
+  animation: whmSpin 0.65s linear infinite;
+}
+
+@keyframes whmSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.whm-native-select-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.whm-billing-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.whm-billing-card {
+  position: relative;
+  min-height: 112px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.whm-billing-card:hover,
+.whm-billing-card.active {
+  border-color: #2563eb;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.whm-billing-card span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.whm-billing-card strong {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.whm-billing-card small {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.whm-billing-badge {
+  width: max-content;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857 !important;
+  font-size: 10px !important;
+  letter-spacing: 0 !important;
+}
+
+.whm-store-plan-card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.whm-store-plan-card:hover {
+  border-color: #bfdbfe !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+}
+
+.whm-store-plan-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.whm-store-plan-top span {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.whm-store-plan-top b {
+  padding: 5px 9px;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 11px;
+}
+
+.whm-store-price.pricing {
+  margin: 14px 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.whm-store-feature-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.whm-store-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.whm-store-feature-list svg {
+  width: 15px;
+  min-width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  color: #2563eb;
+}
+
+.whm-home-hero__content {
+  min-height: 420px;
+  border-radius: 18px !important;
+}
+
+.whm-home-hero h1 {
+  max-width: 780px;
+}
+
+.whm-story-stage,
+.whm-domain-card,
+.whm-workflow-card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* WHMLab SaaS dashboard shell */
+:root {
+  --whm-brand: #2563eb;
+  --whm-brand-50: #eff6ff;
+  --whm-brand-100: #dbeafe;
+  --whm-brand-700: #1d4ed8;
+  --whm-slate-50: #f8fafc;
+  --whm-slate-100: #f1f5f9;
+  --whm-slate-200: #e2e8f0;
+  --whm-slate-300: #cbd5e1;
+  --whm-slate-400: #94a3b8;
+  --whm-slate-500: #64748b;
+  --whm-slate-600: #475569;
+  --whm-slate-700: #334155;
+  --whm-slate-900: #0f172a;
+  --whm-radius: 12px;
+  --whm-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--whm-slate-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--whm-slate-400);
+}
+
+body {
+  background: var(--whm-slate-50) !important;
+  color: var(--whm-slate-900);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  min-height: 100vh;
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  background: rgba(248, 250, 252, 0.94);
+  backdrop-filter: blur(10px);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.preloader.is-hiding {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.whm-preloader-card {
+  width: min(86vw, 310px);
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  overflow: hidden;
+  padding: 16px;
+  position: relative;
+}
+
+.whm-preloader-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--whm-brand);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: whmPreloaderPulse 0.9s ease-in-out infinite;
+}
+
+.whm-preloader-mark svg {
+  width: 21px;
+  height: 21px;
+}
+
+.whm-preloader-card strong,
+.whm-preloader-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whm-preloader-card strong {
+  color: var(--whm-slate-900);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.whm-preloader-card small {
+  color: var(--whm-slate-500);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.whm-preloader-line {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--whm-brand), transparent);
+  animation: whmPreloaderLine 0.85s ease-in-out infinite;
+}
+
+@keyframes whmPreloaderPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.18);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.08);
+  }
+}
+
+@keyframes whmPreloaderLine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whm-preloader-mark,
+  .whm-preloader-line {
+    animation: none;
+  }
+}
+
+body:has(.whm-app-sidebar) {
+  display: block;
+}
+
+.whm-mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+  height: 56px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--whm-slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.whm-mobile-toggle {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--whm-slate-600);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.whm-mobile-toggle:hover {
+  background: var(--whm-slate-100);
+}
+
+.whm-mobile-brand,
+.whm-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--whm-slate-900);
+}
+
+.whm-mobile-brand:hover,
+.whm-brand:hover {
+  color: var(--whm-slate-900);
+}
+
+.whm-brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--whm-brand);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.24);
+}
+
+.whm-brand-mark svg,
+.whm-mobile-toggle svg,
+.whm-nav-item svg,
+.whm-topbar-search svg,
+.whm-cart-link svg,
+.whm-breadcrumb svg,
+.whm-sidebar-user svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.whm-brand strong {
+  display: block;
+  color: var(--whm-slate-900);
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.whm-brand small {
+  display: block;
+  color: var(--whm-slate-400);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.whm-app-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1050;
+  width: 264px;
+  background: #ffffff;
+  border-right: 1px solid var(--whm-slate-200);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whm-app-sidebar.is-open {
+  transform: translateX(0);
+}
+
+.whm-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1045;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+}
+
+.whm-sidebar-overlay.is-open {
+  display: block;
+}
+
+.whm-sidebar-brand {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--whm-slate-200);
+}
+
+.whm-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+}
+
+.whm-nav-group {
+  margin-bottom: 24px;
+}
+
+.whm-nav-group p {
+  color: var(--whm-slate-400);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  padding: 0 12px;
+  text-transform: uppercase;
+}
+
+.whm-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--whm-slate-600);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whm-nav-item + .whm-nav-item {
+  margin-top: 2px;
+}
+
+.whm-nav-item:hover {
+  background: var(--whm-slate-50);
+  color: var(--whm-slate-900);
+}
+
+.whm-nav-item.active {
+  background: var(--whm-brand-50);
+  color: var(--whm-brand);
+}
+
+.whm-nav-item.active::after {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px 0 0 3px;
+  background: var(--whm-brand);
+}
+
+.whm-sidebar-user {
+  border-top: 1px solid var(--whm-slate-200);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.whm-sidebar-user img,
+.whm-avatar-link img {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.whm-sidebar-user div {
+  flex: 1;
+  min-width: 0;
+}
+
+.whm-sidebar-user strong,
+.whm-sidebar-user span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whm-sidebar-user strong {
+  color: var(--whm-slate-900);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.whm-sidebar-user span {
+  color: var(--whm-slate-500);
+  font-size: 12px;
+}
+
+.whm-sidebar-user a {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: var(--whm-slate-400);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.whm-sidebar-user a:hover {
+  background: var(--whm-slate-100);
+  color: var(--whm-slate-700);
+}
+
+.whm-main-content {
+  min-height: 100vh;
+}
+
+.whm-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--whm-slate-200);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.whm-topbar-kicker {
+  color: var(--whm-slate-500);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+}
+
+.whm-topbar h1 {
+  color: var(--whm-slate-900);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.whm-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.whm-topbar-search {
+  position: relative;
+}
+
+.whm-topbar-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  color: var(--whm-slate-400);
+  transform: translateY(-50%);
+}
+
+.whm-topbar-search input {
+  width: 320px;
+  height: 40px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 10px;
+  background: var(--whm-slate-50);
+  color: var(--whm-slate-900);
+  font-size: 14px;
+  outline: none;
+  padding: 0 14px 0 40px;
+}
+
+.whm-topbar-search input:focus {
+  border-color: var(--whm-brand);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.whm-login-btn {
+  min-height: 38px;
+  border-radius: 10px;
+  background: var(--whm-brand);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.whm-login-btn:hover {
+  background: var(--whm-brand-700);
+  color: #ffffff;
+}
+
+.whm-cart-link {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid var(--whm-slate-200);
+  color: var(--whm-slate-600);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+}
+
+.whm-cart-link:hover {
+  background: var(--whm-slate-50);
+  color: var(--whm-brand);
+}
+
+.whm-cart-link span {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
+.whm-breadcrumb {
+  background: transparent !important;
+  border: 0;
+  padding: 22px 0 0;
+}
+
+.whm-breadcrumb .container {
+  max-width: 1400px;
+}
+
+.whm-breadcrumb-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--whm-slate-500);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.whm-breadcrumb-text a {
+  color: var(--whm-brand);
+  text-decoration: none;
+}
+
+.whm-breadcrumb-text span {
+  color: var(--whm-slate-700);
+}
+
+.whm-page-body,
+.service-category {
+  padding: 24px 0 56px;
+}
+
+.whm-main-content > .service-category,
+.whm-main-content .section-full,
+.whm-main-content > .col-12 {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.whm-main-content .service-category > .container,
+.whm-main-content .section-full > .container,
+.whm-main-content .breadcrumb-bg > .container {
+  max-width: 1400px;
+}
+
+.whm-main-content .col-lg-9 {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.whm-main-content .row {
+  --bs-gutter-x: 1.5rem;
+}
+
+.card,
+.custom--card,
+.domain-row,
+.contact-card,
+.gateway-card,
+.domain-card-wrapper,
+.cookies-card {
+  background: #ffffff !important;
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: var(--whm-radius) !important;
+  box-shadow: none !important;
+}
+
+.card:hover,
+.custom--card:hover,
+.service-card .card:hover,
+.service-category .card:hover {
+  box-shadow: var(--whm-shadow) !important;
+  transform: translateY(-1px);
+}
+
+.card-header,
+.custom--card .card-header,
+.custom--card .card-footer,
+.service-card .card-header,
+.service-category .card-header {
+  background: var(--whm-slate-50) !important;
+  border-color: var(--whm-slate-200) !important;
+  color: var(--whm-slate-900) !important;
+  font-weight: 700;
+}
+
+.bg-dark-two {
+  background: var(--whm-slate-50) !important;
+  color: var(--whm-slate-900) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--whm-slate-900);
+}
+
+.service-category h3,
+.whm-main-content h3 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.pricing {
+  background: var(--whm-slate-50);
+  border: 1px solid var(--whm-slate-200);
+  border-radius: var(--whm-radius);
+}
+
+.pricing-header__price {
+  color: var(--whm-slate-900);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.pricing-header__price .text,
+.pricing-header__time,
+.pricing-header__setup,
+.card-text,
+p {
+  color: var(--whm-slate-500);
+}
+
+.btn,
+.cmn--btn,
+.btn--base,
+.btn--base-outline {
+  border-radius: 10px !important;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn--base,
+.cmn--btn {
+  background: var(--whm-brand) !important;
+  border-color: var(--whm-brand) !important;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.12) !important;
+}
+
+.btn--base:hover,
+.cmn--btn:hover {
+  background: var(--whm-brand-700) !important;
+  border-color: var(--whm-brand-700) !important;
+}
+
+.form-control,
+.form--control,
+.form-select,
+.select2-container--default .select2-selection--single {
+  min-height: 44px;
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: var(--whm-slate-900);
+  font-size: 14px;
+}
+
+.form-control:focus,
+.form--control:focus,
+.form-select:focus {
+  border-color: var(--whm-brand) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+label {
+  color: var(--whm-slate-700);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.table,
+table {
+  --bs-table-bg: #ffffff;
+  color: var(--whm-slate-700);
+}
+
+.table thead th,
+table thead th {
+  background: var(--whm-slate-50);
+  color: var(--whm-slate-500);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.table tbody tr:hover,
+table tbody tr:hover {
+  background: var(--whm-slate-50);
+}
+
+.footer {
+  background: transparent !important;
+  border-top: 1px solid var(--whm-slate-200);
+  color: var(--whm-slate-500);
+  margin: 24px 32px 0;
+  padding: 24px 0 !important;
+}
+
+.footer p,
+.footer-text {
+  color: var(--whm-slate-500);
+}
+
+.footer .logo {
+  display: none;
+}
+
+.footer .anchor-decoration {
+  color: var(--whm-slate-600) !important;
+  text-decoration: none;
+}
+
+.footer .anchor-decoration:hover {
+  color: var(--whm-brand) !important;
+}
+
+.whm-footer {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.whm-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.4fr) repeat(4, minmax(130px, 1fr));
+  gap: 28px;
+}
+
+.whm-footer-brand p {
+  max-width: 340px;
+  color: var(--whm-slate-500);
+  line-height: 1.65;
+  margin-top: 14px;
+}
+
+.whm-footer h6 {
+  color: var(--whm-slate-900);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.whm-footer a {
+  color: var(--whm-slate-600);
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+
+.whm-footer a:hover {
+  color: var(--whm-brand);
+}
+
+.whm-footer-bottom {
+  border-top: 1px solid var(--whm-slate-200);
+  color: var(--whm-slate-500);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 650;
+  margin-top: 26px;
+  padding-top: 18px;
+}
+
+@media (min-width: 992px) {
+  .whm-main-content {
+    margin-left: 0;
+    padding-top: 72px;
+  }
+
+  .whm-app-sidebar,
+  .whm-topbar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .whm-main-content {
+    margin-left: 0;
+  }
+
+  .whm-breadcrumb {
+    padding-top: 16px;
+  }
+
+  .whm-page-body,
+  .service-category {
+    padding-top: 18px;
+  }
+}
+
+.whm-desktop-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1060;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--whm-slate-200);
+  backdrop-filter: blur(16px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 32px;
+}
+
+.whm-desktop-menu,
+.whm-desktop-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.whm-desktop-menu {
+  flex: 1;
+  justify-content: center;
+}
+
+.whm-desktop-menu > a,
+.whm-menu-dropdown > button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--whm-slate-700);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.whm-desktop-menu > a:hover,
+.whm-desktop-menu > a.active,
+.whm-menu-dropdown:hover > button {
+  background: var(--whm-slate-100);
+  color: var(--whm-slate-900);
+}
+
+.whm-menu-dropdown {
+  position: relative;
+}
+
+.whm-menu-dropdown button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.whm-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  width: 260px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -8px);
+  transition: all 0.18s ease;
+  padding: 10px;
+}
+
+.whm-dropdown-panel--wide {
+  width: min(760px, calc(100vw - 64px));
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.whm-menu-dropdown:hover .whm-dropdown-panel,
+.whm-menu-dropdown:focus-within .whm-dropdown-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.whm-dropdown-panel a,
+.whm-dropdown-grid a {
+  border-radius: 12px;
+  color: var(--whm-slate-700);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
+.whm-dropdown-panel a:hover,
+.whm-dropdown-grid a:hover {
+  background: var(--whm-brand-50);
+  color: var(--whm-brand);
+}
+
+.whm-dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.whm-dropdown-grid svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.whm-dropdown-intro {
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--whm-brand), var(--whm-brand-700));
+  color: #ffffff;
+  padding: 18px;
+}
+
+.whm-dropdown-intro strong,
+.whm-dropdown-intro span {
+  display: block;
+}
+
+.whm-dropdown-intro strong {
+  font-size: 18px;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.whm-dropdown-intro span {
+  color: #dbeafe;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.whm-user-chip {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 999px;
+  color: var(--whm-slate-900);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 3px 10px 3px 3px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.whm-user-chip img {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+}
+
+.whm-user-chip:hover {
+  background: var(--whm-slate-50);
+  color: var(--whm-brand);
+}
+
+.whm-social-login {
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.whm-social-login > span {
+  color: var(--whm-slate-500);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.whm-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.whm-social-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 14px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+
+.whm-social-icon:hover {
+  border-color: var(--whm-brand-100);
+  background: var(--whm-brand-50);
+  transform: translateY(-1px);
+}
+
+.whm-social-icon img {
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+}
+
+.whm-login-or {
+  color: var(--whm-slate-400);
+  font-size: 12px;
+  font-weight: 700;
+  margin: 2px 0 18px;
+  position: relative;
+}
+
+.whm-login-or::before,
+.whm-login-or::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: var(--whm-slate-200);
+}
+
+.whm-login-or::before {
+  left: 0;
+}
+
+.whm-login-or::after {
+  right: 0;
+}
+
+.whm-plan-card li:nth-child(n + 5),
+.service-card .card-text,
+.service-category .card-text,
+.whm-feature-grid span,
+.whm-workflow-step span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.service-card .card-text,
+.service-category .card-text,
+.whm-feature-grid span {
+  -webkit-line-clamp: 2;
+}
+
+.whm-workflow-step span {
+  -webkit-line-clamp: 2;
+}
+
+.whm-plan-card li:nth-child(n + 5) {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .responsive-table thead,
+  table thead {
+    display: none;
+  }
+
+  .responsive-table tr,
+  table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid var(--whm-slate-200);
+    border-radius: var(--whm-radius);
+    background: #ffffff;
+    padding: 16px;
+  }
+
+  .responsive-table td,
+  table tbody td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0 !important;
+    border: none !important;
+  }
+
+  .responsive-table td::before,
+  table tbody td::before {
+    content: attr(data-label);
+    color: var(--whm-slate-500);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}
+
+.whm-auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  background: var(--whm-slate-50);
+}
+
+.whm-auth-brand-panel {
+  background: var(--whm-brand);
+  color: #ffffff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+}
+
+.whm-auth-brand-panel::before,
+.whm-auth-brand-panel::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.whm-auth-brand-panel::before {
+  width: 320px;
+  height: 320px;
+  top: -120px;
+  right: -120px;
+}
+
+.whm-auth-brand-panel::after {
+  width: 220px;
+  height: 220px;
+  bottom: -80px;
+  left: -80px;
+}
+
+.whm-auth-brand-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.whm-auth-brand-panel .whm-brand strong,
+.whm-auth-brand-panel .whm-brand small {
+  color: #ffffff;
+}
+
+.whm-auth-brand-panel .whm-brand-mark {
+  background: #ffffff;
+  color: var(--whm-brand);
+}
+
+.whm-auth-kicker {
+  color: var(--whm-brand-100);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.whm-auth-brand-panel h1 {
+  color: #ffffff;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  max-width: 620px;
+}
+
+.whm-auth-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.whm-auth-card {
+  width: min(100%, 460px);
+}
+
+.whm-auth-card-wide {
+  width: min(100%, 680px);
+}
+
+.whm-auth-card .card,
+.whm-auth-card .custom--card {
+  box-shadow: var(--whm-shadow) !important;
+}
+
+@media (max-width: 991px) {
+  .whm-auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .whm-auth-brand-panel {
+    min-height: 260px;
+    padding: 28px;
+  }
+}
+
+.whm-home-hero,
+.whm-home-section {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.whm-home-hero {
+  display: block;
+  padding-top: 28px;
+  padding-bottom: 18px;
+}
+
+.whm-home-hero__content {
+  min-height: 350px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(255, 255, 255, 0.16), transparent 18rem),
+    linear-gradient(135deg, #2563eb 0%, #1d4ed8 48%, #172554 100%);
+  color: #ffffff;
+  padding: clamp(28px, 5vw, 58px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.whm-home-hero__content::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -70px;
+  bottom: -90px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.whm-eyebrow {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #dbeafe;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  padding: 8px 12px;
+}
+
+.whm-eyebrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+.whm-home-hero h1 {
+  max-width: 900px;
+  color: #ffffff;
+  font-size: clamp(2.15rem, 4.6vw, 4.35rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.whm-home-hero p {
+  max-width: 680px;
+  color: #bfdbfe;
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+  line-height: 1.75;
+  position: relative;
+  z-index: 1;
+}
+
+.whm-story-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 18px 24px 34px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  gap: 18px;
+}
+
+.whm-story-copy,
+.whm-story-stage {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 16px 46px rgba(15, 23, 42, 0.045);
+}
+
+.whm-story-copy {
+  padding: clamp(22px, 3vw, 34px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.whm-story-copy > p {
+  color: var(--whm-brand);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.whm-story-copy h2 {
+  color: var(--whm-slate-900);
+  font-size: clamp(1.65rem, 3vw, 2.8rem);
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+
+.whm-story-copy span {
+  color: var(--whm-slate-500);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+.whm-story-stage {
+  min-height: 270px;
+  overflow: hidden;
+  position: relative;
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.whm-story-slide {
+  position: absolute;
+  inset: clamp(22px, 3vw, 34px);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.whm-story-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.whm-story-slide small {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--whm-brand-50);
+  color: var(--whm-brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 18px;
+}
+
+.whm-story-slide h3 {
+  color: var(--whm-slate-900);
+  font-size: clamp(1.45rem, 2.4vw, 2.25rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+}
+
+.whm-story-slide p {
+  color: var(--whm-slate-500);
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.7;
+  max-width: 680px;
+}
+
+.whm-story-slide strong {
+  width: fit-content;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 999px;
+  background: rgba(239, 246, 255, 0.84);
+  color: var(--whm-brand);
+  font-size: 13px;
+  font-weight: 850;
+  padding: 8px 12px;
+}
+
+.whm-story-controls {
+  position: absolute;
+  right: 24px;
+  bottom: 22px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.whm-story-controls button {
+  width: 8px;
+  height: 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+  padding: 0;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.whm-story-controls button.active {
+  width: 28px;
+  background: var(--whm-brand);
+}
+
+.whm-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.whm-primary-action,
+.whm-secondary-action {
+  min-height: 46px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 18px;
+}
+
+.whm-primary-action {
+  background: #ffffff;
+  color: var(--whm-brand);
+}
+
+.whm-primary-action:hover {
+  color: var(--whm-brand-700);
+  transform: translateY(-1px);
+}
+
+.whm-secondary-action {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+}
+
+.whm-secondary-action:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.whm-primary-action svg,
+.whm-secondary-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+.whm-hero-panel {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 22px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.whm-hero-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--whm-slate-200);
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.whm-hero-panel__header span,
+.whm-hero-mini-plan small,
+.whm-plan-card__top span,
+.whm-section-heading p,
+.whm-domain-card p {
+  color: var(--whm-slate-500);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.whm-hero-panel__header strong {
+  display: block;
+  color: var(--whm-slate-900);
+  font-size: 24px;
+  line-height: 1.15;
+  margin-top: 4px;
+}
+
+.whm-hero-panel__header > svg {
+  width: 42px;
+  height: 42px;
+  color: var(--whm-brand);
+  background: var(--whm-brand-50);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.whm-hero-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.whm-hero-mini-plan {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+
+.whm-hero-mini-plan:hover {
+  border-color: var(--whm-brand-100);
+  background: var(--whm-brand-50);
+}
+
+.whm-hero-mini-plan strong,
+.whm-hero-mini-plan small {
+  display: block;
+}
+
+.whm-hero-mini-plan strong {
+  color: var(--whm-slate-900);
+  font-size: 15px;
+}
+
+.whm-hero-mini-plan b {
+  color: var(--whm-brand);
+  font-size: 18px;
+}
+
+.whm-home-section {
+  padding-top: 36px;
+  padding-bottom: 36px;
+}
+
+.whm-home-section--tight {
+  padding-top: 6px;
+  padding-bottom: 20px;
+}
+
+.whm-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.whm-metric-card {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.whm-metric-card svg {
+  width: 34px;
+  height: 34px;
+  color: var(--whm-brand);
+  background: var(--whm-brand-50);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 18px;
+}
+
+.whm-metric-card strong {
+  display: block;
+  color: var(--whm-slate-900);
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 7px;
+}
+
+.whm-metric-card span {
+  color: var(--whm-slate-500);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.whm-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.whm-section-heading h2,
+.whm-domain-card h2 {
+  max-width: 760px;
+  color: var(--whm-slate-900);
+  font-size: clamp(1.65rem, 2.6vw, 2.7rem);
+  font-weight: 850;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.whm-billing-switch {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 999px;
+  background: #ffffff;
+  display: flex;
+  padding: 4px;
+}
+
+.whm-billing-switch button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--whm-slate-600);
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 36px;
+  padding: 0 16px;
+}
+
+.whm-billing-switch button.active {
+  background: var(--whm-brand);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+
+.whm-category-tabs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.whm-category-tabs button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--whm-slate-600);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 16px;
+}
+
+.whm-category-tabs button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.whm-category-tabs button.active {
+  border-color: var(--whm-brand);
+  background: var(--whm-brand-50);
+  color: var(--whm-brand);
+}
+
+.whm-category-panel {
+  display: none;
+  animation: whmFadeUp 0.24s ease-out;
+}
+
+.whm-category-panel.active {
+  display: block;
+}
+
+@keyframes whmFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.whm-category-panel__intro {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 18px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 16px;
+  padding: 18px;
+}
+
+.whm-category-panel__intro h3 {
+  color: var(--whm-slate-900);
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+.whm-category-panel__intro p {
+  max-width: 760px;
+  line-height: 1.65;
+}
+
+.whm-category-panel__intro a {
+  color: var(--whm-brand);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  font-weight: 800;
+}
+
+.whm-category-panel__intro a svg {
+  width: 16px;
+  height: 16px;
+}
+
+.whm-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.whm-plan-card {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 20px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 22px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whm-plan-card:hover {
+  border-color: var(--whm-brand-100);
+  box-shadow: var(--whm-shadow);
+  transform: translateY(-2px);
+}
+
+.whm-plan-card__top h4 {
+  color: var(--whm-slate-900);
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+}
+
+.whm-plan-price {
+  border-bottom: 1px solid var(--whm-slate-200);
+  margin: 20px 0;
+  padding-bottom: 18px;
+}
+
+.whm-plan-price strong {
+  color: var(--whm-slate-900);
+  font-size: 34px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.whm-plan-price span {
+  color: var(--whm-slate-500);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.whm-plan-card ul {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.whm-plan-card li {
+  color: var(--whm-slate-600);
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.whm-plan-card li svg {
+  width: 17px;
+  height: 17px;
+  color: #10b981;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.whm-plan-action {
+  min-height: 42px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 12px;
+  color: var(--whm-slate-900);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  margin-top: auto;
+}
+
+.whm-plan-action:hover {
+  border-color: var(--whm-brand);
+  background: var(--whm-brand);
+  color: #ffffff;
+}
+
+.whm-plan-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.whm-split-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 16px;
+}
+
+.whm-domain-card,
+.whm-workflow-card,
+.whm-feature-grid > div {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 22px;
+  background: #ffffff;
+  padding: 24px;
+}
+
+.whm-domain-card .domain-search-form,
+.whm-domain-card form {
+  margin: 22px 0 0;
+}
+
+.whm-tld-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.whm-tld-row span {
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 999px;
+  color: var(--whm-slate-600);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.whm-tld-row b {
+  color: var(--whm-brand);
+  margin-left: 5px;
+}
+
+.whm-workflow-card {
+  display: grid;
+  gap: 14px;
+}
+
+.whm-workflow-step {
+  display: flex;
+  align-items: start;
+  gap: 14px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.whm-workflow-step svg {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: var(--whm-brand-50);
+  color: var(--whm-brand);
+  flex: 0 0 auto;
+  padding: 9px;
+}
+
+.whm-workflow-step strong,
+.whm-workflow-step span {
+  display: block;
+}
+
+.whm-workflow-step strong {
+  color: var(--whm-slate-900);
+  font-size: 15px;
+  margin-bottom: 3px;
+}
+
+.whm-workflow-step span {
+  color: var(--whm-slate-500);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.whm-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.whm-feature-grid svg {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--whm-slate-100);
+  color: var(--whm-brand);
+  padding: 10px;
+  margin-bottom: 18px;
+}
+
+.whm-feature-grid strong,
+.whm-feature-grid span {
+  display: block;
+}
+
+.whm-feature-grid strong {
+  color: var(--whm-slate-900);
+  font-size: 18px;
+  margin-bottom: 7px;
+}
+
+.whm-feature-grid span {
+  color: var(--whm-slate-500);
+  line-height: 1.65;
+}
+
+@media (max-width: 1199px) {
+  .whm-home-hero,
+  .whm-split-section {
+    grid-template-columns: 1fr;
+  }
+
+  .whm-home-hero__content {
+    min-height: 330px;
+  }
+
+  .whm-story-section {
+    grid-template-columns: 1fr;
+  }
+
+  .whm-metric-grid,
+  .whm-plan-grid,
+  .whm-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .whm-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .whm-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 575px) {
+  .whm-footer {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .whm-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Final polish: forms, actions, pricing, header, footer */
+.whm-field-label-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+}
+
+.form-group:not(.custom--checkbox) > label:not([role="button"]) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+}
+
+.whm-field-modern {
+  position: relative;
+}
+
+.form-group:not(.custom--checkbox) > label.whm-field-label-hidden + .form-control,
+.form-group:not(.custom--checkbox) > label.whm-field-label-hidden + .form--control,
+.form-group:not(.custom--checkbox) > label.whm-field-label-hidden + select,
+.whm-field-modern .form-control,
+.whm-field-modern .form--control,
+.whm-field-modern .form-select {
+  margin-top: 0 !important;
+}
+
+.form-control,
+.form--control,
+.form-select,
+textarea.form--control,
+textarea.form-control,
+.select2-container--default .select2-selection--single {
+  min-height: 52px !important;
+  border: 1px solid rgba(148, 163, 184, 0.34) !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(15, 23, 42, 0.08)) border-box !important;
+  color: var(--whm-slate-900) !important;
+  font-size: 15px !important;
+  font-weight: 650;
+  letter-spacing: 0;
+  padding: 0 17px !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+textarea.form--control,
+textarea.form-control {
+  min-height: 132px !important;
+  padding-top: 15px !important;
+  resize: vertical;
+}
+
+.form-control::placeholder,
+.form--control::placeholder,
+textarea::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 650;
+}
+
+.form-control:hover,
+.form--control:hover,
+.form-select:hover {
+  border-color: rgba(37, 99, 235, 0.34) !important;
+}
+
+.form-control:focus,
+.form--control:focus,
+.form-select:focus,
+textarea.form--control:focus,
+textarea.form-control:focus {
+  border-color: var(--whm-brand) !important;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(135deg, var(--whm-brand), #60a5fa) border-box !important;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.11), 0 12px 28px rgba(15, 23, 42, 0.06) !important;
+  transform: translateY(-1px);
+}
+
+.input-group .form-control,
+.input-group .form--control {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.input-group .btn,
+.input-group-text.btn {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.btn,
+.cmn--btn,
+.btn--base,
+.btn--primary,
+.whm-login-btn,
+.whm-primary-action,
+.whm-secondary-action,
+.whm-plan-action {
+  min-height: 46px;
+  border-radius: 999px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 850 !important;
+  letter-spacing: -0.005em;
+}
+
+.btn--base,
+.cmn--btn,
+.whm-login-btn,
+.whm-primary-action {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22) !important;
+}
+
+.btn--base:hover,
+.cmn--btn:hover,
+.whm-login-btn:hover,
+.whm-primary-action:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+  color: #ffffff !important;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28) !important;
+  transform: translateY(-1px);
+}
+
+.btn--base-outline,
+.whm-secondary-action,
+.whm-plan-action {
+  border: 1px solid rgba(148, 163, 184, 0.35) !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  color: var(--whm-slate-900) !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.btn--base-outline:hover,
+.whm-secondary-action:hover,
+.whm-plan-action:hover {
+  border-color: var(--whm-brand) !important;
+  background: var(--whm-brand) !important;
+  color: #ffffff !important;
+}
+
+.whm-desktop-nav {
+  height: 68px;
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 34px rgba(15, 23, 42, 0.045);
+}
+
+.whm-desktop-nav .whm-brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+
+.whm-desktop-menu > a,
+.whm-menu-dropdown > button {
+  color: #1f2937;
+  min-height: 38px;
+  padding: 0 13px;
+}
+
+.whm-desktop-menu > a:hover,
+.whm-desktop-menu > a.active,
+.whm-menu-dropdown:hover > button {
+  background: rgba(241, 245, 249, 0.86);
+  color: var(--whm-brand);
+}
+
+.whm-dropdown-panel {
+  border-color: rgba(226, 232, 240, 0.95);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.13);
+}
+
+.whm-plan-card {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 14rem),
+    #ffffff;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.whm-plan-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, #60a5fa, #2563eb, #93c5fd);
+}
+
+.whm-plan-card:hover {
+  border-color: rgba(37, 99, 235, 0.28);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.1) !important;
+  transform: translateY(-4px);
+}
+
+.whm-plan-card__top span {
+  width: fit-content;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 999px;
+  background: rgba(239, 246, 255, 0.8);
+  color: var(--whm-brand);
+  padding: 5px 9px;
+}
+
+.whm-plan-card__top h4 {
+  font-size: 24px;
+  margin-top: 13px;
+}
+
+.whm-plan-price {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  margin: 18px 0;
+}
+
+.whm-plan-price strong {
+  font-size: clamp(2rem, 3vw, 2.75rem);
+}
+
+.whm-plan-card ul {
+  gap: 9px;
+}
+
+.whm-plan-card li {
+  color: #475569;
+  font-weight: 650;
+}
+
+.service-category .card .pricing,
+.pricing {
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 12rem),
+    #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  padding: 16px;
+}
+
+.pricing-header__price {
+  font-size: clamp(1.65rem, 2.5vw, 2.25rem) !important;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.pricing-header__time {
+  width: fit-content;
+  border-radius: 999px;
+  background: var(--whm-brand-50);
+  color: var(--whm-brand) !important;
+  font-size: 12px;
+  font-weight: 850;
+  padding: 5px 9px;
+}
+
+.whm-footer {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 28px 28px 0 0;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.08), transparent 22rem),
+    rgba(255, 255, 255, 0.78) !important;
+  margin-top: 48px;
+  box-shadow: 0 -12px 40px rgba(15, 23, 42, 0.035);
+}
+
+.whm-footer h6 {
+  color: #0f172a;
+}
+
+.whm-footer a {
+  color: #475569;
+}
+
+.whm-footer a:hover {
+  transform: translateX(2px);
+}
+
+@media (min-width: 992px) {
+  .whm-main-content {
+    padding-top: 68px;
+  }
+}
+
+@media (max-width: 575px) {
+  .form-control,
+  .form--control,
+  .form-select {
+    min-height: 50px !important;
+    border-radius: 14px !important;
+  }
+
+  .whm-plan-card {
+    border-radius: 22px;
+    padding: 20px;
+  }
+}
+
+/* Client area: restored desktop sidebar with refined dashboard pages */
+@media (min-width: 992px) {
+  .whm-client-desktop-nav {
+    display: none !important;
+  }
+
+  .whm-client-sidebar {
+    display: flex !important;
+    transform: translateX(0) !important;
+    width: 276px;
+    border-right: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 10px 0 34px rgba(15, 23, 42, 0.035);
+  }
+
+  .whm-client-main {
+    margin-left: 276px !important;
+    padding-top: 0 !important;
+    min-height: 100vh;
+  }
+
+  .whm-client-main .whm-topbar {
+    display: flex !important;
+  }
+}
+
+.whm-client-main {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(37, 99, 235, 0.06), transparent 24rem),
+    var(--whm-slate-50);
+}
+
+.whm-client-main .whm-topbar {
+  height: 70px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.92);
+  box-shadow: 0 10px 34px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(14px);
+}
+
+.whm-client-main .breadcrumb-bg {
+  padding-top: 18px;
+}
+
+.whm-client-page-body {
+  padding-bottom: 36px;
+}
+
+.whm-client-page-body > .pt-60,
+.whm-client-page-body > .pb-60,
+.whm-client-page-body .pt-60.pb-60 {
+  padding-top: 20px !important;
+  padding-bottom: 24px !important;
+}
+
+.whm-client-page-body .container,
+.whm-client-main .breadcrumb-bg > .container,
+.whm-client-main .service-category > .container {
+  max-width: 1220px;
+}
+
+.whm-client-sidebar .whm-sidebar-brand {
+  min-height: 70px;
+}
+
+.whm-client-sidebar .whm-nav-group {
+  margin-bottom: 18px;
+}
+
+.whm-client-sidebar .whm-nav-item {
+  min-height: 44px;
+  border-radius: 14px;
+}
+
+.whm-client-sidebar .whm-nav-item.active {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.98), rgba(219, 234, 254, 0.72));
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.08);
+}
+
+.user-dashboard {
+  row-gap: 18px;
+  margin-bottom: 24px;
+}
+
+.user-dashboard .custom--card {
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-left: 0 !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 11rem),
+    #ffffff !important;
+  min-height: 132px;
+  overflow: hidden;
+  position: relative;
+}
+
+.user-dashboard .custom--card::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 0;
+  width: 4px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+}
+
+.user-dashboard .custom--card .card-body {
+  padding: 22px;
+}
+
+.user-dashboard .custom--card p {
+  color: var(--whm-slate-500) !important;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.user-dashboard .custom--card h4 {
+  color: var(--whm-slate-900);
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.widgets-icons-2 {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 16px !important;
+  background: var(--whm-brand-50) !important;
+  color: var(--whm-brand) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px !important;
+}
+
+.whm-client-page-body .card,
+.whm-client-page-body .custom--card {
+  border-radius: 22px !important;
+  border-color: rgba(226, 232, 240, 0.95) !important;
+}
+
+.whm-client-page-body .custom-border-top-dark {
+  border-top: 0 !important;
+}
+
+.whm-client-page-body .card-header {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+}
+
+.whm-client-page-body table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+.whm-client-page-body .table {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 22px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.whm-client-page-body .table thead th {
+  padding: 16px 18px;
+}
+
+.whm-client-page-body .table tbody td {
+  padding: 17px 18px;
+  vertical-align: middle;
+}
+
+.whm-client-page-body .badge--icon,
+.whm-client-page-body .badge.badge--icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--whm-brand-50) !important;
+  color: var(--whm-brand) !important;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+}
+
+.whm-client-page-body .badge--icon:hover,
+.whm-client-page-body .badge.badge--icon:hover {
+  background: var(--whm-brand) !important;
+  color: #ffffff !important;
+}
+
+.whm-client-main .footer {
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
+@media (max-width: 991px) {
+  .whm-client-page-body {
+    padding-top: 0;
+  }
+
+  .whm-client-main .footer {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .whm-home-hero,
+  .whm-home-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .whm-home-hero {
+    gap: 16px;
+    padding-top: 18px;
+  }
+
+  .whm-home-hero__content {
+    border-radius: 18px;
+    min-height: auto;
+    padding: 28px;
+  }
+
+  .whm-story-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .whm-story-stage {
+    min-height: 330px;
+  }
+
+  .whm-section-heading,
+  .whm-category-panel__intro {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .whm-metric-grid,
+  .whm-plan-grid,
+  .whm-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .whm-plan-price strong {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .whm-story-stage {
+    min-height: 380px;
+  }
+
+  .whm-story-controls {
+    left: 24px;
+    right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whm-story-slide {
+    transition: none;
+  }
+}
+
+/* WHMLab clean dashboard pass: flat surfaces, single brand accent, responsive client nav */
+:root {
+  --whm-brand: #2563eb;
+  --whm-brand-700: #1d4ed8;
+  --whm-brand-50: #eff6ff;
+  --whm-slate-900: #0f172a;
+  --whm-slate-700: #334155;
+  --whm-slate-600: #475569;
+  --whm-slate-500: #64748b;
+  --whm-slate-200: #e2e8f0;
+  --whm-slate-100: #f1f5f9;
+  --whm-slate-50: #f8fafc;
+  --whm-surface: #ffffff;
+  --whm-radius: 14px;
+  --whm-shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --whm-shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+body {
+  background: var(--whm-slate-50) !important;
+  color: var(--whm-slate-900);
+}
+
+.whm-main-content,
+.whm-client-main,
+.service-category,
+.pricing,
+.bg--light {
+  background: var(--whm-slate-50) !important;
+}
+
+.whm-client-main .whm-topbar,
+.whm-desktop-nav,
+.whm-mobile-header,
+.whm-app-sidebar,
+.whm-footer,
+.card,
+.custom--card,
+.whm-plan-card,
+.pricing,
+.whm-category-panel,
+.whm-story-stage,
+.whm-feature-card,
+.whm-info-card,
+.whm-topbar-search,
+.whm-dropdown-panel {
+  background: var(--whm-surface) !important;
+  border-color: var(--whm-slate-200) !important;
+  box-shadow: var(--whm-shadow-subtle) !important;
+  backdrop-filter: none !important;
+}
+
+.whm-desktop-nav,
+.whm-mobile-header,
+.whm-client-main .whm-topbar {
+  border-bottom: 1px solid var(--whm-slate-200) !important;
+}
+
+.whm-app-sidebar,
+.whm-client-sidebar {
+  border-right: 1px solid var(--whm-slate-200) !important;
+}
+
+.whm-footer {
+  border: 1px solid var(--whm-slate-200) !important;
+}
+
+.whm-home-hero__content,
+.whm-dropdown-intro {
+  background: var(--whm-brand) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.whm-home-hero__content::after,
+.whm-plan-card::before,
+.user-dashboard .custom--card::before {
+  background: var(--whm-brand) !important;
+}
+
+.whm-home-hero__content::before,
+.whm-home-hero__content::after {
+  opacity: 0.14;
+}
+
+.whm-plan-card,
+.pricing,
+.user-dashboard .custom--card,
+.whm-client-page-body .card,
+.whm-client-page-body .custom--card {
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: var(--whm-radius) !important;
+  overflow: hidden;
+}
+
+.whm-plan-card:hover,
+.pricing:hover,
+.user-dashboard .custom--card:hover,
+.whm-feature-card:hover,
+.whm-info-card:hover,
+.card-hover:hover {
+  border-color: #bfdbfe !important;
+  box-shadow: var(--whm-shadow-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn--base,
+.whm-login-btn,
+.whm-primary-action,
+button.btn--base,
+a.btn--base {
+  background: var(--whm-brand) !important;
+  border: 1px solid var(--whm-brand) !important;
+  color: #ffffff !important;
+  box-shadow: var(--whm-shadow-subtle) !important;
+}
+
+.btn--base:hover,
+.whm-login-btn:hover,
+.whm-primary-action:hover,
+button.btn--base:hover,
+a.btn--base:hover {
+  background: var(--whm-brand-700) !important;
+  border-color: var(--whm-brand-700) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.btn--base-outline,
+.whm-secondary-action,
+.whm-topbar-search {
+  background: #ffffff !important;
+  border: 1px solid var(--whm-slate-200) !important;
+  color: var(--whm-slate-700) !important;
+}
+
+.btn--base-outline:hover,
+.whm-secondary-action:hover {
+  background: var(--whm-brand-50) !important;
+  border-color: #bfdbfe !important;
+  color: var(--whm-brand) !important;
+}
+
+.form--control,
+.form-control,
+.select,
+select,
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]) {
+  background: #ffffff !important;
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: 12px !important;
+  color: var(--whm-slate-900) !important;
+  box-shadow: none !important;
+}
+
+.form--control:focus,
+.form-control:focus,
+.select:focus,
+select:focus,
+textarea:focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):focus {
+  border-color: var(--whm-brand) !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+.whm-nav-item,
+.whm-desktop-menu a,
+.whm-desktop-menu button,
+.whm-mobile-bottom-nav a {
+  color: var(--whm-slate-600) !important;
+}
+
+.whm-nav-item.active,
+.whm-nav-item:hover,
+.whm-desktop-menu a.active,
+.whm-desktop-menu a:hover,
+.whm-desktop-menu button:hover,
+.whm-mobile-bottom-nav a.active {
+  background: var(--whm-brand-50) !important;
+  color: var(--whm-brand) !important;
+  box-shadow: none !important;
+}
+
+.whm-nav-item.active {
+  border-right: 3px solid var(--whm-brand);
+}
+
+.whm-brand-mark,
+.widgets-icons-2,
+.whm-plan-card__top span,
+.badge--icon,
+.whm-client-page-body .badge--icon,
+.whm-client-page-body .badge.badge--icon {
+  background: var(--whm-brand-50) !important;
+  color: var(--whm-brand) !important;
+  border: 1px solid rgba(37, 99, 235, 0.14) !important;
+}
+
+.whm-brand .whm-brand-mark,
+.whm-sidebar-brand .whm-brand-mark {
+  background: var(--whm-brand) !important;
+  color: #ffffff !important;
+  border-color: var(--whm-brand) !important;
+}
+
+.whm-client-page-body .table,
+.table {
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: var(--whm-radius) !important;
+  box-shadow: var(--whm-shadow-subtle) !important;
+}
+
+.whm-client-page-body .table thead th,
+.table thead th {
+  background: var(--whm-slate-50) !important;
+  color: var(--whm-slate-500) !important;
+  border-bottom: 1px solid var(--whm-slate-200) !important;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.whm-client-page-body .table tbody tr:hover,
+.table tbody tr:hover {
+  background: var(--whm-slate-50) !important;
+}
+
+.whm-footer-grid {
+  gap: 24px;
+}
+
+.whm-footer h6,
+.whm-footer-brand strong,
+.whm-topbar h1,
+.whm-section-heading h2,
+.whm-plan-card__top h4 {
+  color: var(--whm-slate-900) !important;
+  letter-spacing: -0.02em;
+}
+
+.whm-footer p,
+.whm-footer a,
+.whm-topbar-kicker,
+.whm-section-heading p,
+.whm-plan-card li,
+.pricing-header__time,
+.pricing-header__setup {
+  color: var(--whm-slate-500) !important;
+}
+
+.whm-footer a:hover {
+  color: var(--whm-brand) !important;
+}
+
+.whm-plan-price strong,
+.pricing-header__price,
+.pricing-header__price .text {
+  color: var(--whm-slate-900) !important;
+}
+
+.whm-mobile-bottom-nav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  min-height: 64px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+}
+
+.whm-mobile-bottom-nav a {
+  min-width: 0;
+  min-height: 48px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.whm-mobile-bottom-nav svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+}
+
+@media (max-width: 991px) {
+  .whm-client-main {
+    padding-bottom: 92px;
+  }
+
+  .whm-client-main .footer {
+    margin-bottom: 92px;
+  }
+}
+
+@media (max-width: 575px) {
+  .whm-mobile-bottom-nav {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    min-height: 60px;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .whm-mobile-bottom-nav span {
+    font-size: 9px;
+  }
+
+  .whm-home-hero__content,
+  .whm-story-stage,
+  .whm-category-panel,
+  .whm-plan-card,
+  .pricing,
+  .card,
+  .custom--card {
+    border-radius: 12px !important;
+  }
+}
+
+/* WHMLab final storefront fit pass: cleaner shell, tighter rhythm, image-led homepage */
+:root {
+  --whm-page-x: clamp(16px, 3vw, 40px);
+  --whm-content-max: 1320px;
+  --whm-radius-sm: 10px;
+  --whm-radius-md: 14px;
+  --whm-radius-lg: 18px;
+  --whm-text: #0f172a;
+  --whm-muted: #64748b;
+  --whm-line: #e2e8f0;
+  --whm-panel: #ffffff;
+  --whm-soft: #f8fafc;
+}
+
+body {
+  background: #f8fafc !important;
+  color: var(--whm-text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.whm-main-content {
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+.whm-desktop-nav {
+  height: 70px !important;
+  padding: 0 var(--whm-page-x) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.92) !important;
+  box-shadow: none !important;
+}
+
+.whm-desktop-nav > .whm-brand,
+.whm-desktop-actions {
+  flex: 0 0 auto;
+}
+
+.whm-brand,
+.whm-mobile-brand {
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.whm-brand-mark {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.whm-brand strong {
+  font-size: 18px !important;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.whm-brand small {
+  color: #64748b !important;
+  font-size: 9px !important;
+  letter-spacing: 0.12em !important;
+}
+
+.whm-desktop-menu {
+  gap: 3px !important;
+  min-width: 0;
+}
+
+.whm-desktop-menu > a,
+.whm-menu-dropdown > button {
+  min-height: 36px !important;
+  border-radius: 9px !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  padding: 0 11px !important;
+}
+
+.whm-desktop-menu > a:hover,
+.whm-desktop-menu > a.active,
+.whm-menu-dropdown:hover > button,
+.whm-menu-dropdown:focus-within > button {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+.whm-desktop-actions {
+  gap: 8px !important;
+}
+
+.whm-login-btn {
+  min-height: 38px !important;
+  border-radius: 10px !important;
+  padding: 0 14px !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+
+.whm-cart-link {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.whm-dropdown-panel {
+  top: calc(100% + 10px) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12) !important;
+  padding: 8px !important;
+}
+
+.whm-dropdown-panel--wide {
+  width: min(680px, calc(100vw - 48px)) !important;
+  grid-template-columns: 190px minmax(0, 1fr) !important;
+}
+
+.whm-dropdown-intro {
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+
+.whm-dropdown-intro strong {
+  font-size: 16px !important;
+}
+
+.whm-dropdown-panel a,
+.whm-dropdown-grid a {
+  min-height: 38px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  padding: 9px 10px !important;
+}
+
+.whm-mobile-header {
+  height: 58px !important;
+  padding: 0 14px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: none !important;
+}
+
+.whm-mobile-toggle {
+  width: 40px !important;
+  height: 40px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+}
+
+.whm-mobile-brand span:last-child {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whm-sidebar-overlay {
+  background: rgba(15, 23, 42, 0.42) !important;
+  backdrop-filter: none !important;
+}
+
+.whm-app-sidebar {
+  width: min(86vw, 318px) !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 20px 0 52px rgba(15, 23, 42, 0.16) !important;
+}
+
+.whm-sidebar-brand {
+  min-height: 72px !important;
+  padding: 0 18px !important;
+}
+
+.whm-sidebar-nav {
+  padding: 14px 10px 20px !important;
+}
+
+.whm-nav-group {
+  margin-bottom: 18px !important;
+}
+
+.whm-nav-group p {
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+  margin-bottom: 7px !important;
+  padding: 0 10px !important;
+}
+
+.whm-nav-item {
+  min-height: 40px !important;
+  border-radius: 10px !important;
+  gap: 10px !important;
+  padding: 9px 10px !important;
+  font-size: 13px !important;
+  font-weight: 720 !important;
+}
+
+.whm-nav-item.active {
+  border-right: 0 !important;
+}
+
+.whm-nav-item.active::after {
+  right: 6px !important;
+  top: 11px !important;
+  bottom: 11px !important;
+  width: 2px !important;
+  border-radius: 999px !important;
+}
+
+@media (min-width: 992px) {
+  .whm-main-content {
+    padding-top: 70px !important;
+  }
+}
+
+.whm-home-hero,
+.whm-home-section,
+.whm-story-section,
+.whm-image-story-section {
+  max-width: var(--whm-content-max) !important;
+  padding-left: var(--whm-page-x) !important;
+  padding-right: var(--whm-page-x) !important;
+}
+
+.whm-home-hero {
+  padding-top: clamp(18px, 3vw, 32px) !important;
+  padding-bottom: 12px !important;
+}
+
+.whm-home-hero__content {
+  min-height: clamp(390px, 48vw, 540px) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.48)),
+    url("https://images.unsplash.com/photo-1551808525-51a94da548ce?auto=format&fit=crop&w=1800&q=82") center/cover no-repeat !important;
+  padding: clamp(28px, 6vw, 72px) !important;
+  box-shadow: none !important;
+}
+
+.whm-home-hero__content::after {
+  display: none !important;
+}
+
+.whm-eyebrow {
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #e0f2fe !important;
+  padding: 7px 10px !important;
+}
+
+.whm-home-hero h1 {
+  max-width: 760px !important;
+  font-size: clamp(2.35rem, 5.8vw, 5.25rem) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.055em !important;
+  margin-bottom: 18px !important;
+}
+
+.whm-home-hero p {
+  max-width: 610px !important;
+  color: #dbeafe !important;
+  font-size: clamp(0.98rem, 1.5vw, 1.12rem) !important;
+  line-height: 1.7 !important;
+}
+
+.whm-hero-actions {
+  margin-top: 24px !important;
+}
+
+.whm-primary-action,
+.whm-secondary-action,
+.whm-plan-action,
+.btn,
+.cmn--btn,
+.btn--base,
+.btn--base-outline {
+  border-radius: 10px !important;
+  min-height: 44px !important;
+  font-weight: 780 !important;
+}
+
+.whm-primary-action {
+  background: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  color: #1d4ed8 !important;
+  box-shadow: none !important;
+}
+
+.whm-primary-action:hover {
+  color: #1e40af !important;
+}
+
+.whm-secondary-action {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.whm-story-section {
+  padding-top: 16px !important;
+  padding-bottom: 18px !important;
+  gap: 14px !important;
+}
+
+.whm-story-copy,
+.whm-story-stage,
+.whm-domain-card,
+.whm-workflow-card,
+.whm-category-panel__intro,
+.whm-feature-grid > div,
+.whm-plan-card {
+  border-radius: var(--whm-radius-lg) !important;
+  border: 1px solid var(--whm-line) !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.whm-story-copy,
+.whm-story-stage {
+  min-height: 258px !important;
+}
+
+.whm-story-copy {
+  padding: clamp(22px, 3vw, 34px) !important;
+}
+
+.whm-story-copy h2,
+.whm-section-heading h2,
+.whm-domain-card h2,
+.whm-image-story-copy h2 {
+  font-size: clamp(1.7rem, 3.1vw, 3rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.045em !important;
+}
+
+.whm-story-copy span,
+.whm-story-slide p,
+.whm-domain-card p,
+.whm-category-panel__intro p,
+.whm-image-story-copy span {
+  color: #64748b !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
+}
+
+.whm-image-story-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 14px;
+  margin: 0 auto;
+  padding-top: 16px;
+  padding-bottom: 28px;
+}
+
+.whm-image-story-media,
+.whm-image-story-copy {
+  min-height: 420px;
+  border: 1px solid var(--whm-line);
+  border-radius: 18px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.whm-image-story-media img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.whm-image-story-copy {
+  padding: clamp(24px, 4vw, 44px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.whm-image-story-copy > p {
+  color: #2563eb !important;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.whm-image-story-copy h2 {
+  margin-bottom: 13px;
+}
+
+.whm-image-story-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.whm-image-story-list div {
+  min-height: 76px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: center;
+  padding: 13px;
+}
+
+.whm-image-story-list svg {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 9px;
+  grid-row: span 2;
+}
+
+.whm-image-story-list strong,
+.whm-image-story-list small {
+  display: block;
+}
+
+.whm-image-story-list strong {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 820;
+  line-height: 1.25;
+}
+
+.whm-image-story-list small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+  margin-top: 3px;
+}
+
+.whm-home-section {
+  padding-top: clamp(24px, 4vw, 42px) !important;
+  padding-bottom: clamp(24px, 4vw, 42px) !important;
+}
+
+.whm-section-heading {
+  align-items: flex-end !important;
+  gap: 16px !important;
+  margin-bottom: 18px !important;
+}
+
+.whm-section-heading p,
+.whm-domain-card p,
+.whm-plan-card__top span {
+  color: #2563eb !important;
+  font-size: 11px !important;
+  letter-spacing: 0.09em !important;
+}
+
+h1, h2, h3, h4, h5, h6, strong, b, .font-extrabold, .font-black, .font-bold, .fw-bold, .fw-semibold, .font-semibold {
+  font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ── Domain Page Cards, Badges & Pill Buttons Styling ── */
+.domain-card-box {
+  background-color: #141416 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  color: #ffffff !important;
+}
+
+.tld-row-item {
+  padding: 16px 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.tld-row-item:last-child {
+  border-bottom: none !important;
+}
+
+.btn-add-cart-pill {
+  padding: 8px 24px !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9999px !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-add-cart-pill:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+.whm-billing-switch,
+.whm-category-tabs button {
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.whm-billing-switch {
+  padding: 3px !important;
+}
+
+.whm-billing-switch button {
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  padding: 0 12px !important;
+}
+
+.whm-category-tabs {
+  gap: 8px !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 8px !important;
+}
+
+.whm-category-tabs button {
+  min-height: 38px !important;
+  font-size: 13px !important;
+  padding: 0 12px !important;
+}
+
+.whm-category-panel__intro {
+  margin-bottom: 14px !important;
+  padding: 16px !important;
+}
+
+.whm-category-panel__intro h3 {
+  font-size: 19px !important;
+  font-weight: 850 !important;
+}
+
+.whm-plan-grid {
+  gap: 14px !important;
+}
+
+.whm-plan-card {
+  padding: 20px !important;
+  min-height: 100% !important;
+}
+
+.whm-plan-card::before {
+  display: none !important;
+}
+
+.whm-plan-card:hover {
+  border-color: #bfdbfe !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07) !important;
+  transform: translateY(-2px) !important;
+}
+
+.whm-plan-card__top span {
+  width: fit-content;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  padding: 4px 7px;
+}
+
+.whm-plan-card__top h4 {
+  font-size: 20px !important;
+  line-height: 1.2 !important;
+  margin-top: 10px !important;
+}
+
+.whm-plan-price {
+  margin: 16px 0 !important;
+  padding-bottom: 16px !important;
+}
+
+.whm-plan-price strong {
+  font-size: clamp(1.9rem, 3vw, 2.35rem) !important;
+}
+
+.whm-plan-card ul {
+  gap: 8px !important;
+  margin-bottom: 18px !important;
+}
+
+.whm-plan-card li {
+  color: #475569 !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+.whm-split-section {
+  gap: 14px !important;
+}
+
+.whm-domain-card,
+.whm-workflow-card {
+  padding: clamp(20px, 3vw, 32px) !important;
+}
+
+.whm-feature-grid {
+  gap: 14px !important;
+}
+
+.whm-feature-grid > div {
+  padding: 20px !important;
+}
+
+.whm-feature-grid svg,
+.whm-workflow-step svg {
+  border-radius: 11px !important;
+}
+
+.footer {
+  margin: 28px var(--whm-page-x) 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.whm-footer {
+  max-width: var(--whm-content-max) !important;
+  border-radius: 18px 18px 0 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  padding: 28px var(--whm-page-x) !important;
+}
+
+.whm-footer-grid {
+  gap: 22px !important;
+}
+
+.whm-footer h6 {
+  font-size: 11px !important;
+  letter-spacing: 0.1em !important;
+}
+
+.whm-footer a {
+  font-size: 13px !important;
+  margin-bottom: 8px !important;
+}
+
+.whm-footer-bottom {
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+}
+
+@media (max-width: 1199px) {
+  .whm-desktop-menu > a,
+  .whm-menu-dropdown > button {
+    padding: 0 8px !important;
+  }
+
+  .whm-desktop-nav {
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .whm-main-content {
+    padding-top: 0 !important;
+  }
+
+  .whm-home-hero {
+    padding-top: 16px !important;
+  }
+
+  .whm-story-section,
+  .whm-image-story-section,
+  .whm-split-section {
+    grid-template-columns: 1fr !important;
+  }
+
+  .whm-story-copy,
+  .whm-story-stage,
+  .whm-image-story-media,
+  .whm-image-story-copy {
+    min-height: auto !important;
+  }
+
+  .whm-image-story-media img {
+    min-height: 280px !important;
+    max-height: 380px;
+  }
+
+  .whm-plan-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .whm-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .whm-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .whm-home-hero,
+  .whm-home-section,
+  .whm-story-section,
+  .whm-image-story-section {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .whm-home-hero__content {
+    min-height: 430px !important;
+    border-radius: 14px !important;
+    padding: 26px !important;
+  }
+
+  .whm-home-hero h1 {
+    font-size: clamp(2.1rem, 12vw, 3.7rem) !important;
+  }
+
+  .whm-section-heading,
+  .whm-category-panel__intro {
+    align-items: stretch !important;
+  }
+
+  .whm-billing-switch {
+    width: 100%;
+  }
+
+  .whm-billing-switch button {
+    flex: 1;
+    padding: 0 8px !important;
+  }
+
+  .whm-plan-grid,
+  .whm-feature-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .whm-story-stage {
+    min-height: 320px !important;
+  }
+
+  .whm-image-story-copy,
+  .whm-domain-card,
+  .whm-workflow-card {
+    padding: 20px !important;
+  }
+
+  .footer {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .whm-mobile-header .whm-cart-link {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .whm-home-hero__content,
+  .whm-story-copy,
+  .whm-story-stage,
+  .whm-image-story-media,
+  .whm-image-story-copy,
+  .whm-domain-card,
+  .whm-workflow-card,
+  .whm-category-panel__intro,
+  .whm-plan-card,
+  .whm-feature-grid > div {
+    border-radius: 12px !important;
+  }
+
+  .whm-story-stage {
+    min-height: 360px !important;
+  }
+
+  .whm-image-story-list div {
+    grid-template-columns: 34px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .whm-image-story-list svg {
+    width: 34px;
+    height: 34px;
+    padding: 8px;
+  }
+
+  .whm-footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ZodHost overall polish layer */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--whm-slate-50) !important;
+  color: var(--whm-slate-900);
+  letter-spacing: 0;
+}
+
+.whm-auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(420px, 0.95fr) minmax(0, 1.05fr);
+  background: var(--whm-slate-50);
+}
+
+.whm-auth-brand-panel {
+  min-height: 100vh;
+  padding: clamp(28px, 5vw, 56px);
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72)),
+    url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=82") center/cover;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 42px;
+}
+
+.whm-auth-brand-panel .whm-brand strong,
+.whm-auth-brand-panel .whm-brand small,
+.whm-auth-brand-panel .whm-brand {
+  color: #ffffff;
+}
+
+.whm-auth-brand-panel .whm-brand-mark {
+  background: #ffffff;
+  color: var(--whm-brand);
+  box-shadow: none;
+}
+
+.whm-auth-kicker {
+  width: fit-content;
+  margin: 0 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  color: #dbeafe;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 6px 9px;
+  text-transform: uppercase;
+}
+
+.whm-auth-brand-panel h1 {
+  max-width: 680px;
+  color: #ffffff;
+  font-size: clamp(2.25rem, 5vw, 4.8rem);
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  margin: 0;
+}
+
+.whm-auth-content {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(22px, 5vw, 56px);
+}
+
+.whm-auth-card {
+  width: min(100%, 440px);
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 18px;
+  background: #ffffff;
+  padding: clamp(24px, 4vw, 34px);
+  box-shadow: 0 18px 60px rgba(15, 23, 42, 0.08);
+}
+
+.whm-auth-card-wide {
+  width: min(100%, 500px);
+}
+
+.whm-auth-form-head {
+  margin-bottom: 22px;
+}
+
+.whm-auth-form-head span {
+  display: inline-flex;
+  margin-bottom: 10px;
+  border: 1px solid var(--whm-brand-100);
+  border-radius: 8px;
+  background: var(--whm-brand-50);
+  color: var(--whm-brand);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  padding: 5px 8px;
+  text-transform: uppercase;
+}
+
+.whm-auth-form-head h2 {
+  color: var(--whm-slate-900);
+  font-size: clamp(1.8rem, 4vw, 2.35rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 8px;
+}
+
+.whm-auth-form-head p {
+  color: var(--whm-slate-500);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.whm-social-login {
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.whm-social-login > span {
+  display: block;
+  color: var(--whm-slate-500);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.whm-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.whm-social-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--whm-slate-200);
+  border-radius: 12px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.whm-social-icon:hover {
+  border-color: var(--whm-slate-300);
+  box-shadow: var(--whm-shadow);
+  transform: translateY(-1px);
+}
+
+.whm-social-icon img {
+  max-width: 20px;
+  max-height: 20px;
+}
+
+.whm-login-or {
+  position: relative;
+  margin: 18px 0;
+}
+
+.whm-login-or::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--whm-slate-200);
+}
+
+.whm-login-or span {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  color: var(--whm-slate-400);
+  font-size: 12px;
+  font-weight: 750;
+  padding: 0 12px;
+}
+
+.whm-field {
+  margin-bottom: 0 !important;
+}
+
+.account-form .form-control,
+.account-form .form--control,
+.account-form .form-select,
+.contact-section .form-control,
+.modal .form-control,
+.modal .form-select,
+.custom--card .form-control,
+.custom--card .form-select {
+  min-height: 48px !important;
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  color: var(--whm-slate-900) !important;
+  font-size: 14px !important;
+  padding: 11px 14px !important;
+}
+
+.account-form .form-control::placeholder,
+.contact-section .form-control::placeholder,
+.modal .form-control::placeholder,
+.custom--card .form-control::placeholder {
+  color: var(--whm-slate-400);
+}
+
+.account-form .form-control:focus,
+.account-form .form--control:focus,
+.account-form .form-select:focus,
+.contact-section .form-control:focus,
+.modal .form-control:focus,
+.modal .form-select:focus,
+.custom--card .form-control:focus,
+.custom--card .form-select:focus {
+  border-color: var(--whm-brand) !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+.account-form .custom--checkbox,
+.whm-auth-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.whm-auth-options {
+  justify-content: space-between;
+}
+
+.custom--checkbox label,
+.whm-auth-options a {
+  font-size: 13px;
+}
+
+.form-check-input {
+  border-color: var(--whm-slate-300) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--whm-brand) !important;
+  border-color: var(--whm-brand) !important;
+}
+
+.whm-auth-submit,
+.btn--base,
+.cmn--btn {
+  min-height: 46px;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0;
+}
+
+.whm-auth-switch {
+  color: var(--whm-slate-500);
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+.custom--card,
+.card,
+.pricing,
+.service-card,
+.service-category,
+.whm-plan-card,
+.whm-domain-card,
+.whm-workflow-card,
+.whm-feature-grid > div {
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.custom--card:hover,
+.pricing:hover,
+.service-card:hover,
+.service-category:hover,
+.whm-plan-card:hover {
+  border-color: var(--whm-slate-300) !important;
+  box-shadow: var(--whm-shadow) !important;
+  transform: translateY(-1px);
+}
+
+.card-header,
+.custom--card .card-header,
+.custom--card .card-footer,
+.modal-header,
+.modal-footer {
+  border-color: var(--whm-slate-200) !important;
+  background: var(--whm-slate-50) !important;
+}
+
+.modal-content {
+  border: 1px solid var(--whm-slate-200) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.table-responsive,
+.custom--card,
+.card {
+  overflow: hidden;
+}
+
+.table > :not(caption) > * > *,
+table > :not(caption) > * > * {
+  border-color: var(--whm-slate-200) !important;
+}
+
+.table tbody tr,
+table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.badge,
+[class*="badge--"] {
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+}
+
+@media (max-width: 991px) {
+  .whm-auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .whm-auth-brand-panel {
+    min-height: auto;
+    padding: 24px 18px;
+  }
+
+  .whm-auth-brand-panel h1 {
+    max-width: 680px;
+    font-size: clamp(2rem, 9vw, 3.35rem);
+  }
+
+  .whm-auth-content {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .whm-auth-card {
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .whm-auth-brand-panel h1 {
+    font-size: clamp(1.9rem, 12vw, 2.65rem);
+  }
+
+  .whm-auth-card {
+    border-radius: 14px;
+    padding: 22px 18px;
+  }
+
+  .whm-auth-options {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Client dashboard layout fix: keep desktop content clear of the fixed sidebar. */
+@media (min-width: 992px) {
+  .whm-client-sidebar {
+    width: 276px !important;
+    transform: translateX(0) !important;
+  }
+
+  .whm-client-main {
+    width: calc(100% - 276px) !important;
+    min-width: 0;
+    margin-left: 276px !important;
+    padding-top: 0 !important;
+  }
+
+  .whm-client-main > .whm-topbar {
+    width: 100%;
+    padding-left: 28px !important;
+    padding-right: 28px !important;
+  }
+
+  .whm-client-main > .whm-breadcrumb,
+  .whm-client-main > .whm-page-body,
+  .whm-client-main > .service-category,
+  .whm-client-main > .footer {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .whm-client-main .whm-breadcrumb > .container,
+  .whm-client-main .service-category > .container,
+  .whm-client-main .whm-page-body > .container,
+  .whm-client-main .footer > .container,
+  .whm-client-main .whm-footer {
+    width: 100% !important;
+    max-width: 1220px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .whm-client-main .whm-breadcrumb {
+    padding: 16px 0 0 !important;
+  }
+
+  .whm-client-main .whm-breadcrumb-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 991px) {
+  .whm-client-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+  }
+}

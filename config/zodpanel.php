@@ -15,6 +15,7 @@ return [
     ],
     'custom_file_paths' => [
         '/usr/local/hestia/bin/zodpanel-ssl-sync',
+        '/usr/local/hestia/bin/v-configure-zodpanel-ssl-automation',
         '/usr/local/hestia/bin/v-zodpanel-save-package-features',
         '/usr/local/hestia/bin/v-zodpanel-run-domain-command',
         '/usr/local/hestia/bin/v-add-user-pma-temp-user',

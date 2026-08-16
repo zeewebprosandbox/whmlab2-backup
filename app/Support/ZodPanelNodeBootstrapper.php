@@ -330,7 +330,16 @@ class ZodPanelNodeBootstrapper
 
     private function finalizeNode(): void
     {
-        $this->run('chown -R root:root /usr/local/hestia/bin/v-zodpanel-save-package-features /usr/local/hestia/bin/v-zodpanel-run-domain-command /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-add-user-pma-temp-user 2>/dev/null || true');
+        $this->run('chown -R root:root /usr/local/hestia/bin/v-zodpanel-save-package-features /usr/local/hestia/bin/v-zodpanel-run-domain-command /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-configure-zodpanel-ssl-automation /usr/local/hestia/bin/v-add-user-pma-temp-user 2>/dev/null || true');
+        $this->run('chmod 755 /usr/local/hestia/bin/zodpanel-ssl-sync /usr/local/hestia/bin/v-configure-zodpanel-ssl-automation 2>/dev/null || true');
+
+        // Configure 1-minute continuous Auto-SSL system cron job
+        $cronContent = "* * * * * root /usr/local/hestia/bin/zodpanel-ssl-sync >/dev/null 2>&1\n";
+        $this->run("echo " . escapeshellarg($cronContent) . " > /etc/cron.d/zodpanel-ssl-auto && chmod 644 /etc/cron.d/zodpanel-ssl-auto 2>/dev/null || true");
+
+        // Execute initial SSL sync run
+        $this->run('/usr/local/hestia/bin/zodpanel-ssl-sync 2>/dev/null || true');
+
         $this->run('systemctl restart hestia 2>/dev/null || service hestia restart 2>/dev/null || true');
     }
 
