@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# ZodPanel 100% Instant Auto-SSL Provisioner Engine
+# Stage 1: Instantly provisions SSL & Force HTTPS for all domains (0 seconds wait time)
+# Stage 2: Upgrades to official Let's Encrypt SSL as soon as ACME challenge validates
+
+for user_conf in /usr/local/hestia/data/users/*/web.conf; do
+    [ -f "$user_conf" ] || continue
+    USER=$(echo "$user_conf" | awk -F'/' '{print $7}')
+    
+    while IFS= read -r line; do
+        DOMAIN=$(echo "$line" | grep -oP "DOMAIN='\K[^']+")
+        SSL=$(echo "$line" | grep -oP "SSL='\K[^']+")
+        LETSENCRYPT=$(echo "$line" | grep -oP "LETSENCRYPT='\K[^']+")
+        
+        if [ -n "$DOMAIN" ]; then
+            # Stage 1: Instant SSL & Force HTTPS if SSL='no'
+            if [ "$SSL" = "no" ]; then
+                echo "Stage 1 Instant SSL for $USER -> $DOMAIN..."
+                rm -rf "/tmp/ssl_$DOMAIN"
+                mkdir -p "/tmp/ssl_$DOMAIN"
+                openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+                    -keyout "/tmp/ssl_$DOMAIN/$DOMAIN.key" \
+                    -out "/tmp/ssl_$DOMAIN/$DOMAIN.crt" \
+                    -subj "/C=US/ST=California/L=San Francisco/O=ZodPanel/CN=$DOMAIN" >/dev/null 2>&1
+                
+                if [ -f "/tmp/ssl_$DOMAIN/$DOMAIN.crt" ]; then
+                    /usr/local/hestia/bin/v-add-web-domain-ssl "$USER" "$DOMAIN" "/tmp/ssl_$DOMAIN" 'yes' >/dev/null 2>&1
+                    /usr/local/hestia/bin/v-add-web-domain-ssl-force "$USER" "$DOMAIN" >/dev/null 2>&1
+                    rm -rf "/tmp/ssl_$DOMAIN"
+                fi
+            fi
+            
+            # Stage 2: Attempt Let's Encrypt upgrade if LETSENCRYPT='no'
+            if [ "$LETSENCRYPT" = "no" ]; then
+                echo "Stage 2 Let's Encrypt upgrade for $USER -> $DOMAIN..."
+                /usr/local/hestia/bin/v-add-letsencrypt-domain "$USER" "$DOMAIN" '' 'yes' >/dev/null 2>&1
+            fi
+        fi
+    done < "$user_conf"
+done
