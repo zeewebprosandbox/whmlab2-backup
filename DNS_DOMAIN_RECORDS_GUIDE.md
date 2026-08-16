@@ -53,7 +53,7 @@ Use this complete RFC 1035 zone file to import all records at once into Hostinge
 $ORIGIN zodserver.cloud.
 $TTL 14400
 
-@ 14400 IN SOA ns1.zodserver.cloud. admin.zodserver.cloud. ( 2026081601 14400 3600 1209600 3600 )
+@ 14400 IN SOA ns1.zodserver.cloud. admin.zodserver.cloud. ( 2026081602 14400 3600 1209600 3600 )
 
 @ 14400 IN NS ns1.zodserver.cloud.
 @ 14400 IN NS ns2.zodserver.cloud.
@@ -64,6 +64,8 @@ ns2 14400 IN A 169.58.176.53
 zodpanel 14400 IN A 169.58.176.53
 vps 14400 IN A 169.58.176.53
 mail 14400 IN A 169.58.176.53
+mta-sts 14400 IN A 169.58.176.53
+mail-brevo 14400 IN A 169.58.176.53
 
 www 14400 IN CNAME zodserver.cloud.
 ftp 14400 IN CNAME zodserver.cloud.
@@ -75,8 +77,12 @@ pop3 14400 IN CNAME mail.zodserver.cloud.
 
 @ 14400 IN MX 10 mail.zodserver.cloud.
 
-@ 14400 IN TXT "v=spf1 a mx ip4:169.58.176.53 -all"
-_dmarc 14400 IN TXT "v=DMARC1; p=quarantine; pct=100; ri=86400; sp=quarantine; aspf=r; adkim=r"
+@ 14400 IN TXT "v=spf1 a mx ip4:169.58.176.53 include:spf.brevo.com include:sendinblue.com ~all"
+_dmarc 14400 IN TXT "v=DMARC1; p=quarantine; pct=100; rua=mailto:dmarc@zodserver.cloud; ruf=mailto:dmarc@zodserver.cloud; fo=1; adkim=r; aspf=r"
+_mta-sts 14400 IN TXT "v=STSv1; id=2026081601;"
+_smtp._tls 14400 IN TXT "v=TLSRPTv1; rua=mailto:tls-reports@zodserver.cloud;"
+
+mail._domainkey 14400 IN TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAub5gDQaWY13a39cz8NejFtEDO9zhmgUZvMo+RQIejGawSvxzOph572yjdAvphypYdR8+fD2rfoVMRZzqQxRfZL+7GeUj8E53aPOFSTu9t/ETT0u5YA+ikvzRdI3IETKor7ipK8lETq9jzAQMdpVCG8laVAvo1/eHeZwv+59GzdD/PcTk67/84X0V2RiPRxkqaVxJWLF2vJ2EmgMjEOE8K9bVl1bHrksAs9dO0WqWcZAl1j9FVWi3hAWInnVjBzciv2q97+RDKi1gGWmViEcG6c9Iw/DSbx6fVEoTCt6eDnQIkgPYIvX5F1wiSZb7MVeu99V7ViQsDEUCiTazfQbK1wIDAQAB"
 
 _submission._tcp 14400 IN SRV 1 0 587 mail.zodserver.cloud.
 _imap._tcp 14400 IN SRV 1 0 143 mail.zodserver.cloud.
