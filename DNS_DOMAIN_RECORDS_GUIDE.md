@@ -45,60 +45,44 @@ When provisioning the main panel domain `zodserver.cloud` (or any custom tenant 
 
 ---
 
-### BIND 9 Zone File Format (RFC 1035 Standard for Import)
+### BIND 9 Zone File Format (RFC 1035 Standard for Hostinger / Cloudflare / cPanel Import)
 
-Use this complete RFC 1035 zone file to import all records at once into Cloudflare, cPanel, Route 53, Namecheap, or any DNS provider:
+Use this complete RFC 1035 zone file to import all records at once into Hostinger, Cloudflare, cPanel, Route 53, or Namecheap:
 
 ```bind
-; ====================================================================
-; BIND 9 Zone File for zodserver.cloud (RFC 1035 Standard Format)
-; Ready for direct import into Cloudflare, cPanel, Route 53, Namecheap, etc.
-; ====================================================================
 $ORIGIN zodserver.cloud.
 $TTL 14400
 
-; SOA Record
-@       IN  SOA  ns1.zodserver.cloud. admin.zodserver.cloud. (
-                 2026081601 ; Serial (YYYYMMDDvv)
-                 14400      ; Refresh (4 hours)
-                 3600       ; Retry (1 hour)
-                 1209600    ; Expire (2 weeks)
-                 3600 )     ; Minimum TTL (1 hour)
+@ 14400 IN SOA ns1.zodserver.cloud. admin.zodserver.cloud. ( 2026081601 14400 3600 1209600 3600 )
 
-; Authority Nameservers (NS)
-@       IN  NS   ns1.zodserver.cloud.
-@       IN  NS   ns2.zodserver.cloud.
+@ 14400 IN NS ns1.zodserver.cloud.
+@ 14400 IN NS ns2.zodserver.cloud.
 
-; Core IPv4 Host Records (A)
-@          IN  A    169.58.176.53
-ns1        IN  A    169.58.176.53
-ns2        IN  A    169.58.176.53
-zodpanel   IN  A    169.58.176.53
-vps        IN  A    169.58.176.53
-mail       IN  A    169.58.176.53
+@ 14400 IN A 169.58.176.53
+ns1 14400 IN A 169.58.176.53
+ns2 14400 IN A 169.58.176.53
+zodpanel 14400 IN A 169.58.176.53
+vps 14400 IN A 169.58.176.53
+mail 14400 IN A 169.58.176.53
 
-; Service Aliases (CNAME)
-www        IN  CNAME zodserver.cloud.
-ftp        IN  CNAME zodserver.cloud.
-webmail    IN  CNAME mail.zodserver.cloud.
-smtp       IN  CNAME mail.zodserver.cloud.
-imap       IN  CNAME mail.zodserver.cloud.
-pop        IN  CNAME mail.zodserver.cloud.
-pop3       IN  CNAME mail.zodserver.cloud.
+www 14400 IN CNAME zodserver.cloud.
+ftp 14400 IN CNAME zodserver.cloud.
+webmail 14400 IN CNAME mail.zodserver.cloud.
+smtp 14400 IN CNAME mail.zodserver.cloud.
+imap 14400 IN CNAME mail.zodserver.cloud.
+pop 14400 IN CNAME mail.zodserver.cloud.
+pop3 14400 IN CNAME mail.zodserver.cloud.
 
-; Mail Exchanger (MX)
-@          IN  MX   10 mail.zodserver.cloud.
+@ 14400 IN MX 10 mail.zodserver.cloud.
 
-; Sender Authentication & Policy Records (TXT)
-@               IN  TXT  "v=spf1 a mx ip4:169.58.176.53 -all"
-_dmarc          IN  TXT  "v=DMARC1; p=quarantine; pct=100; ri=86400; sp=quarantine; aspf=r; adkim=r"
+@ 14400 IN TXT "v=spf1 a mx ip4:169.58.176.53 -all"
+_dmarc 14400 IN TXT "v=DMARC1; p=quarantine; pct=100; ri=86400; sp=quarantine; aspf=r; adkim=r"
 
-; Service Location Discovery Records (SRV)
-_submission._tcp IN  SRV  1 0 587 mail.zodserver.cloud.
-_imap._tcp       IN  SRV  1 0 143 mail.zodserver.cloud.
-_imaps._tcp      IN  SRV  1 0 993 mail.zodserver.cloud.
-_pop3._tcp       IN  SRV  1 0 110 mail.zodserver.cloud.
-_pop3s._tcp      IN  SRV  1 0 995 mail.zodserver.cloud.
+_submission._tcp 14400 IN SRV 1 0 587 mail.zodserver.cloud.
+_imap._tcp 14400 IN SRV 1 0 143 mail.zodserver.cloud.
+_imaps._tcp 14400 IN SRV 1 0 993 mail.zodserver.cloud.
+_pop3._tcp 14400 IN SRV 1 0 110 mail.zodserver.cloud.
+_pop3s._tcp 14400 IN SRV 1 0 995 mail.zodserver.cloud.
 ```
 
 ---
