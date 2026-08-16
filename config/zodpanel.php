@@ -6,6 +6,7 @@ return [
     'hestia_install_url' => env('ZODPANEL_HESTIA_INSTALL_URL', 'https://raw.githubusercontent.com/hestiacp/hestiacp/release/install/hst-install.sh'),
     'backup_repo' => env('ZODPANEL_BACKUP_REPO', 'https://github.com/zeewebprosandbox/zodpanel-hestia-custom-backup'),
     'whmlab_repo' => env('WHMLAB_BACKUP_REPO', 'https://github.com/zeewebprosandbox/whmlab2-backup'),
+    'github_token' => env('ZODPANEL_GITHUB_TOKEN', env('GITHUB_TOKEN')),
     'live' => [
         'host' => env('ZODPANEL_LIVE_HOST', 'zodpanel.zodhost.com'),
         'ssh_port' => env('ZODPANEL_LIVE_SSH_PORT', 22),

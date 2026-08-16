@@ -226,6 +226,31 @@ class ZodPanelNodeBootstrapper
             }
         }
 
+        $githubToken = config('zodpanel.github_token');
+        $repoUrl = config('zodpanel.backup_repo');
+
+        if ($githubToken && $repoUrl && $host && $password && $sshpassBin) {
+            $authRepoUrl = str_replace('https://', "https://{$githubToken}@", $repoUrl);
+            if (!str_ends_with($authRepoUrl, '.git')) {
+                $authRepoUrl .= '.git';
+            }
+            $gitCmd = sprintf(
+                'PATH=$PATH:/usr/local/bin:/opt/homebrew/bin %s -p %s ssh -o StrictHostKeyChecking=no -p %d %s@%s "which git || apt-get install -y git; rm -rf /tmp/zodpanel-repo && git clone --depth 1 %s /tmp/zodpanel-repo && cp -rf /tmp/zodpanel-repo/usr/local/hestia/* /usr/local/hestia/ && rm -rf /tmp/zodpanel-repo"',
+                escapeshellarg($sshpassBin),
+                escapeshellarg($password),
+                $port,
+                escapeshellarg($user),
+                escapeshellarg($host),
+                escapeshellarg($authRepoUrl)
+            );
+            $gitOutput = (string) shell_exec($gitCmd . ' 2>&1');
+            if (!str_contains($gitOutput, 'fatal:') && !str_contains($gitOutput, 'Error:')) {
+                $this->line("Synced custom layer from private GitHub repository");
+                $this->run('chmod +x /usr/local/hestia/bin/* 2>/dev/null || true');
+                return;
+            }
+        }
+
         if ($host && $password && $sshpassBin) {
             $cmd = sprintf(
                 'tar -cf - -C %s . | PATH=$PATH:/usr/local/bin:/opt/homebrew/bin %s -p %s ssh -o StrictHostKeyChecking=no -p %d %s@%s "mkdir -p /usr/local/hestia && tar -xf - -C /usr/local/hestia"',

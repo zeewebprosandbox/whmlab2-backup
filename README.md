@@ -128,6 +128,31 @@ php artisan route:cache
 
 ---
 
+## 🔒 Private GitHub Authentication & Domain DNS Setup
+
+### Keeping GitHub Repositories 100% Private
+
+Your ZodPanel repositories (`whmlab2-backup` and `zodpanel-hestia-custom-backup`) can remain **100% PRIVATE**. When adding a new VPS via 1-Click Auto-Merge, WHMLab authenticates with GitHub using a **GitHub Personal Access Token (PAT)**.
+
+1. **Add Token to `.env`**:
+   ```env
+   ZODPANEL_GITHUB_TOKEN=ghp_abcdefghijklmnopqrstuvwxyz0123456789
+   ZODPANEL_BACKUP_REPO=https://github.com/zeewebprosandbox/zodpanel-hestia-custom-backup
+   WHMLAB_BACKUP_REPO=https://github.com/zeewebprosandbox/whmlab2-backup
+   ```
+2. **Automated Node Deployment**:
+   During 1-Click VPS Auto-Merge, WHMLab uses `https://{TOKEN}@github.com/...` to clone and update the latest ZodPanel release directly onto the node without exposing public access.
+
+---
+
+## 🌐 Full Domain DNS Records & Registrar Setup
+
+For full technical specifications on all DNS records (A, NS, CNAME, MX, SPF, DKIM, DMARC, SRV) and step-by-step registrar glue record guides for Cloudflare, Namecheap, GoDaddy, NameSilo, etc., see:
+
+👉 **[Complete Domain DNS Records & Registrar Guide](DNS_DOMAIN_RECORDS_GUIDE.md)**
+
+---
+
 ## 🛡️ License & Credits
 
 Built for high-performance server administration & hosting billing. Built with Next.js 14, shadcn/ui, Tailwind CSS, Lucide Icons, and Laravel.
