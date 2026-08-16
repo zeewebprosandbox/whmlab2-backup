@@ -1519,7 +1519,10 @@ class Whmpanel implements HostingManagerInterface
     private function bridgeRequest($server, string $method, string $endpoint, array $payload = [], int $timeout = 20): array
     {
         $token = $server->api_token ?: $server->security_token;
-        $url = rtrim($server->hostname, '/') . '/api/whmlab/index.php';
+        $port = $server->port ?: 8083;
+        $protocol = $server->protocol ?: 'https://';
+        $host = $server->ip_address ?: (parse_url($server->hostname, PHP_URL_HOST) ?: $server->host);
+        $url = rtrim("{$protocol}{$host}:{$port}", '/') . '/api/whmlab/index.php';
 
         try {
             $client = Http::acceptJson()
