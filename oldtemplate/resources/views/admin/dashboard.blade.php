@@ -218,14 +218,8 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <a href="{{ route('admin.server.add.page') }}" class="btn btn-sm btn-outline--success me-2">
-        <i class="las la-server"></i> @lang('Add Server Node')
-    </a>
-    <a href="{{ route('admin.product.add.page') }}" class="btn btn-sm btn-outline--info me-2">
-        <i class="las la-box"></i> @lang('Add Product')
-    </a>
-    <button class="btn btn-sm btn-outline--primary" data-bs-toggle="modal" data-bs-target="#cronModal">
-        <i class="las la-clock"></i> @lang('Cron Setup')
+    <button class="btn btn-outline--primary" data-bs-toggle="modal" data-bs-target="#cronModal">
+        <i class="las la-server"></i>@lang('Cron Setup')
     </button>
 @endpush
 

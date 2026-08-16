@@ -54,8 +54,11 @@
                             {{ !$domain->id_protection ? 'disabled' : null }}>
                                 <i class="las la-shopping-cart"></i>@lang('Disable ID Protection')
                             </button>
-                        </div> 
-                        
+                        <div class="col-lg-4 col-xxl-2 col-md-4 col-sm-6 col-xsm-6 form-group">
+                            <button class="btn btn-sm btn-outline--danger moduleModal w-100" type="button" data-module="7">
+                                <i class="las la-trash"></i>@lang('Cancel & Wipe Domain')
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

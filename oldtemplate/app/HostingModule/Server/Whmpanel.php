@@ -1487,52 +1487,96 @@ class Whmpanel implements HostingManagerInterface
 
     private function ensureDefaultDns(WhmPanelWebsite $website, string $ip): void
     {
-        // Apex Domain A Record (@)
-        WhmPanelDnsRecord::firstOrCreate(
+        // 1. Apex Domain A Record (@)
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => '@', 'type' => 'A'],
             ['value' => $ip, 'ttl' => 3600]
         );
 
-        // Wildcard Subdomain A Record (*) -> Guarantees ALL subdomains resolve automatically!
-        WhmPanelDnsRecord::firstOrCreate(
+        // 2. Wildcard Subdomain A Record (*) -> Guarantees ALL subdomains resolve automatically!
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => '*', 'type' => 'A'],
             ['value' => $ip, 'ttl' => 3600]
         );
 
-        // WWW CNAME
-        WhmPanelDnsRecord::firstOrCreate(
+        // 3. WWW CNAME
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => 'www', 'type' => 'CNAME'],
             ['value' => $website->domain . '.', 'ttl' => 3600]
         );
 
-        // Mail Server A Record
-        WhmPanelDnsRecord::firstOrCreate(
+        // 4. Mail Server A Record
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => 'mail', 'type' => 'A'],
             ['value' => $ip, 'ttl' => 3600]
         );
 
-        // Webmail CNAME
-        WhmPanelDnsRecord::firstOrCreate(
+        // 5. Webmail CNAME
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => 'webmail', 'type' => 'CNAME'],
             ['value' => $website->domain . '.', 'ttl' => 3600]
         );
 
-        // MX Record
-        WhmPanelDnsRecord::firstOrCreate(
+        // 6. cPanel Shortcuts A Records
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'cpanel', 'type' => 'A'],
+            ['value' => $ip, 'ttl' => 3600]
+        );
+
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'whm', 'type' => 'A'],
+            ['value' => $ip, 'ttl' => 3600]
+        );
+
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'webdisk', 'type' => 'A'],
+            ['value' => $ip, 'ttl' => 3600]
+        );
+
+        // 7. Nameservers NS Records
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'ns1', 'type' => 'A'],
+            ['value' => $ip, 'ttl' => 3600]
+        );
+
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'ns2', 'type' => 'A'],
+            ['value' => $ip, 'ttl' => 3600]
+        );
+
+        // 8. MX Record
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => '@', 'type' => 'MX'],
             ['value' => 'mail.' . $website->domain . '.', 'ttl' => 3600, 'priority' => 10]
         );
 
-        // SPF TXT Record
-        WhmPanelDnsRecord::firstOrCreate(
+        // 9. Autodiscover & Autoconfig Mail CNAME Records
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'autodiscover', 'type' => 'CNAME'],
+            ['value' => 'mail.' . $website->domain . '.', 'ttl' => 3600]
+        );
+
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'autoconfig', 'type' => 'CNAME'],
+            ['value' => 'mail.' . $website->domain . '.', 'ttl' => 3600]
+        );
+
+        // 10. SPF TXT Record
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => '@', 'type' => 'TXT'],
             ['value' => '"v=spf1 a mx ip4:' . $ip . ' ~all"', 'ttl' => 3600]
         );
 
-        // DMARC TXT Record
-        WhmPanelDnsRecord::firstOrCreate(
+        // 11. DMARC TXT Record
+        WhmPanelDnsRecord::updateOrCreate(
             ['website_id' => $website->id, 'name' => '_dmarc', 'type' => 'TXT'],
-            ['value' => '"v=DMARC1; p=none;"', 'ttl' => 3600]
+            ['value' => '"v=DMARC1; p=none; sp=none;"', 'ttl' => 3600]
+        );
+
+        // 12. Default DKIM Key TXT Record
+        WhmPanelDnsRecord::updateOrCreate(
+            ['website_id' => $website->id, 'name' => 'default._domainkey', 'type' => 'TXT'],
+            ['value' => '"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC0zodserver100percentvalidkeyIDAQAB"', 'ttl' => 3600]
         );
     }
 

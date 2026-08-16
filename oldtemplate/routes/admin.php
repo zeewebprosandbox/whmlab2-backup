@@ -213,8 +213,10 @@ Route::middleware(['admin', 'admin.permission'])->group(function () {
         Route::get('server/login/{id}','serverLogin')->name('server.login');
         Route::post('server/health/{id}','serverHealth')->name('server.health');
         Route::post('server/status/{id}', 'serverStatus')->name('server.status');
-
         Route::post('server/test/connection','testConnection')->name('server.test.connection');
+        Route::post('server/zodpanel/bootstrap/preview','zodPanelBootstrapPreview')->name('server.zodpanel.bootstrap.preview');
+        Route::get('server/reinstall/stream','reinstallServerStream')->name('server.reinstall.stream');
+        Route::post('server/reinstall/stream','reinstallServerStream')->name('server.reinstall.stream.post');
     });
 
     // Billing Setting

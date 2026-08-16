@@ -10,6 +10,8 @@ class Hosting extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     protected $casts = [ 
         'next_due_date'=>'date', 
         'next_invoice_date'=>'date', 

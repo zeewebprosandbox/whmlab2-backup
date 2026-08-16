@@ -91,6 +91,9 @@
                                                 >
                                                     <i class="la la-pencil"></i> @lang('Edit')
                                                 </a>
+                                                <a href="{{ route('admin.server.add.page') }}?vps_ip={{ $server->ip_address ?: $server->host }}" class="dropdown-item text-warning">
+                                                    <i class="la la-terminal"></i> @lang('Reinstall VPS & Live Terminal')
+                                                </a>
                                             @endpermit
                                             @permit('admin.server.health')
                                                 <a href="javascript:void(0)" class="dropdown-item confirmationBtn"

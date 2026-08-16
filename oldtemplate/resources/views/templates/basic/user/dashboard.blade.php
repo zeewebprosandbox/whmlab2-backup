@@ -1,269 +1,275 @@
 @extends($activeTemplate . 'layouts.master_side_bar')
 
 @section('content')
-<div class="col-lg-9 space-y-6">
+    <div class="col-lg-9">
 
-    <!-- KYC Notice if unverified -->
-    @if ($user->kv == 0 || $user->kv == 2)
-        @php $kyc = @getContent('kyc.content', true); @endphp
-        <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-between text-xs text-amber-400">
-            <div class="flex items-center gap-3">
-                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 flex-shrink-0"></i>
-                <div>
-                    <strong class="font-semibold text-white">@lang('KYC Verification Required')</strong>
-                    <p class="text-neutral-400 mt-0.5">@lang('Please submit your verification documents to unlock full server capabilities.')</p>
-                </div>
-            </div>
-            <a href="{{ route('user.kyc.form') }}" class="px-3 py-1.5 bg-amber-500 text-black font-semibold rounded-md hover:bg-amber-400 transition-colors">
-                @lang('Submit KYC')
-            </a>
-        </div>
-    @endif
+        <div class="notice"></div>
 
-    <!-- Hero Header -->
-    <div class="p-6 lg:p-8 bg-[#141416] border border-white/10 rounded-2xl relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        <div class="space-y-2 relative z-10">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 orb-pulse"></span>
-                @lang('Console Active')
-            </div>
-            <h1 class="text-2xl lg:text-3xl font-extrabold tracking-tight text-white">
-                @lang('Welcome back,') <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">{{ explode(' ', $user->fullname)[0] ?? $user->username }}</span> 👋
-            </h1>
-            <p class="text-sm text-neutral-400 max-w-xl">
-                @lang('All system nodes operational. You have') <span class="text-white font-medium">{{ $widget['active_services'] ?? 0 }} @lang('active services')</span> @lang('and') <span class="text-white font-medium">{{ $widget['active_domains'] ?? 0 }} @lang('registered domains')</span>.
-            </p>
-        </div>
+        @if ($user->kv == 0 || $user->kv == 2)
+            @php
+                $kyc = @getContent('kyc.content', true);
+            @endphp
 
-        <!-- Quick Action Pills -->
-        <div class="flex flex-wrap items-center gap-2 relative z-10">
-            <a href="{{ route('user.invoice.list') }}" class="px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] border border-white/10 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
-                <i data-lucide="receipt" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>@lang('View Invoices')</span>
-            </a>
-            <a href="{{ route('ticket.open') }}" class="px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] border border-white/10 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
-                <i data-lucide="life-buoy" class="w-3.5 h-3.5 text-indigo-400"></i>
-                <span>@lang('Open Ticket')</span>
-            </a>
-            <a href="{{ route('service.category') }}?all" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-glow-accent transition-all flex items-center gap-1.5">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>@lang('Deploy Service')</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- Server Health Overview Card (Full Width) -->
-    <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i data-lucide="activity" class="w-5 h-5 text-indigo-400"></i>
-                <h3 class="text-base font-semibold text-white">@lang('Server Health Overview')</h3>
-            </div>
-            <span class="text-xs text-neutral-400">@lang('Live Telemetry') • @lang('Node Cluster #1')</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <!-- CPU Gauge -->
-            <div class="p-4 bg-[#1C1C1F] border border-white/5 rounded-xl space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-neutral-400 font-medium">@lang('CPU Load')</span>
-                    <span class="text-cyan-400 font-semibold font-mono">32%</span>
-                </div>
-                <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-                    <div class="h-full bg-cyan-400 rounded-full" style="width: 32%"></div>
-                </div>
-                <div class="text-[11px] text-neutral-500">8 Cores • 3.40 GHz AMD EPYC</div>
-            </div>
-
-            <!-- RAM Gauge -->
-            <div class="p-4 bg-[#1C1C1F] border border-white/5 rounded-xl space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-neutral-400 font-medium">@lang('RAM Usage')</span>
-                    <span class="text-amber-400 font-semibold font-mono">68%</span>
-                </div>
-                <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-                    <div class="h-full bg-amber-400 rounded-full" style="width: 68%"></div>
-                </div>
-                <div class="text-[11px] text-neutral-500">21.7 GB / 32 GB DDR5</div>
-            </div>
-
-            <!-- NVMe Disk Gauge -->
-            <div class="p-4 bg-[#1C1C1F] border border-white/5 rounded-xl space-y-2">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-neutral-400 font-medium">@lang('NVMe Disk')</span>
-                    <span class="text-cyan-400 font-semibold font-mono">41%</span>
-                </div>
-                <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-                    <div class="h-full bg-cyan-400 rounded-full" style="width: 41%"></div>
-                </div>
-                <div class="text-[11px] text-neutral-500">205 GB / 500 GB Storage</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Metrics Strip (Redesigned Compact Cards) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <!-- Active Services -->
-        <a href="{{ route('user.service.list') }}" class="p-4 bg-[#141416] hover:bg-[#18181B] border border-white/10 hover:border-indigo-500/30 rounded-xl transition-all group flex flex-col justify-between space-y-3">
-            <div class="flex items-center justify-between">
-                <div class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform">
-                    <i data-lucide="server" class="w-4 h-4"></i>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">@lang('Live')</span>
-            </div>
-            <div>
-                <div class="text-2xl font-bold text-white font-mono tracking-tight">{{ $widget['active_services'] ?? 0 }}</div>
-                <div class="text-xs font-medium text-neutral-400 mt-0.5 flex items-center justify-between">
-                    <span>@lang('Active Services')</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-neutral-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all"></i>
-                </div>
-            </div>
-        </a>
-
-        <!-- Active Domains -->
-        <a href="{{ route('user.domain.list') }}" class="p-4 bg-[#141416] hover:bg-[#18181B] border border-white/10 hover:border-cyan-500/30 rounded-xl transition-all group flex flex-col justify-between space-y-3">
-            <div class="flex items-center justify-between">
-                <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
-                    <i data-lucide="globe" class="w-4 h-4"></i>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">@lang('DNS')</span>
-            </div>
-            <div>
-                <div class="text-2xl font-bold text-white font-mono tracking-tight">{{ $widget['active_domains'] ?? 0 }}</div>
-                <div class="text-xs font-medium text-neutral-400 mt-0.5 flex items-center justify-between">
-                    <span>@lang('My Domains')</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-neutral-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all"></i>
-                </div>
-            </div>
-        </a>
-
-        <!-- Pending Invoices -->
-        <a href="{{ route('user.invoice.list') }}" class="p-4 bg-[#141416] hover:bg-[#18181B] border border-white/10 hover:border-amber-500/30 rounded-xl transition-all group flex flex-col justify-between space-y-3">
-            <div class="flex items-center justify-between">
-                <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
-                    <i data-lucide="file-text" class="w-4 h-4"></i>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">@lang('Billing')</span>
-            </div>
-            <div>
-                <div class="text-2xl font-bold text-white font-mono tracking-tight">{{ $widget['unpaid_invoices'] ?? 0 }}</div>
-                <div class="text-xs font-medium text-neutral-400 mt-0.5 flex items-center justify-between">
-                    <span>@lang('Unpaid Invoices')</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-neutral-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all"></i>
-                </div>
-            </div>
-        </a>
-
-        <!-- Support Tickets -->
-        <a href="{{ route('ticket.index') }}" class="p-4 bg-[#141416] hover:bg-[#18181B] border border-white/10 hover:border-emerald-500/30 rounded-xl transition-all group flex flex-col justify-between space-y-3">
-            <div class="flex items-center justify-between">
-                <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
-                    <i data-lucide="messages-square" class="w-4 h-4"></i>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">@lang('Support')</span>
-            </div>
-            <div>
-                <div class="text-2xl font-bold text-white font-mono tracking-tight">{{ $widget['open_tickets'] ?? 0 }}</div>
-                <div class="text-xs font-medium text-neutral-400 mt-0.5 flex items-center justify-between">
-                    <span>@lang('Open Tickets')</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-neutral-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all"></i>
-                </div>
-            </div>
-        </a>
-    </div>
-
-    <!-- Main Section Grid: 3-column Services + Right Activity & Billing -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Left 2 Cols: Services Quick Grid -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
-                        <h3 class="text-base font-semibold text-white">@lang('Active Services')</h3>
-                    </div>
-                    <a href="{{ route('user.service.list') }}" class="text-xs text-indigo-400 hover:underline font-medium">@lang('View all services →')</a>
-                </div>
-
-                @if(isset($services) && count($services) > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($services->take(4) as $service)
-                            <div class="p-4 bg-[#1C1C1F] border border-white/5 hover:border-white/10 rounded-xl space-y-3 relative group">
-                                <div class="flex items-center justify-between">
-                                    <div class="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-                                        <i data-lucide="cpu" class="w-4 h-4"></i>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card custom--card style-two mb-4 mb-4 bg--navajowhite">
+                        <div class="card-body">
+                            @if ($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
+                                <div class="justify-content-between d-flex flex-wrap gap-4">
+                                    <div class="d-flex justify-content-between flex-wrap align-items-center gap-2">
+                                        <h6>@lang('KYC Documents Rejected')</h6>
+                                        <button class="btn btn-outline-secondary btn--sm" data-bs-toggle="modal" data-bs-target="#kycRejectionReason">
+                                            @lang('Show Reason')
+                                        </button>
                                     </div>
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                        Active
-                                    </span>
+                                    <a href="{{ route('user.kyc.form') }}" class="text-bold text--primary">@lang('Click Here to Re-submit Documents')</a>
                                 </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-white tracking-tight truncate">{{ $service->domain ?? 'Unassigned domain' }}</h4>
-                                    <p class="text-xs text-neutral-400 mt-0.5">{{ $service->product->name ?? 'cPanel Hosting' }}</p>
+                                <hr>
+                                <p>{{ __(@$kyc->data_values->kyc_reject) }}</p>
+                            @elseif($user->kv == Status::KYC_UNVERIFIED)
+                                <div class="justify-content-between d-flex flex-wrap">
+                                    <h6>@lang('KYC Verification Required')</h6>
+                                    <a href="{{ route('user.kyc.form') }}" class="text-bold text--primary">@lang('Click Here to Submit Documents')</a>
                                 </div>
-                                <div class="pt-2 border-t border-white/5 flex items-center justify-between">
-                                    <a href="{{ route('user.service.details', $service->id) }}" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white text-xs font-semibold rounded-md transition-all">
-                                        @lang('Manage')
-                                    </a>
-                                    <span class="text-[11px] text-neutral-500 font-mono">{{ $service->created_at->format('M d, Y') }}</span>
+                                <hr>
+                                <p>{{ __(@$kyc->data_values->kyc_required) }}</p>
+                            @elseif($user->kv == Status::KYC_PENDING)
+                                <div class="justify-content-between d-flex flex-wrap">
+                                    <h6>@lang('KYC Verification Pending')</h6>
+                                    <a href="{{ route('user.kyc.data') }}" class="text-bold text--primary">@lang('See KYC Data')</a>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="p-8 border border-dashed border-white/10 rounded-xl text-center space-y-3">
-                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-neutral-500 mx-auto">
-                            <i data-lucide="server-off" class="w-6 h-6"></i>
+                                <hr>
+                                <p>{{ __(@$kyc->data_values->kyc_pending) }}</p>
+                            @endif
                         </div>
-                        <h4 class="text-sm font-semibold text-white">@lang('No Active Hosting Services Yet')</h4>
-                        <p class="text-xs text-neutral-400 max-w-sm mx-auto">@lang('Deploy high performance NVMe cPanel or VPS hosting instances in seconds.')</p>
-                        <a href="{{ route('service.category') }}?all" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg shadow-glow-accent">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                            <span>@lang('Browse Hosting Plans')</span>
-                        </a>
                     </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Right Col: Support PIN & Recent Activity -->
-        <div class="space-y-6">
-            <!-- Support PIN Card -->
-            <div class="p-5 bg-[#141416] border border-white/10 rounded-2xl space-y-3">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-neutral-400 font-medium">@lang('Support PIN')</span>
-                    <span class="text-neutral-500">@lang('Expires soon')</span>
                 </div>
-                <div class="flex items-center justify-between bg-[#1C1C1F] p-3 rounded-xl border border-white/5">
-                    <span class="text-xl font-bold font-mono text-cyan-400 tracking-wider">{{ $supportPin->plain_code ?? '849-201' }}</span>
+            </div>
+        @endif
+
+        <div class="card custom--card whm-support-pin-card mb-4">
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <p class="mb-1 text--secondary">@lang('Support PIN')</p>
+                        <h3 class="mb-1 whm-support-pin-code">{{ $supportPin->plain_code }}</h3>
+                        <small class="text-muted">
+                            @lang('Share this only with support. Expires')
+                            {{ diffForHumans($supportPin->expires_at) }}.
+                        </small>
+                    </div>
                     <form action="{{ route('user.support.pin.regenerate') }}" method="post">
                         @csrf
-                        <button type="submit" class="p-1.5 bg-white/5 hover:bg-white/10 text-neutral-300 rounded-md transition-colors" title="@lang('Regenerate PIN')">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <button class="btn btn--base" type="submit">
+                            <i class="fas fa-sync-alt"></i> @lang('Regenerate')
                         </button>
                     </form>
                 </div>
-                <p class="text-[11px] text-neutral-500">@lang('Share this PIN with customer support representatives for account verification.')</p>
             </div>
+        </div>
 
-            <!-- Account Balance Snapshot -->
-            <div class="p-5 bg-[#141416] border border-white/10 rounded-2xl space-y-3">
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-neutral-400 font-medium">@lang('Credit Balance')</span>
-                    <a href="{{ route('user.deposit.index') }}" class="text-xs text-indigo-400 hover:underline font-semibold">+ @lang('Add Funds')</a>
+        <div class="row user-dashboard">
+            <div class="col-xl-4 col-md-6 col-sm-6">
+                <div class="custom--card custom-radius-10 border-start border-0 border-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text--secondary">@lang('Balance')</p>
+                                <h4 class="my-1">{{ showAmount($user->balance) }}</h4>
+                            </div>
+                            <div class="widgets-icons-2 rounded--circle bg-gradient-blooker text--white ms--auto">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <a href="{{ route('user.transactions') }}" class="has-anchor"></a>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-2xl font-extrabold text-white font-mono">{{ showAmount($user->balance) }}</div>
-                <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full" style="width: 75%"></div>
+            </div>
+            <div class="col-xl-4 col-md-6 col-sm-6">
+                <div class="custom--card custom-radius-10 border-start border-0 border-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text--secondary">@lang('Deposit')</p>
+                                <h4 class="my-1">{{ @$user->deposits->count() }}</h4>
+                            </div>
+                            <div class="widgets-icons-2 rounded--circle bg-gradient-blooker text--white ms--auto">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <a href="{{ route('user.deposit.history') }}" class="has-anchor"></a>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center justify-between text-[11px] text-neutral-400">
-                    <span>@lang('Auto-Renew'): <strong class="text-emerald-400">ON</strong></span>
-                    <span>@lang('Next billing cycle in 14d')</span>
+            </div>
+            <div class="col-xl-4 col-md-6 col-sm-6">
+                <div class="custom--card custom-radius-10 border-start border-0 border-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text--secondary">@lang('Services')</p>
+                                <h4 class="my-1">{{ $totalService }}</h4>
+                            </div>
+                            <div class="widgets-icons-2 rounded--circle bg-gradient-scooter text--white ms--auto">
+                                <i class="fa fa-box"></i>
+                            </div>
+                            <a href="{{ route('user.service.list') }}" class="has-anchor"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6 col-sm-6">
+                <div class="custom--card custom-radius-10 border-start border-0 border-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text--secondary">@lang('Domains')</p>
+                                <h4 class="my-1">{{ $totalDomain }}</h4>
+                            </div>
+                            <div class="widgets-icons-2 rounded--circle bg-gradient-bloody text--white ms--auto">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <a href="{{ route('user.domain.list') }}" class="has-anchor"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6 col-sm-6">
+                <div class="custom--card custom-radius-10 border-start border-0 border-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text--secondary">@lang('Tickets')
+
+                                </p>
+                                <h4 class="my-1">{{ $totalTicket }}</h4>
+                            </div>
+                            <div class="widgets-icons-2 rounded--circle bg-gradient-ohhappiness text--white ms--auto">
+                                <i class="fa fa-comments"></i>
+                            </div>
+                            <a href="{{ route('ticket.index') }}" class="has-anchor"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6 col-sm-6">
+                <div class="custom--card custom-radius-10 border-start border-0 border-3 border-left-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text--secondary">@lang('Invoices')</p>
+                                <h4 class="my-1">{{ $totalInvoice }}</h4>
+                            </div>
+                            <div class="widgets-icons-2 rounded--circle bg-gradient-blooker text--white ms--auto">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <a href="{{ route('user.invoice.list') }}" class="has-anchor"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-xl-6 col-lg-6">
+                <div class="card custom-border-top-dark">
+                    <div class="card-body">
+                        <div class="justify-content-between d-flex mb-3 flex-wrap">
+                            <div> <i class="fas fa-calculator"></i> @lang('Overdue Invoices') </div>
+                            <a class="btn btn--xs btn--base" href="{{ route('user.invoice.list') }}">
+                                <i class="fas fa-list"></i> @lang('View All')
+                            </a>
+                        </div>
+                        @lang('You have') {{ $totalOverDueInvoice->total }}
+                        @lang('overdue invoice(s) with a total balance due of')
+                        {{ showAmount($totalOverDueInvoice->totalDue) }}.
+                        @lang('Pay them now to avoid any interruptions in service').
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6">
+                <div class="card custom-border-top-dark h-100">
+                    <div class="card-body">
+                        <div class="justify-content-between d-flex mb-3 flex-wrap">
+                            <div> <i class="fas fa-cube"></i> @lang('Products/Services') </div>
+                            <a class="btn btn--xs btn--base" href="{{ route('user.service.list') }}"> <i class="fas fa-list"></i> @lang('View All')</a>
+                        </div>
+                        @lang('It appears you do not have any products/services with us yet').
+                        <a href="{{ route('service.category') }}?all">@lang('Place an order to get started')</a>.
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6">
+                <div class="card custom-border-top-dark h-100">
+                    <div class="card-body">
+                        <div class="justify-content-between d-flex mb-3 flex-wrap">
+                            <div> <i class="fas fa-comments"></i> @lang('Support Tickets') </div>
+                            <a class="btn btn--xs btn--base" href="{{ route('ticket.index') }}"> <i class="fas fa-list"></i> @lang('View All')</a>
+                        </div>
+                        @lang('No Recent Tickets Found. If you need any help'), <a href="{{ route('ticket.open') }}">@lang('please open a ticket')</a>.
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6">
+                <div class="card custom-border-top-dark h-100">
+                    <div class="card-body">
+                        <div> <i class="fas fa-globe"></i> @lang('Register New Domain') </div>
+                        <form action="" class="form mt-4">
+                            <div class="form-group position-relative mb-0">
+                                <div class="domain-search-icon"><i class="fas fa-search"></i></div>
+                                <input class="form-control form--control h-45" type="text" name="domain" placeholder="@lang('Domain name or keyword')" required>
+                                <div class="domain-search-icon-reset">
+                                    <button class="btn btn--base btn--sm" type="submit">@lang('Search')</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    @if ($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
+        <div class="modal fade" id="kycRejectionReason">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@lang('KYC Document Rejection Reason')</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ $user->kyc_rejection_reason }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
+
+@push('script')
+    <script>
+        (function($) {
+            "use strict";
+            $('.form').on('submit', function(e) {
+                e.preventDefault();
+                var domain = $(this).find('input[name=domain]').val();
+                window.location.href = "{{ route('register.domain') }}?domain=" + domain;
+            })
+        })(jQuery);
+    </script>
+@endpush
+
+@push('style')
+    <style>
+        .whm-support-pin-card {
+            border-left: 4px solid #2563eb !important;
+        }
+
+        .whm-support-pin-code {
+            color: #0f172a;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 900;
+            letter-spacing: .16em;
+        }
+    </style>
+@endpush

@@ -131,18 +131,18 @@ class HostingModuleController extends Controller{
             $notify[] = ['error', $execute['message']];
             return back()->withNotify($notify);
         }
-        /**
-        * For knowing about status 
-        * @see \App\Models\Hosting go to status method 
-        */
+
         $hosting->status = 4; //4 means Terminated
         $hosting->save(); 
         if ($wasActive && $hosting->server && $hosting->server->current_accounts > 0) {
             $hosting->server->decrement('current_accounts');
         }
 
-        $notify[] = ['success', $execute['message']];
-        return back()->withNotify($notify);
+        // Permanently wipe terminated account from admin database
+        $hosting->delete();
+
+        $notify[] = ['success', 'Service account terminated and wiped from admin successfully'];
+        return redirect()->route('admin.services')->withNotify($notify);
     }
 
     protected function deactivate($serverGroup, $hosting, $request)

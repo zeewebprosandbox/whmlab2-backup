@@ -11,6 +11,8 @@ class Server extends Model{
 
     use HasFactory, GlobalStatus;
 
+    protected $guarded = [];
+
     protected $casts = [
         'health_checked_at' => 'datetime',
         'last_deployed_at' => 'datetime',

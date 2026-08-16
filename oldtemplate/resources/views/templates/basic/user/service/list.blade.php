@@ -33,7 +33,9 @@
             @php
                 $server = $service->server;
                 $serverGroup = @$server->group;
-                $role = @$server->serviceRoleLabel() ?: \App\Models\Server::serviceRoles()[\App\Models\Server::roleForProduct($service->product)];
+                $fallbackRoleKey = \App\Models\Server::roleForProduct($service->product);
+                $allRoles = \App\Models\Server::serviceRoles();
+                $role = $server ? $server->serviceRoleLabel() : ($allRoles[$fallbackRoleKey] ?? ucfirst($fallbackRoleKey));
             @endphp
             <div class="whm-service-card">
                 <div class="whm-service-card__main">

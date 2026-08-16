@@ -52,8 +52,20 @@ class DomainModuleController extends Controller{
         elseif($request->module_type == 6){
             return $this->disableIdProtection($domain);
         }
+        elseif($request->module_type == 7){
+            return $this->cancelDomain($domain);
+        }
 
     } 
+
+    protected function cancelDomain($domain){
+        $domain->status = 4; // Terminated/Cancelled
+        $domain->save();
+        $domain->delete();
+
+        $notify[] = ['success', 'Domain order cancelled and wiped from admin successfully'];
+        return redirect()->route('admin.domains')->withNotify($notify);
+    }
 
     protected function register($domain, $request){
 

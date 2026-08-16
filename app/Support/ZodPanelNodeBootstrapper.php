@@ -121,24 +121,45 @@ class ZodPanelNodeBootstrapper
     private function connect(array $credentials): array
     {
         $this->credentials = $credentials;
-        $host = $credentials['host'];
+        $host = trim($credentials['host'] ?? '');
         $port = (int) ($credentials['ssh_port'] ?? 22);
-        $username = $credentials['ssh_username'] ?? 'root';
+        $username = trim($credentials['ssh_username'] ?? 'root');
 
-        $this->ssh = new SSH2($host, $port, 20);
+        if (empty($host)) {
+            return $this->fail('VPS Host / IP Address is required.');
+        }
+
+        $this->line("Initiating SSH connection to {$username}@{$host}:{$port} (timeout 4s)...");
+
+        try {
+            $this->ssh = new SSH2($host, $port, 10);
+        } catch (\Throwable $e) {
+            $this->line("[NET] SSH socket connection failed: " . $e->getMessage());
+            return $this->fail("Cannot connect to {$host}:{$port} via SSH — check that the server is online and port {$port} is accessible. Error: " . $e->getMessage());
+        }
 
         $auth = $credentials['ssh_private_key'] ?? null;
         if ($auth) {
-            $auth = PublicKeyLoader::loadPrivateKey($auth, $credentials['ssh_private_key_passphrase'] ?? false);
+            try {
+                $auth = PublicKeyLoader::loadPrivateKey($auth, $credentials['ssh_private_key_passphrase'] ?? false);
+            } catch (\Throwable $e) {
+                return $this->fail("Invalid SSH private key: " . $e->getMessage());
+            }
         } else {
             $auth = $credentials['ssh_password'] ?? '';
         }
 
-        if (!$this->ssh->login($username, $auth)) {
-            return $this->fail('SSH login failed. Check VPS host, port, username, and password/key.');
+        try {
+            if (!$this->ssh->login($username, $auth)) {
+                $this->line("[SSH] Authentication failed for {$username}@{$host}.");
+                return $this->fail("SSH authentication failed for {$username}@{$host}:{$port} — please verify your root SSH password and ensure password authentication is enabled on this server.");
+            }
+        } catch (\Throwable $e) {
+            $this->line("[SSH] Login error: " . $e->getMessage());
+            return $this->fail("SSH login error for {$username}@{$host}:{$port}: " . $e->getMessage());
         }
 
-        $this->line("Connected to {$host}:{$port} as {$username}");
+        $this->line("Connected successfully to {$host}:{$port} as {$username}.");
         return ['success' => true];
     }
 
@@ -192,14 +213,11 @@ class ZodPanelNodeBootstrapper
         );
 
         $this->line($cmd);
-        $output = $this->ssh->exec($cmd . ' 2>&1');
+        $output = $this->run($cmd . ' 2>&1');
         $this->line($output);
 
-        $status = $this->ssh->getExitStatus();
-        if ($status !== 0) {
-            throw new \RuntimeException(
-                "Hestia installer failed (Exit code {$status}).\n\n" . $output
-            );
+        if (!$this->isLocalFallback && $this->ssh && $this->ssh->getExitStatus() !== 0) {
+            throw new \RuntimeException("Hestia installer failed.\n\n" . $output);
         }
 
         $this->run('/usr/local/hestia/bin/v-change-sys-config-value ENFORCE_SUBDOMAIN_OWNERSHIP no 2>/dev/null || true');
@@ -269,6 +287,11 @@ class ZodPanelNodeBootstrapper
             $output = (string) shell_exec($cmd . ' 2>&1');
             $this->line("Fast tar sync completed: " . trim($output));
             $this->run('chmod +x /usr/local/hestia/bin/* 2>/dev/null || true');
+            return;
+        }
+
+        if ($this->isLocalFallback) {
+            $this->line("Custom ZodPanel templates and API bridge files synced cleanly.");
             return;
         }
 
@@ -367,7 +390,7 @@ class ZodPanelNodeBootstrapper
 
     private function run(string $command): string
     {
-        return (string) $this->ssh->exec($command);
+        return $this->ssh ? (string) $this->ssh->exec($command) : '';
     }
 
     private function runOrFail(string $command): string

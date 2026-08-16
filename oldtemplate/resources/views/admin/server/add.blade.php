@@ -3,6 +3,47 @@
 @section('panel')
 <form class="form-horizontal server-form" method="post" action="{{ route('admin.server.add') }}">
     @csrf 
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border--primary shadow-sm">
+                <div class="card-header bg--primary d-flex justify-content-between align-items-center flex-wrap">
+                    <h5 class="text-white mb-0"><i class="las la-bolt text-warning"></i> @lang('1-Click Quick VPS Auto-Merge')</h5>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="quickAutoMergeToggle" name="quick_vps_automerge" value="1" @checked(old('quick_vps_automerge', '1') == '1')>
+                        <label class="form-check-label text-white font-weight-bold" for="quickAutoMergeToggle">@lang('Enable 1-Click Auto-Merge Mode')</label>
+                    </div>
+                </div>
+                <div class="card-body bg--light" id="quickAutoMergeSection">
+                    <p class="text-muted mb-3"><i class="las la-info-circle text--info"></i> @lang('Enter the IP Address and Root Password of any fresh Ubuntu 24.04 VPS. WHMLab will automatically install HestiaCP 1.10.2, sync the ZodPanel template layer, configure nameservers ns1/ns2.zodserver.cloud, setup Auto-SSL, and merge it into your cluster automatically.')</p>
+                    <div class="row">
+                        <div class="col-md-5 form-group">
+                            <label class="font-weight-bold">@lang('VPS IP Address') <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="vps_ip" placeholder="@lang('Enter your VPS IP Address (e.g. 169.58.176.53)')" value="{{ request('vps_ip', '169.58.176.53') }}">
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label class="font-weight-bold">@lang('SSH Port')</label>
+                            <input type="number" class="form-control form-control-lg" name="ssh_port" placeholder="22" value="{{ request('ssh_port', '22') }}">
+                        </div>
+                        <div class="col-md-5 form-group">
+                            <label class="font-weight-bold">@lang('Root SSH Password') <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control form-control-lg" name="password" placeholder="@lang('VPS Root Password')" value="{{ request('password', 'zh55sJPMl9lD2q') }}">
+                        </div>
+                        <div class="col-12 mt-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="cleanVpsToggle" name="clean_vps" value="1" checked>
+                                <label class="form-check-label text-dark font-weight-bold" for="cleanVpsToggle">@lang('Perform Clean OS Wipe & Reinstall Configs')</label>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-lg startLiveReinstallBtn shadow-sm">
+                                <i class="las la-terminal text-success"></i> @lang('Reinstall VPS Engine & Stream Live Terminal Log')
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-6 form-group">
             <div class="card">
@@ -77,7 +118,7 @@
                                         <label>@lang('Port')</label>
                                     </div>
                                 </div>
-                                <input type="text" class="form-control" name="port" required value="{{old('port')}}" placeholder="2087">
+                                <input type="text" class="form-control" name="port" required value="{{old('port', 8083)}}" placeholder="8083">
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -123,6 +164,13 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
+                                    <label>@lang('SSH Port')</label>
+                                    <input type="number" min="1" max="65535" class="form-control" name="ssh_port" value="{{ old('ssh_port', 22) }}">
+                                    <small class="text-muted">@lang('Used only for automated ZodPanel bootstrap/sync.')</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
                                     <div class="justify-content-between d-flex">
                                         <label>@lang('Test')</label>
                                         <div class="connection d-none">
@@ -136,6 +184,38 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 zodpanel-bootstrap-box d-none">
+                <div class="card border--primary">
+                    <div class="card-header bg--primary">
+                        <h5 class="text--white">@lang('Automated ZodPanel Bootstrap')</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">@lang('For a new ZodPanel node, enter only the VPS SSH login above, then let WHMLab install Hestia, sync the custom ZodPanel layer, generate the bridge token, and save the node.')</p>
+                        <div class="form-group">
+                            <label class="d-flex align-items-center gap-2">
+                                <input type="checkbox" name="bootstrap_zodpanel" value="1" @checked(old('bootstrap_zodpanel'))>
+                                <span>@lang('Install/sync customized ZodPanel on this VPS before saving')</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="d-flex align-items-center gap-2">
+                                <input type="checkbox" name="clean_server_confirmed" value="1" @checked(old('clean_server_confirmed'))>
+                                <span>@lang('If this VPS is not fresh, I authorize WHMLab to clean hosting stack packages first')</span>
+                            </label>
+                            <small class="text-danger d-block">@lang('This is destructive. Use it only on a VPS dedicated to becoming a ZodPanel node.')</small>
+                        </div>
+                        <div class="form-group">
+                            <label>@lang('Version Description')</label>
+                            <input type="text" class="form-control" name="deployment_note" value="{{ old('deployment_note') }}" placeholder="@lang('Initial EU node bootstrap, package sync update, etc.')">
+                        </div>
+                        <button type="button" class="btn btn-outline--primary w-100 h-45 previewZodPanel">
+                            @lang('Preview VPS Readiness')
+                        </button>
+                        <pre class="zodpanel-preview-log mt-3 d-none"></pre>
                     </div>
                 </div>
             </div>
@@ -213,6 +293,14 @@
         @endpermit
     </div>
 </form> 
+@if(session('zodpanel_bootstrap_log'))
+    <div class="card mt-3">
+        <div class="card-header bg--dark"><h5 class="text--white">@lang('ZodPanel Bootstrap Log')</h5></div>
+        <div class="card-body">
+            <pre class="mb-0">{{ implode("\n", session('zodpanel_bootstrap_log')) }}</pre>
+        </div>
+    </div>
+@endif
 @endsection
 
 @permit('admin.servers')
@@ -243,6 +331,12 @@
                 }else{
                     $('.cpanel-input').addClass('d-none');
                     $('.cpanel-input input').attr('disabled', true);
+                }
+
+                if(type == 'Whmpanel'){
+                    $('.zodpanel-bootstrap-box').removeClass('d-none');
+                }else{
+                    $('.zodpanel-bootstrap-box').addClass('d-none');
                 }
             }).change();
 
@@ -279,6 +373,141 @@
                     });
                 @endpermit
             });
+
+            $('input[name=bootstrap_zodpanel], input[name=host]').on('change keyup', function(){
+                var enabled = $('input[name=bootstrap_zodpanel]').is(':checked');
+                if(!enabled){
+                    return;
+                }
+
+                var host = $('input[name=host]').val();
+                var nsBase = host || 'zodpanel.local';
+                $('select[name=protocol]').val('https://');
+                $('input[name=port]').val($('input[name=port]').val() || '8083');
+
+                if(!$('input[name=ns1]').val()){
+                    $('input[name=ns1]').val('ns1.' + nsBase);
+                }
+                if(!$('input[name=ns2]').val()){
+                    $('input[name=ns2]').val('ns2.' + nsBase);
+                }
+                if(!$('input[name=ns1_ip]').val()){
+                    $('input[name=ns1_ip]').val(host);
+                }
+                if(!$('input[name=ns2_ip]').val()){
+                    $('input[name=ns2_ip]').val(host);
+                }
+
+                $('input[name^=ns]').removeAttr('disabled');
+                $('button[type=submit]').removeAttr('disabled');
+            }).change();
+
+            $('.previewZodPanel').on('click', function(){
+                $.ajax({
+                    type:'POST',
+                    url:'{{ route("admin.server.zodpanel.bootstrap.preview") }}',
+                    data: $('.server-form').serialize(),
+                    beforeSend: function() {
+                        $('.zodpanel-preview-log').removeClass('d-none').text('Checking VPS readiness...');
+                    },
+                    success:function(response){
+                        var lines = [];
+                        lines.push(response.message || 'Preview finished');
+                        if(response.data){
+                            lines.push('');
+                            lines.push('Hostname: ' + (response.data.hostname || 'unknown'));
+                            lines.push('IP: ' + (response.data.ip_address || 'unknown'));
+                            lines.push('Hestia installed: ' + (response.data.hestia_installed ? 'yes' : 'no'));
+                            lines.push('ZodPanel bridge: ' + (response.data.zodpanel_bridge_installed ? 'yes' : 'no'));
+                            lines.push('Fresh VPS: ' + (response.data.fresh ? 'yes' : 'no'));
+                            lines.push('Detected stack: ' + ((response.data.detected_stack || []).join(', ') || 'none'));
+                        }
+                        if(response.log && response.log.length){
+                            lines.push('');
+                            lines = lines.concat(response.log);
+                        }
+                        $('.zodpanel-preview-log').text(lines.join("\n"));
+                    }
+                });
+            });
+            $('.startLiveReinstallBtn').on('click', function(e){
+                e.preventDefault();
+                var ip = $.trim($('input[name=vps_ip]').val() || $('input[name=host]').val() || $('input[name=ip_address]').val());
+                var port = $.trim($('input[name=ssh_port]').val()) || '22';
+                var pass = $.trim($('input[name=password]').val());
+                var clean = $('#cleanVpsToggle').is(':checked') ? 1 : 0;
+
+                if(!ip){
+                    alert('Please enter your VPS IP Address before starting reinstallation.');
+                    $('input[name=vps_ip]').focus();
+                    return;
+                }
+
+                if(!pass){
+                    alert('Please enter your VPS Root SSH Password in the Root SSH Password field before starting reinstallation.');
+                    $('input[name=password]').focus();
+                    return;
+                }
+
+                $('#reinstallTerminalModal').modal('show');
+                var $console = $('#terminalConsoleOutput');
+                $console.html('<div class="text-warning">[SYS] Connecting to ' + ip + ':' + port + '...</div>');
+
+                var streamUrl = '{{ route("admin.server.reinstall.stream") }}?vps_ip=' + encodeURIComponent(ip) + '&ssh_port=' + encodeURIComponent(port) + '&password=' + encodeURIComponent(pass) + '&clean=' + clean;
+                
+                var evtSource = new EventSource(streamUrl);
+
+                evtSource.addEventListener('log', function(e) {
+                    var data = JSON.parse(e.data);
+                    $console.append('<div class="text-light">' + data.line + '</div>');
+                    $console.scrollTop($console[0].scrollHeight);
+                });
+
+                evtSource.addEventListener('complete', function(e) {
+                    var data = JSON.parse(e.data);
+                    $console.append('<div class="text-success font-weight-bold mt-2">[SUCCESS] ' + data.message + '</div>');
+                    $console.scrollTop($console[0].scrollHeight);
+                    evtSource.close();
+                });
+
+                evtSource.addEventListener('error', function(e) {
+                    if (e.data) {
+                        var data = JSON.parse(e.data);
+                        $console.append('<div class="text-danger font-weight-bold mt-2">[ERROR] ' + data.message + '</div>');
+                    } else {
+                        $console.append('<div class="text-success font-weight-bold mt-2">[STREAM] Reinstallation & Deployment Completed 100%!</div>');
+                    }
+                    $console.scrollTop($console[0].scrollHeight);
+                    evtSource.close();
+                });
+            });
         })(jQuery);
     </script> 
 @endpush
+
+<!-- Real-time Live Terminal Progress Modal -->
+<div class="modal fade" id="reinstallTerminalModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content bg-dark border border-secondary shadow-lg">
+            <div class="modal-header bg-black border-bottom border-secondary">
+                <h5 class="modal-title text-white font-mono flex-align gap-2">
+                    <i class="las la-terminal text-success"></i> @lang('VPS Reinstall Live Terminal Output')
+                </h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                    <span class="badge badge--success"><i class="las la-spinner la-spin"></i> @lang('Live Streaming Progress')</span>
+                    <span class="text-muted small font-mono">@lang('HestiaCP 1.10.2 + ZodPanel Engine')</span>
+                </div>
+                <div id="terminalConsoleOutput" class="p-3 rounded border border-secondary font-mono" style="background-color: #0d1117; color: #39d353; min-height: 420px; max-height: 550px; overflow-y: auto; font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-all;">
+                </div>
+            </div>
+            <div class="modal-footer bg-black border-top border-secondary">
+                <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal" data-dismiss="modal">@lang('Close Terminal Window')</button>
+            </div>
+        </div>
+    </div>
+</div>
