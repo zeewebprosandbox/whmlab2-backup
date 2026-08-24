@@ -33,6 +33,8 @@ return [
         '/usr/local/hestia/web/fm/dist/css/hst-custom.css',
         '/usr/local/hestia/web/fm/dist/js/app.js',
         '/usr/local/hestia/web/fm/domains/index.php',
+        '/usr/local/hestia/web/templates/pages/list_fm_domains.php',
+        '/usr/local/hestia/web/src/app/WebApp/BaseSetup.php',
         '/usr/local/hestia/web/open/phpmyadmin/index.php',
         '/usr/local/hestia/nginx/conf/nginx.conf',
         '/usr/share/phpmyadmin/hestia-sso.php',
