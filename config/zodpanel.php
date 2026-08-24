@@ -35,6 +35,8 @@ return [
         '/usr/local/hestia/web/fm/domains/index.php',
         '/usr/local/hestia/web/templates/pages/list_fm_domains.php',
         '/usr/local/hestia/web/src/app/WebApp/BaseSetup.php',
+        '/usr/local/hestia/web/src/app/WebApp/Installers/WordPress/WordPressSetup.php',
+        '/usr/local/hestia/web/src/app/WebApp/Installers/ClassicPress/ClassicPressSetup.php',
         '/usr/local/hestia/web/open/phpmyadmin/index.php',
         '/usr/local/hestia/nginx/conf/nginx.conf',
         '/usr/share/phpmyadmin/hestia-sso.php',
