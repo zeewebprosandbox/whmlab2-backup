@@ -32,9 +32,10 @@ return [
         '/usr/local/hestia/web/fm/configuration.php',
         '/usr/local/hestia/web/fm/dist/css/hst-custom.css',
         '/usr/local/hestia/web/fm/dist/js/app.js',
+        '/usr/local/hestia/web/fm/domains/index.php',
         '/usr/local/hestia/web/open/phpmyadmin/index.php',
-        '/usr/local/hestia/web/fm/dist/js/app.js.bak-zod-bulk-chmod-20260702091807',
-        '/usr/local/hestia/web/open/phpmyadmin/index.php.bak-zod-port-20260702093643',
-        '/usr/local/hestia/web/open/phpmyadmin/index.php.bak-zod-pma-standard-port-20260702093952',
+        '/usr/local/hestia/nginx/conf/nginx.conf',
+        '/usr/share/phpmyadmin/hestia-sso.php',
+        '/etc/phpmyadmin/conf.d/00-hestia-sso.php',
     ],
 ];

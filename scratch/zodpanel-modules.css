@@ -1,0 +1,673 @@
+/* ============================================================
+   ZodPanel Cloud OS — State of the Art Mobile UX (v3.6)
+   Clean Swipeable Nav • Zero Clutter • Ultra-Sleek Bento Cards
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --zod-canvas: #09090c;
+    --zod-surface: #111116;
+    --zod-surface-card: #14141a;
+    --zod-surface-hover: #1a1a24;
+    --zod-surface-soft: #181820;
+    
+    --zod-border: rgba(255, 255, 255, 0.08);
+    --zod-border-hover: rgba(99, 102, 241, 0.45);
+    --zod-border-subtle: rgba(255, 255, 255, 0.03);
+    
+    --zod-text: #f4f4f7;
+    --zod-text-muted: #a1a1aa;
+    --zod-text-subtle: #71717a;
+    
+    --zod-primary: #6366f1;
+    --zod-primary-hover: #4f46e5;
+    --zod-primary-glow: rgba(99, 102, 241, 0.35);
+    
+    --zod-cyan: #06b6d4;
+    --zod-green: #10b981;
+    --zod-violet: #8b5cf6;
+    --zod-orange: #f59e0b;
+    --zod-red: #ef4444;
+    
+    --zod-font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --zod-font-mono: 'JetBrains Mono', monospace;
+    --zod-radius-xs: 4px;
+    --zod-radius-sm: 6px;
+    --zod-radius: 10px;
+    --zod-radius-lg: 14px;
+    --zod-radius-pill: 9999px;
+}
+
+body {
+    background-color: var(--zod-canvas) !important;
+    color: var(--zod-text) !important;
+    font-family: var(--zod-font-sans) !important;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    font-size: 13px !important;
+    overflow-x: hidden !important;
+}
+
+/* ── Container Layout ───────────────────────────────────────── */
+.container,
+.top-bar-inner,
+.main-menu .container,
+.toolbar-inner,
+.units-table {
+    max-width: 1280px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Eliminate Default Artifacts & Clumsy Toggles ───────────── */
+.main-menu-item-link::after,
+.main-menu-item-link::before,
+.main-menu-stats,
+.zod-progress-meter,
+.zod-progress-fill,
+.main-menu-toggle,
+.main-menu-toggle-label {
+    display: none !important;
+    content: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ── 1. HEADER & BRAND BAR ──────────────────────────────────── */
+.app-header {
+    background: transparent !important;
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+}
+
+.top-bar {
+    position: static !important;
+    background: rgba(14, 14, 18, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid var(--zod-border) !important;
+    padding: 8px 0 !important;
+    min-height: 52px !important;
+    display: block !important;
+    width: 100% !important;
+}
+
+.top-bar-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+.top-bar-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    flex-wrap: wrap !important;
+}
+
+.top-bar-logo img {
+    display: none !important;
+}
+
+.top-bar-logo {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    text-decoration: none !important;
+}
+
+.top-bar-logo::before {
+    content: '⚡';
+    font-size: 16px;
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+}
+
+.top-bar-logo::after {
+    content: 'ZODPANEL';
+    font-family: var(--zod-font-sans);
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.top-bar-usage {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.top-bar-usage-inner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+
+.top-bar-usage-item {
+    background: var(--zod-surface-card) !important;
+    border: 1px solid var(--zod-border) !important;
+    border-radius: var(--zod-radius-pill) !important;
+    color: var(--zod-text-muted) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 4px 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+    transition: all 0.2s ease !important;
+}
+
+.top-bar-usage-item:hover {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: var(--zod-surface-soft) !important;
+}
+
+.top-bar-usage-item i.fa-user,
+.top-bar-usage-item i.fa-user-tie,
+.top-bar-usage-item i.fa-binoculars {
+    color: #818cf8 !important;
+}
+
+.top-bar-usage-item i.fa-hard-drive {
+    color: #06b6d4 !important;
+}
+
+.top-bar-usage-item i.fa-right-left {
+    color: #10b981 !important;
+}
+
+.top-bar-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.top-bar-menu-list {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.top-bar-menu-link {
+    background: var(--zod-surface-card) !important;
+    border: 1px solid var(--zod-border) !important;
+    border-radius: var(--zod-radius-sm) !important;
+    color: var(--zod-text-muted) !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.top-bar-menu-link:hover, .top-bar-menu-link.active {
+    background: var(--zod-surface-hover) !important;
+    border-color: var(--zod-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px var(--zod-primary-glow) !important;
+}
+
+.top-bar-menu-link[href*="logout"]:hover {
+    border-color: #ef4444 !important;
+    color: #f87171 !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* ── 2. SCROLLABLE HORIZONTAL NAVIGATION TABS ───────────────── */
+.main-menu {
+    position: static !important;
+    background: rgba(18, 18, 24, 0.8) !important;
+    border-bottom: 1px solid var(--zod-border) !important;
+    backdrop-filter: blur(16px) !important;
+    padding: 6px 0 !important;
+    display: block !important;
+    width: 100% !important;
+}
+
+.main-menu-list {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 4px !important;
+    list-style: none !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    flex-wrap: nowrap !important;
+}
+
+.main-menu-list::-webkit-scrollbar {
+    display: none !important;
+}
+
+.main-menu-item {
+    flex: 0 0 auto !important;
+}
+
+.main-menu-item-link {
+    background: var(--zod-surface-card) !important;
+    border: 1px solid var(--zod-border) !important;
+    border-radius: var(--zod-radius-sm) !important;
+    padding: 5px 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+}
+
+.main-menu-item-label {
+    color: var(--zod-text-muted) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+
+.main-menu-item-link.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(99, 102, 241, 0.08) 100%) !important;
+    border-color: var(--zod-primary) !important;
+    box-shadow: 0 0 10px var(--zod-primary-glow) !important;
+}
+
+.main-menu-item-link.active .main-menu-item-label {
+    color: #ffffff !important;
+}
+
+.main-menu-item-link.active .main-menu-item-label i {
+    color: #a5b4fc !important;
+}
+
+/* ── 3. MODERN FITTED ACTION TOOLBAR ────────────────────────── */
+.toolbar {
+    background: var(--zod-surface) !important;
+    border: 1px solid var(--zod-border) !important;
+    border-radius: var(--zod-radius) !important;
+    padding: 10px 14px !important;
+    margin: 12px auto !important;
+    max-width: 1280px !important;
+    box-sizing: border-box !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.toolbar-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+}
+
+.button, .btn, .zod-action-button {
+    border-radius: var(--zod-radius-sm) !important;
+    font-family: var(--zod-font-sans) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    padding: 7px 14px !important;
+    min-height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.button-primary, .zod-action-primary, .js-button-create {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    border: 1px solid #6366f1 !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 10px var(--zod-primary-glow) !important;
+}
+
+.form-control, .form-select, input[type="search"], input[type="text"], input[type="password"], input[type="email"], select, textarea {
+    background: var(--zod-surface-card) !important;
+    border: 1px solid var(--zod-border) !important;
+    border-radius: var(--zod-radius-sm) !important;
+    color: var(--zod-text) !important;
+    font-family: var(--zod-font-sans) !important;
+    font-size: 12px !important;
+    padding: 7px 12px !important;
+}
+
+/* ── 4. CHECKBOXES ──────────────────────────────────────────── */
+input[type="checkbox"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    background: var(--zod-surface-card) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--zod-primary) !important;
+    border-color: var(--zod-primary) !important;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓' !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    line-height: 1 !important;
+}
+
+/* ── 5. DESKTOP TABLE LAYOUT (>= 769px) ─────────────────────── */
+@media (min-width: 769px) {
+    .units-table {
+        display: table !important;
+        width: 100% !important;
+        max-width: 1280px !important;
+        border-collapse: separate !important;
+        border-spacing: 0 8px !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 auto !important;
+    }
+
+    .units-table-header {
+        display: table-row !important;
+        background: #111116 !important;
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.06em !important;
+        color: var(--zod-text-muted) !important;
+    }
+
+    .units-table-header .units-table-cell {
+        background: #111116 !important;
+        border-top: 1px solid var(--zod-border) !important;
+        border-bottom: 1px solid var(--zod-border) !important;
+        padding: 12px 14px !important;
+    }
+
+    .units-table-header .units-table-cell:first-child {
+        border-left: 1px solid var(--zod-border) !important;
+        border-top-left-radius: 8px !important;
+        border-bottom-left-radius: 8px !important;
+        width: 36px !important;
+        text-align: center !important;
+    }
+
+    .units-table-header .units-table-cell:last-child {
+        border-right: 1px solid var(--zod-border) !important;
+        border-top-right-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+    }
+
+    .units-table-row, .unit, .units {
+        display: table-row !important;
+        background: var(--zod-surface-card) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .units-table-row .units-table-cell,
+    .unit .units-table-cell,
+    .units .units-table-cell {
+        display: table-cell !important;
+        vertical-align: middle !important;
+        background: var(--zod-surface-card) !important;
+        border-top: 1px solid var(--zod-border) !important;
+        border-bottom: 1px solid var(--zod-border) !important;
+        padding: 12px 14px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .units-table-row .units-table-cell:first-child,
+    .unit .units-table-cell:first-child,
+    .units .units-table-cell:first-child {
+        border-left: 1px solid var(--zod-border) !important;
+        border-top-left-radius: 10px !important;
+        border-bottom-left-radius: 10px !important;
+        width: 36px !important;
+        text-align: center !important;
+    }
+
+    .units-table-row .units-table-cell:last-child,
+    .unit .units-table-cell:last-child,
+    .units .units-table-cell:last-child {
+        border-right: 1px solid var(--zod-border) !important;
+        border-top-right-radius: 10px !important;
+        border-bottom-right-radius: 10px !important;
+    }
+
+    .units-table-row:hover .units-table-cell,
+    .unit:hover .units-table-cell,
+    .units:hover .units-table-cell {
+        background: var(--zod-surface-hover) !important;
+        border-color: var(--zod-border-hover) !important;
+    }
+
+    .units-table-row:hover .units-table-cell:first-child,
+    .unit:hover .units-table-cell:first-child,
+    .units:hover .units-table-cell:first-child {
+        box-shadow: inset 3px 0 0 var(--zod-primary) !important;
+    }
+}
+
+/* ── 6. MOBILE BENTO CARD RESPONSIVE LAYOUT (<= 768px) ──────── */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .top-bar-inner {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    .top-bar-left {
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    .top-bar-right {
+        justify-content: flex-end !important;
+    }
+
+    .top-bar-usage-inner {
+        gap: 6px !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+        padding-bottom: 2px !important;
+    }
+
+    .top-bar-usage-item {
+        font-size: 10px !important;
+        padding: 3px 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .toolbar {
+        margin: 8px auto !important;
+        padding: 10px !important;
+    }
+
+    .toolbar-inner {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    .button-primary, .js-button-create {
+        width: 100% !important;
+        min-height: 40px !important;
+    }
+
+    .units-table {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    .units-table-header {
+        display: none !important;
+    }
+
+    .units-table-row, .unit, .units {
+        display: flex !important;
+        flex-direction: column !important;
+        background: var(--zod-surface-card) !important;
+        border: 1px solid var(--zod-border) !important;
+        border-radius: 14px !important;
+        padding: 16px !important;
+        gap: 10px !important;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    .units-table-cell {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 2px 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .units-table-cell:first-child {
+        width: auto !important;
+    }
+
+    .units-table-row-actions {
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding-top: 10px !important;
+        margin-top: 6px !important;
+        border-top: 1px solid var(--zod-border-subtle) !important;
+        justify-content: flex-start !important;
+    }
+
+    .units-table-row-action-link,
+    .units-table-row-action a {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 6px !important;
+    }
+}
+
+/* ── 7. MICRO ACTION BUTTONS ────────────────────────────────── */
+.units-table-row-actions,
+.data-controls,
+.actions {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+}
+
+.units-table-row-actions span,
+.units-table-row-action span,
+.units-table-row-action-link span,
+.data-controls span,
+.actions span {
+    display: none !important;
+}
+
+.units-table-row-action {
+    display: inline-flex !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.units-table-row-action-link,
+.units-table-row-action a {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--zod-border) !important;
+    border-radius: var(--zod-radius-xs) !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--zod-text-muted) !important;
+    font-size: 11px !important;
+    transition: all 0.15s ease !important;
+    text-decoration: none !important;
+    padding: 0 !important;
+}
+
+.units-table-row-action-link:hover,
+.units-table-row-action a:hover {
+    background: var(--zod-primary) !important;
+    border-color: var(--zod-primary) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) scale(1.05) !important;
+}
+
+/* ── 8. STATUS BADGES ───────────────────────────────────────── */
+.icon-green, .fas.fa-check, .fa-check-circle {
+    color: var(--zod-green) !important;
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
+}
+
+.icon-red, .fas.fa-xmark, .fa-times-circle {
+    color: var(--zod-text-subtle) !important;
+    opacity: 0.4;
+}
+
+/* ── 9. FOOTER ──────────────────────────────────────────────── */
+.app-footer {
+    border-top: 1px solid var(--zod-border) !important;
+    color: var(--zod-text-subtle) !important;
+    font-size: 11px !important;
+    padding: 18px 0 !important;
+    margin-top: 30px !important;
+}
