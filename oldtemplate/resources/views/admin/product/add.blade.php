@@ -80,8 +80,11 @@
                                                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                                             </label>
                                             <select name="package_name" class="form-control">
-                                                <option value="">@lang('Select One')</option>
+                                                <option value="">@lang('Auto-create from plan specs')</option>
                                             </select>
+                                            <small class="text-muted d-block mt-1">
+                                                @lang('For ZodPanel, leave this on auto to create or update a package from the product description limits.')
+                                            </small>
                                         </div>
                                     </div>
                                     <div class="col-md-12 mt-2">

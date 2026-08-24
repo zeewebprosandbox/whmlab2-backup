@@ -15,6 +15,7 @@ class Server extends Model{
 
     protected $casts = [
         'health_checked_at' => 'datetime',
+        'last_deployed_at' => 'datetime',
     ];
 
     public function group(){
@@ -87,21 +88,27 @@ class Server extends Model{
 
     public static function bestForProduct(Product $product): ?self
     {
-        if (!$product->server_group_id) {
-            return null;
-        }
-
         $role = self::roleForProduct($product);
 
-        return self::where('server_group_id', $product->server_group_id)
-            ->provisionable()
+        $query = self::provisionable()
             ->where(function ($server) use ($role) {
                 $server->where('service_role', $role)->orWhere('service_role', 'any');
-            })
-            ->orderByRaw('CASE WHEN service_role = ? THEN 0 ELSE 1 END', [$role])
-            ->orderByRaw('CASE WHEN max_accounts > 0 THEN current_accounts / max_accounts ELSE 0 END asc')
+            });
+
+        if ($product->server_group_id) {
+            $matched = (clone $query)->where('server_group_id', $product->server_group_id)
+                ->orderByRaw('CASE WHEN service_role = ? THEN 0 ELSE 1 END', [$role])
+                ->orderByRaw('CASE WHEN max_accounts > 0 THEN current_accounts / max_accounts ELSE 0 END asc')
+                ->orderBy('current_accounts')
+                ->first();
+            if ($matched) {
+                return $matched;
+            }
+        }
+
+        return $query->orderByRaw('CASE WHEN service_role = ? THEN 0 ELSE 1 END', [$role])
             ->orderBy('current_accounts')
-            ->first();
+            ->first() ?: self::where('status', 1)->first();
     }
 
     public function capacityPercent(): int

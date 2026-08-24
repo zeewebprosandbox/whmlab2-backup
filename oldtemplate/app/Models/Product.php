@@ -10,6 +10,10 @@ use App\Traits\GlobalStatus;
 class Product extends Model 
 {
     use HasFactory, GlobalStatus;
+
+    protected $casts = [
+        'whmpanel_features' => 'array',
+    ];
  
     public function configures() {
         return $this->belongsToMany(ProductConfiguration::class, 'product_configurations', 'product_id', 'configurable_group_id');

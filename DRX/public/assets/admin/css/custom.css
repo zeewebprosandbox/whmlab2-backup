@@ -1,0 +1,70 @@
+.product-module-cpanel-logo {
+    max-height: 10px;
+}
+
+.product-module-plesk-logo {
+    max-height: 16px;
+}
+
+.product-module-directadmin-logo {
+    max-height: 25px;
+}
+
+.modal .toggle-on.btn,
+.modal .toggle-off.btn {
+    line-height: 27px;
+}
+
+.custom-pricing {
+    background: #fafafa;
+    padding: 30px 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.custom-pricing .border-line-title {
+    margin-top: 0;
+}
+
+.custom-pricing .form-control {
+    background: white;
+}
+
+.fw-500 {
+    font-weight: 500 !important;
+}
+
+.text-dot {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    height: 1.2em;
+    white-space: nowrap;
+}
+
+.border-line-area.style-two {
+    text-align: center;
+    position: relative;
+    border-bottom: 0;
+    padding: 8px 0;
+    z-index: 1;
+}
+
+.border-line-area.style-two .border-line-title {
+    display: inline-block;
+    margin-bottom: 0 !important;
+    background: #fff;
+    padding: 10px;
+}
+
+.border-line-area.style-two::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: .1px;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #e5e5e5;
+    z-index: -1;
+}

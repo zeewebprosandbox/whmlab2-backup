@@ -260,41 +260,58 @@ class SiteController extends Controller
     {
         $parsed = $this->parseDomainName($domain);
         $tld = $parsed['tld'];
+        $isAvailable = null;
 
         try {
-            $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://justcheckdomain.com/api/check', [
+            $response = \Illuminate\Support\Facades\Http::timeout(3)->get('https://justcheckdomain.com/api/check', [
                 'domain' => $domain,
             ]);
 
             if ($response->successful()) {
                 $json = $response->json();
-                $isAvailable = isset($json['available']) ? (bool) $json['available'] : false;
-
-                return [
-                    'domain' => $domain,
-                    'available' => $isAvailable,
-                    'tld' => $tld,
-                    'pricing' => $tldPricingMap[$tld] ?? ['price' => 12.99, 'renew' => 12.99, 'setup' => null],
-                ];
+                if (isset($json['available'])) {
+                    $isAvailable = (bool) $json['available'];
+                }
             }
         } catch (\Throwable $e) {
-            // Fallback
+            // Fallback to DNS
         }
+
+        if ($isAvailable === null) {
+            $hasDns = @checkdnsrr($domain, 'NS') || @checkdnsrr($domain, 'A') || @checkdnsrr($domain, 'MX');
+            $isAvailable = !$hasDns;
+        }
+
+        $firstTldData = reset($tldPricingMap);
+        $defaultSetup = $firstTldData['setup'] ?? null;
+        $defaultPricing = [
+            'setup' => $defaultSetup,
+            'price' => 12.99,
+            'renew' => 12.99
+        ];
 
         return [
             'domain' => $domain,
-            'available' => true,
+            'available' => $isAvailable,
             'tld' => $tld,
-            'pricing' => $tldPricingMap[$tld] ?? ['price' => 12.99, 'renew' => 12.99, 'setup' => null],
+            'pricing' => $tldPricingMap[$tld] ?? $defaultPricing,
         ];
     }
 
     private function checkMultipleDomainsLive(array $domains, array $tldPricingMap): array
     {
+        $firstTldData = reset($tldPricingMap);
+        $defaultSetup = $firstTldData['setup'] ?? null;
+        $defaultPricing = [
+            'setup' => $defaultSetup,
+            'price' => 12.99,
+            'renew' => 12.99
+        ];
+
         try {
             $responses = \Illuminate\Support\Facades\Http::pool(function ($pool) use ($domains) {
                 return collect($domains)->map(function ($domain) use ($pool) {
-                    return $pool->as($domain)->timeout(4)->get('https://justcheckdomain.com/api/check', [
+                    return $pool->as($domain)->timeout(3)->get('https://justcheckdomain.com/api/check', [
                         'domain' => $domain,
                     ]);
                 })->all();
@@ -304,18 +321,25 @@ class SiteController extends Controller
             foreach ($domains as $domain) {
                 $parsed = $this->parseDomainName($domain);
                 $tld = $parsed['tld'];
-                $isAvailable = false;
+                $isAvailable = null;
 
                 if (isset($responses[$domain]) && $responses[$domain]->successful()) {
                     $json = $responses[$domain]->json();
-                    $isAvailable = isset($json['available']) ? (bool) $json['available'] : false;
+                    if (isset($json['available'])) {
+                        $isAvailable = (bool) $json['available'];
+                    }
+                }
+
+                if ($isAvailable === null) {
+                    $hasDns = @checkdnsrr($domain, 'NS') || @checkdnsrr($domain, 'A') || @checkdnsrr($domain, 'MX');
+                    $isAvailable = !$hasDns;
                 }
 
                 $results[] = [
                     'domain' => $domain,
                     'available' => $isAvailable,
                     'tld' => $tld,
-                    'pricing' => $tldPricingMap[$tld] ?? ['price' => 12.99, 'renew' => 12.99, 'setup' => null],
+                    'pricing' => $tldPricingMap[$tld] ?? $defaultPricing,
                 ];
             }
 
@@ -366,7 +390,9 @@ class SiteController extends Controller
 
         if ($product->domain_register) {
             $domains = DomainSetup::active()->orderBy('id', 'DESC')->with('pricing')->get();
-            $server = Server::bestForProduct($product) ?: optional($product->serverGroup)->servers->where('status', 1)->first();
+            $server = Server::bestForProduct($product) 
+                ?: ($product->serverGroup?->servers ? $product->serverGroup->servers->where('status', 1)->first() : null)
+                ?: Server::where('status', 1)->first();
             $nameservers = collect([
                 ['label' => 'NS1', 'host' => @$server->ns1, 'ip' => @$server->ns1_ip],
                 ['label' => 'NS2', 'host' => @$server->ns2, 'ip' => @$server->ns2_ip],
@@ -441,31 +467,25 @@ class SiteController extends Controller
         }
         $tldSuggestions = array_values(array_filter($this->checkMultipleDomainsLive($tldPool, $tldPricingMap), fn($i) => $i['available']));
 
+        // Smart Name Variant Suggestions
+        $variantPool = [
+            'get' . $rootName . '.com',
+            $rootName . 'cloud.com',
+            $rootName . 'app.com',
+            'try' . $rootName . '.com',
+            $rootName . 'hub.com',
+        ];
+        $variantSuggestions = array_values(array_filter($this->checkMultipleDomainsLive($variantPool, $tldPricingMap), fn($i) => $i['available']));
+        $allSuggestions = array_merge($tldSuggestions, $variantSuggestions);
+
         return response()->json([
             'success' => true,
             'result' => [
                 'domain' => $fullDomain,
                 'available' => $primaryResult['available'],
                 'pricing' => $primaryResult['pricing'],
-                'suggestions' => $tldSuggestions,
+                'suggestions' => $allSuggestions,
             ],
         ]);
-    }
-
-    private function lookupNameservers(string $domain): array
-    {
-        $records = @dns_get_record($domain, DNS_NS);
-
-        if (!$records) {
-            return [];
-        }
-
-        return collect($records)
-            ->pluck('target')
-            ->filter()
-            ->map(fn ($nameserver) => strtolower(rtrim($nameserver, '.')))
-            ->unique()
-            ->values()
-            ->all();
     }
 }

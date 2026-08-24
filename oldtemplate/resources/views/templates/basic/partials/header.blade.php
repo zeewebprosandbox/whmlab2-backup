@@ -2,19 +2,19 @@
     $pages = App\Models\Page::where('tempname', $activeTemplate)->where('is_default', 0)->get();
 @endphp
 
-<header class="whm-desktop-nav d-none d-lg-flex">
-    <a href="{{ route('home') }}" class="whm-brand">
-        <span class="whm-brand-mark"><i data-lucide="server"></i></span>
+<header class="tw-nav">
+    <a href="{{ route('home') }}" class="tw-brand">
+        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
         <span>
-            <strong>{{ gs('site_name') }}</strong>
-            <small>@lang('Hosting & Domains')</small>
+            <strong class="tw-brand-title">{{ gs('site_name') }}</strong>
+            <small class="tw-brand-subtitle">@lang('Hosting & Domains')</small>
         </span>
     </a>
 
-    <nav class="whm-desktop-menu">
-        <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">@lang('Home')</a>
+    <nav class="tw-menu">
+        <a href="{{ route('home') }}" class="tw-menu-link {{ request()->routeIs('home') ? 'active' : '' }}">@lang('Home')</a>
         <div class="whm-menu-dropdown">
-            <button type="button">@lang('Hosting') <i data-lucide="chevron-down"></i></button>
+            <button type="button" class="tw-menu-button">@lang('Hosting') <i data-lucide="chevron-down"></i></button>
             <div class="whm-dropdown-panel whm-dropdown-panel--wide">
                 <div class="whm-dropdown-intro">
                     <strong>@lang('Explore packages')</strong>
@@ -30,10 +30,10 @@
                 </div>
             </div>
         </div>
-        <a href="{{ route('register.domain') }}" class="{{ request()->routeIs('register.domain') ? 'active' : '' }}">@lang('Domains')</a>
-        <a href="{{ route('blogs') }}" class="{{ request()->routeIs('blogs*') ? 'active' : '' }}">@lang('Announcements')</a>
+        <a href="{{ route('register.domain') }}" class="tw-menu-link {{ request()->routeIs('register.domain') ? 'active' : '' }}">@lang('Domains')</a>
+        <a href="{{ route('blogs') }}" class="tw-menu-link {{ request()->routeIs('blogs*') ? 'active' : '' }}">@lang('Announcements')</a>
         <div class="whm-menu-dropdown">
-            <button type="button">@lang('Company') <i data-lucide="chevron-down"></i></button>
+            <button type="button" class="tw-menu-button">@lang('Company') <i data-lucide="chevron-down"></i></button>
             <div class="whm-dropdown-panel">
                 @foreach ($pages as $data)
                     <a href="{{ route('pages', [$data->slug]) }}">{{ __($data->name) }}</a>
@@ -47,20 +47,20 @@
         @include($activeTemplate . 'partials.cart_widget')
         <x-language />
         @auth
-            <a href="{{ route('user.home') }}" class="whm-login-btn">@lang('Client Area')</a>
+            <a href="{{ route('user.home') }}" class="tw-button tw-button-primary">@lang('Client Area')</a>
         @else
-            <a href="{{ route('user.login') }}" class="whm-login-btn">@lang('Login')</a>
+            <a href="{{ route('user.login') }}" class="tw-button tw-button-primary">@lang('Login')</a>
         @endauth
     </div>
 </header>
 
-<header class="whm-mobile-header d-lg-none">
+<header class="tw-mobile-nav">
     <button type="button" class="whm-mobile-toggle" data-whm-toggle>
         <i data-lucide="menu"></i>
     </button>
-    <a href="{{ route('home') }}" class="whm-mobile-brand">
-        <span class="whm-brand-mark"><i data-lucide="server"></i></span>
-        <span>{{ gs('site_name') }}</span>
+    <a href="{{ route('home') }}" class="tw-brand">
+        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
+        <span class="font-black text-ink">{{ gs('site_name') }}</span>
     </a>
     @include($activeTemplate . 'partials.cart_widget')
 </header>

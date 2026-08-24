@@ -128,6 +128,32 @@
                                     <input type="text" class="form-control" name="security_token" value="{{ $server->security_token }}" placeholder="123456789">
                                 </div>
                             </div>
+                            <div class="col-lg-12 zodpanel-sync-box d-none">
+                                <div class="border-line-area style-two mt-2">
+                                    <h5 class="border-line-title">@lang('ZodPanel Custom Sync')</h5>
+                                </div>
+                                <div class="form-group">
+                                    <label>@lang('SSH Port')</label>
+                                    <input type="number" min="1" max="65535" class="form-control" name="ssh_port" value="{{ old('ssh_port', 22) }}">
+                                    <small class="text-muted">@lang('Uses the server username/password above to push the current Git-backed custom Hestia layer.')</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="d-flex align-items-center gap-2">
+                                        <input type="checkbox" name="sync_zodpanel_custom" value="1">
+                                        <span>@lang('Sync latest customized ZodPanel/Hestia files to this server now')</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>@lang('Version Description')</label>
+                                    <input type="text" class="form-control" name="deployment_note" value="{{ old('deployment_note') }}" placeholder="@lang('Describe this node sync/version')">
+                                </div>
+                                @if($server->last_deployed_at || $server->deployment_status)
+                                    <small class="text-muted d-block">
+                                        @lang('Last deployment'): {{ $server->last_deployed_at ? showDateTime($server->last_deployed_at) : __('Never') }}
+                                        / {{ __($server->deployment_status ?: 'manual') }}
+                                    </small>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -205,6 +231,14 @@
         @endpermit
     </div>
     </form>
+    @if(session('zodpanel_bootstrap_log') || $server->deployment_log)
+        <div class="card mt-3">
+            <div class="card-header bg--dark"><h5 class="text--white">@lang('ZodPanel Deployment Log')</h5></div>
+            <div class="card-body">
+                <pre class="mb-0">{{ session('zodpanel_bootstrap_log') ? implode("\n", session('zodpanel_bootstrap_log')) : $server->deployment_log }}</pre>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @permit('admin.servers')
@@ -233,6 +267,12 @@
                     $('.cpanel-input').removeClass('d-none');
                 }else{
                     $('.cpanel-input').addClass('d-none');
+                }
+
+                if(type == 'Whmpanel'){
+                    $('.zodpanel-sync-box').removeClass('d-none');
+                }else{
+                    $('.zodpanel-sync-box').addClass('d-none');
                 }
             }).change();
 

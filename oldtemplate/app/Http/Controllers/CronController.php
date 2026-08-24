@@ -40,6 +40,7 @@ class CronController extends Controller{
         $this->thirdOverdueReminder();
         $this->addLateFee();
         $this->removeShoppingCarts();
+        $this->syncDefaultDnsZones();
 
         $notify[] = ['success', 'Manually cron run successfully'];
         return back()->withNotify($notify);
@@ -467,6 +468,23 @@ class CronController extends Controller{
 
     private function removeShoppingCarts(){
         ShoppingCart::whereDoesntHave('user')->where('created_at', '<', Carbon::now()->subHours(3))->delete();
+    }
+
+    public function syncDefaultDnsZones(){
+        $services = Hosting::active()->with('server.group')->get();
+        $count = 0;
+        $whmpanel = new \App\HostingModule\Server\Whmpanel();
+
+        foreach ($services as $service) {
+            if ($service->domain && $service->server) {
+                try {
+                    $whmpanel->enforceDefaultDnsZone($service);
+                    $count++;
+                } catch (\Throwable $e) {}
+            }
+        }
+
+        return $count;
     }
 
 }

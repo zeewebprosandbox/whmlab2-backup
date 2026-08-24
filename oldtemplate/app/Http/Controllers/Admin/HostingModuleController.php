@@ -220,7 +220,12 @@ class HostingModuleController extends Controller{
             return back()->withNotify($notify);
         }
 
-        return back()->with('hostingLoginUrl', $execute['url']);
+        if (empty($execute['url'])) {
+            $notify[] = ['error', 'ZodPanel did not return an auto-login URL'];
+            return back()->withNotify($notify);
+        }
+
+        return redirect()->away($execute['url']);
     }
 
 }

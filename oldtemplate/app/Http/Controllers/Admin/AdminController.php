@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ServiceCategory;
 use App\Models\User;
+use App\Models\Server;
 use App\Rules\FileTypeValidate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -364,14 +365,124 @@ class AdminController extends Controller
     
     public function services(){
         $pageTitle = 'All Services';
-        $services = Hosting::orderBy('id', 'DESC')->searchable(['user:username', 'user:email'])->with('product.serviceCategory', 'user')->paginate(getPaginate());
-        return view('admin.services', compact('pageTitle', 'services'));
+        $services = Hosting::orderBy('id', 'DESC')->searchable(['user:username', 'user:email', 'domain'])->with('product.serviceCategory', 'user', 'server')->paginate(getPaginate());
+        $allServers = Server::orderBy('name', 'ASC')->get();
+        return view('admin.services', compact('pageTitle', 'services', 'allServers'));
+    }
+
+    public function activeServices(){
+        $pageTitle = 'Active Services';
+        $services = Hosting::active()->orderBy('id', 'DESC')->searchable(['user:username', 'user:email', 'domain'])->with('product.serviceCategory', 'user', 'server')->paginate(getPaginate());
+        $allServers = Server::orderBy('name', 'ASC')->get();
+        return view('admin.services', compact('pageTitle', 'services', 'allServers'));
+    }
+
+    public function mergeServiceServer(Request $request){
+        $request->validate([
+            'hosting_id' => 'required|integer|exists:hostings,id',
+            'target_server_id' => 'required|integer|exists:servers,id',
+        ]);
+
+        $hosting = Hosting::with('user', 'product')->findOrFail($request->hosting_id);
+        $targetServer = Server::findOrFail($request->target_server_id);
+
+        $oldServerName = $hosting->server ? $hosting->server->name : 'Unassigned';
+
+        // Reassign server and networking parameters
+        $hosting->server_id = $targetServer->id;
+        $hosting->dedicated_ip = $targetServer->ip_address;
+        $hosting->ip = $targetServer->ip_address;
+        $hosting->ns1 = $targetServer->ns1 ?: 'ns1.zodserver.cloud';
+        $hosting->ns2 = $targetServer->ns2 ?: 'ns2.zodserver.cloud';
+        $hosting->ns1_ip = $targetServer->ns1_ip ?: $targetServer->ip_address;
+        $hosting->ns2_ip = $targetServer->ns2_ip ?: $targetServer->ip_address;
+        $hosting->save();
+
+        // Enforce authoritative DNS zone on the target server node in real-time
+        try {
+            $whmpanel = new \App\HostingModule\Server\Whmpanel();
+            $whmpanel->enforceDefaultDnsZone($hosting);
+        } catch (\Throwable $e) {}
+
+        $notify[] = ['success', "Service '{$hosting->domain}' successfully merged and reassigned to Server '{$targetServer->name}' ({$targetServer->ip_address}) in real time!"];
+        return back()->withNotify($notify);
     }
 
     public function domains(){
         $pageTitle = 'All Domains';
         $domains = Domain::orderBy('id', 'DESC')->searchable(['user:username', 'user:email', 'domain'])->with('user')->paginate(getPaginate());
         return view('admin.domains', compact('pageTitle', 'domains'));
+    }
+
+    public function activeDomains(){
+        $pageTitle = 'Active Domains';
+        $domains = Domain::active()->orderBy('id', 'DESC')->searchable(['user:username', 'user:email', 'domain'])->with('user')->paginate(getPaginate());
+        return view('admin.domains', compact('pageTitle', 'domains'));
+    }
+
+    public function deleteService($id){
+        $service = Hosting::with('server', 'user')->findOrFail($id);
+        $domain = $service->domain ?: '#' . $service->id;
+
+        // Clean up linked WhmPanelAccount, websites, DNS, databases, mail accounts
+        if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_accounts')) {
+            $account = \App\Models\WhmPanelAccount::where('hosting_id', $service->id)->first();
+            if ($account) {
+                if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_websites')) {
+                    $websites = \App\Models\WhmPanelWebsite::where('account_id', $account->id)->get();
+                    foreach ($websites as $w) {
+                        if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_dns_records')) {
+                            \App\Models\WhmPanelDnsRecord::where('website_id', $w->id)->delete();
+                        }
+                        $w->delete();
+                    }
+                }
+                if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_databases')) {
+                    \App\Models\WhmPanelDatabase::where('account_id', $account->id)->delete();
+                }
+                if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_mail_accounts')) {
+                    \App\Models\WhmPanelMailAccount::where('account_id', $account->id)->delete();
+                }
+                $account->delete();
+            }
+        }
+
+        // Decrement server accounts counter
+        if ($service->server && $service->server->current_accounts > 0) {
+            $service->server->decrement('current_accounts');
+        }
+
+        // Clean up invoice items referencing this hosting
+        \App\Models\InvoiceItem::where('hosting_id', $service->id)->delete();
+
+        $service->delete();
+
+        $notify[] = ['success', "Service '{$domain}' has been deleted entirely 100% successfully."];
+        return back()->withNotify($notify);
+    }
+
+    public function deleteAllServices(){
+        $count = Hosting::count();
+
+        // Truncate/Clean mirror tables
+        if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_dns_records')) {
+            \App\Models\WhmPanelDnsRecord::truncate();
+        }
+        if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_websites')) {
+            \App\Models\WhmPanelWebsite::truncate();
+        }
+        if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_accounts')) {
+            \App\Models\WhmPanelAccount::truncate();
+        }
+
+        // Reset server current_accounts
+        Server::query()->update(['current_accounts' => 0]);
+
+        // Wipe hostings
+        Hosting::query()->delete();
+
+        $notify[] = ['success', "All {$count} service(s) have been deleted entirely 100% successfully."];
+        return back()->withNotify($notify);
     }
 
 }

@@ -105,6 +105,7 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('/{id}/dns/repair', 'repairDns')->name('dns.repair');
                 Route::post('/{id}/email/create', 'createMailbox')->name('email.create');
                 Route::post('/{id}/database/create', 'createDatabase')->name('database.create');
+                Route::post('/{id}/php/change', 'changePhp')->name('php.change');
                 Route::post('service/cancel/request', 'cancelRequest')->name('cancel.request');
             });
 

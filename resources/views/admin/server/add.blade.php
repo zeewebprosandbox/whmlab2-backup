@@ -335,6 +335,16 @@
 
                 if(type == 'Whmpanel'){
                     $('.zodpanel-bootstrap-box').removeClass('d-none');
+                    // Enable submit button and nameserver fields for Whmpanel groups
+                    // (servers can be saved with pending status even without bridge connectivity)
+                    $('input[name^=ns]').removeAttr('disabled');
+                    $('button[type=submit]').removeAttr('disabled');
+                    // Auto-fill nameserver defaults if empty
+                    var host = $('input[name=host]').val() || $('input[name=vps_ip]').val();
+                    if(!$('input[name=ns1]').val()) $('input[name=ns1]').val('ns1.zodserver.cloud');
+                    if(!$('input[name=ns2]').val()) $('input[name=ns2]').val('ns2.zodserver.cloud');
+                    if(host && !$('input[name=ns1_ip]').val()) $('input[name=ns1_ip]').val(host);
+                    if(host && !$('input[name=ns2_ip]').val()) $('input[name=ns2_ip]').val(host);
                 }else{
                     $('.zodpanel-bootstrap-box').addClass('d-none');
                 }

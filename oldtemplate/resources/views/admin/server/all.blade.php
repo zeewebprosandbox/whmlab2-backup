@@ -49,9 +49,11 @@
                                     <td>
                                         @php $capacity = $server->capacityPercent(); @endphp
                                         <div class="text-start min-width-180">
-                                            <div class="d-flex justify-content-between">
-                                                <small>{{ $server->current_accounts ?? 0 }} / {{ $server->max_accounts ? $server->max_accounts : __('Unlimited') }}</small>
-                                                <small>{{ $server->max_accounts ? $capacity.'%' : __('Open') }}</small>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="{{ route('admin.server.accounts', $server->id) }}" class="fw-bold text--primary">
+                                                    <i class="las la-users"></i> {{ $server->current_accounts ?? 0 }} @lang('Accounts')
+                                                </a>
+                                                <small class="text-muted">{{ $server->max_accounts ? $capacity.'%' : __('Open') }}</small>
                                             </div>
                                             <div class="progress mt-1" style="height: 6px;">
                                                 <div class="progress-bar bg--base" style="width: {{ $server->max_accounts ? $capacity : 8 }}%"></div>
@@ -78,6 +80,9 @@
                                             <i class="las la-ellipsis-v"></i>@lang('Action')
                                         </button>
                                         <div class="dropdown-menu">
+                                            <a href="{{ route('admin.server.accounts', $server->id) }}" class="dropdown-item text--primary fw-bold">
+                                                <i class="las la-users"></i> @lang('Hosted Accounts & Credentials')
+                                            </a>
                                             @permit('admin.server.login')
                                                 <a href="{{ route('admin.server.login', $server->id) }}" class="dropdown-item" 
                                                     data-modal_title="@lang("Login to $serverType")"
@@ -93,6 +98,12 @@
                                                 </a>
                                                 <a href="{{ route('admin.server.add.page') }}?vps_ip={{ $server->ip_address ?: $server->host }}" class="dropdown-item text-warning">
                                                     <i class="la la-terminal"></i> @lang('Reinstall VPS & Live Terminal')
+                                                </a>
+                                                <a href="javascript:void(0)" class="dropdown-item text--success syncDesignLiveBtn"
+                                                   data-id="{{ $server->id }}"
+                                                   data-name="{{ $server->name }}"
+                                                   data-ip="{{ $server->ip_address ?: $server->host }}">
+                                                    <i class="la la-paint-brush"></i> @lang('Sync Custom Hestia Design (Live Stream)')
                                                 </a>
                                             @endpermit
                                             @permit('admin.server.health')
@@ -128,6 +139,13 @@
                                                     </a>
                                                 @endif
                                             @endpermit
+
+                                            <button type="button" class="dropdown-item text--danger confirmationBtn"
+                                                data-action="{{ route('admin.server.delete', $server->id) }}"
+                                                data-question="@lang('Are you sure you want to delete this server entirely 100%? All associated data and linked hosting references will be cleanly unlinked.')"
+                                            >
+                                                <i class="la la-trash"></i> @lang('Delete Server')
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -151,23 +169,52 @@
 
 <x-confirmation-modal />
 
+{{-- Live Custom Hestia Design Sync Terminal Modal --}}
+<div class="modal fade" id="syncDesignTerminalModal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content bg-dark text-white border-0 shadow-lg">
+            <div class="modal-header border-secondary py-2 bg-black bg-opacity-50">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="spinner-border spinner-border-sm text-info" id="syncTerminalSpinner" role="status"></span>
+                    <h6 class="modal-title text-white font-mono mb-0" id="syncDesignModalTitle">
+                        <i class="las la-terminal text-info"></i> @lang('Custom Hestia Design Live Terminal')
+                    </h6>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary font-mono" id="syncStatusBadge">@lang('Connecting...')</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="syncModalCloseBtn"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0 bg-black">
+                <div class="p-2 border-bottom border-secondary bg-dark text-muted small font-mono d-flex justify-content-between">
+                    <span id="syncServerInfo">Node: ...</span>
+                    <span class="text-info">Real-time Stream</span>
+                </div>
+                <pre id="syncDesignTerminal" class="p-3 mb-0 font-mono text-success" style="height: 380px; overflow-y: auto; background-color: #0d1117; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-all;"></pre>
+            </div>
+            <div class="modal-footer border-secondary py-2 bg-black bg-opacity-50 justify-content-between">
+                <small class="text-muted font-mono" id="syncTerminalFooterNote">
+                    @lang('Streaming live SSH output from VPS node...')
+                </small>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-warning d-none" id="syncRetryBtn">
+                        <i class="las la-redo"></i> @lang('Retry Sync')
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">
+                        @lang('Close')
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="" class="loginUrl d-none" target="_blank">#</a>
 @endsection
 
 @push('breadcrumb-plugins')
-<div class="justify-content-end d-flex flex-wrap gap-2">
-    @permit('admin.groups.server')
-        <a class="btn btn-sm btn-outline--success" href="{{ route('admin.groups.server') }}">
-            <i class="las la-plus"></i>@lang('Add Server Group')
-        </a>
-    @endpermit
-    @permit('admin.server.add.page')
-        <a class="btn btn-sm btn-outline--primary" href="{{ route('admin.server.add.page') }}">
-            <i class="las la-plus"></i>@lang('Add Server')
-        </a>
-    @endpermit
-</div>
-<a href="{{ session()->get('loginUrl') ?? '#' }}" class="loginUrl" target="_blank"></a>
-@endpush 
+    <a href="{{ route('admin.server.add.page') }}" class="btn btn-sm btn-outline--primary"><i class="las la-plus"></i> @lang('Add New')</a>
+@endpush
 
 @push('style')
 <style>
@@ -199,6 +246,127 @@
                 document.querySelector('.loginUrl').click();
             }
 
+            let currentSyncEventSource = null;
+
+            function startCustomDesignSync(serverId, serverName, serverIp) {
+                let modal = $('#syncDesignTerminalModal');
+                let terminal = $('#syncDesignTerminal');
+                let spinner = $('#syncTerminalSpinner');
+                let statusBadge = $('#syncStatusBadge');
+                let retryBtn = $('#syncRetryBtn');
+                let serverInfo = $('#syncServerInfo');
+                let footerNote = $('#syncTerminalFooterNote');
+
+                if (currentSyncEventSource) {
+                    currentSyncEventSource.close();
+                    currentSyncEventSource = null;
+                }
+
+                terminal.text('');
+                spinner.removeClass('d-none');
+                statusBadge.removeClass('bg-success bg-danger bg-secondary').addClass('bg-info').text('Syncing...');
+                retryBtn.addClass('d-none');
+                serverInfo.text('Node: ' + serverName + ' (' + serverIp + ')');
+                footerNote.text('Deploying custom Hestia theme, templates, CSS, JS, and modules...');
+
+                modal.modal('show');
+
+                function appendLog(line, isError = false) {
+                    let timestamp = new Date().toLocaleTimeString();
+                    let prefix = isError ? '❌ ' : '';
+                    let formattedLine = '[' + timestamp + '] ' + prefix + line + '\n';
+                    terminal.append(formattedLine);
+                    terminal.scrollTop(terminal[0].scrollHeight);
+                }
+
+                appendLog('Connecting to ' + serverName + ' (' + serverIp + ')...');
+
+                let streamUrl = '{{ route("admin.server.sync.design.stream", ":id") }}'.replace(':id', serverId);
+                currentSyncEventSource = new EventSource(streamUrl);
+
+                currentSyncEventSource.addEventListener('log', function(e) {
+                    try {
+                        let data = JSON.parse(e.data);
+                        if (data.line) {
+                            appendLog(data.line);
+                        }
+                    } catch(err) {
+                        appendLog(e.data);
+                    }
+                });
+
+                currentSyncEventSource.addEventListener('complete', function(e) {
+                    try {
+                        let data = JSON.parse(e.data);
+                        appendLog('----------------------------------------------------');
+                        appendLog('✓ ' + (data.message || 'Custom Hestia Design Synced 100% Successfully!'));
+                    } catch(err) {
+                        appendLog('✓ Custom Hestia Design Synced 100% Successfully!');
+                    }
+                    spinner.addClass('d-none');
+                    statusBadge.removeClass('bg-info bg-danger').addClass('bg-success').text('100% Synced');
+                    footerNote.text('✓ Custom Hestia design is 100% active and running on port 8083.');
+                    if (currentSyncEventSource) {
+                        currentSyncEventSource.close();
+                        currentSyncEventSource = null;
+                    }
+                });
+
+                currentSyncEventSource.addEventListener('error', function(e) {
+                    let errorMsg = 'Sync failed or connection interrupted.';
+                    try {
+                        if (e.data) {
+                            let data = JSON.parse(e.data);
+                            if (data.message) errorMsg = data.message;
+                        }
+                    } catch(err) {}
+
+                    appendLog('----------------------------------------------------');
+                    appendLog('ERROR: ' + errorMsg, true);
+                    spinner.addClass('d-none');
+                    statusBadge.removeClass('bg-info bg-success').addClass('bg-danger').text('Failed');
+                    footerNote.text('Sync encountered errors. Progress is logged above.');
+                    retryBtn.removeClass('d-none').off('click').on('click', function() {
+                        startCustomDesignSync(serverId, serverName, serverIp);
+                    });
+
+                    if (currentSyncEventSource) {
+                        currentSyncEventSource.close();
+                        currentSyncEventSource = null;
+                    }
+                });
+
+                currentSyncEventSource.onerror = function() {
+                    if (statusBadge.text() !== '100% Synced') {
+                        appendLog('Stream disconnected before 100% confirmation.', true);
+                        spinner.addClass('d-none');
+                        statusBadge.removeClass('bg-info bg-success').addClass('bg-danger').text('Disconnected');
+                        retryBtn.removeClass('d-none').off('click').on('click', function() {
+                            startCustomDesignSync(serverId, serverName, serverIp);
+                        });
+                        if (currentSyncEventSource) {
+                            currentSyncEventSource.close();
+                            currentSyncEventSource = null;
+                        }
+                    }
+                };
+            }
+
+            $('.syncDesignLiveBtn').on('click', function(e) {
+                e.preventDefault();
+                let serverId = $(this).data('id');
+                let serverName = $(this).data('name');
+                let serverIp = $(this).data('ip');
+                startCustomDesignSync(serverId, serverName, serverIp);
+            });
+
+            $('#syncDesignTerminalModal').on('hidden.bs.modal', function() {
+                if (currentSyncEventSource) {
+                    currentSyncEventSource.close();
+                    currentSyncEventSource = null;
+                }
+            });
+
         })(jQuery);
     </script>
-@endpush 
+@endpush

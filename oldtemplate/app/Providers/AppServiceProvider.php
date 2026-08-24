@@ -54,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
 
         view()->composer('admin.partials.sidenav', function ($view) {
             $view->with([
+                'sidenav'                    => file_get_contents(resource_path('views/admin/partials/sidenav.json')),
                 'bannedUsersCount'           => User::banned()->count(),
                 'emailUnverifiedUsersCount' => User::emailUnverified()->count(),
                 'mobileUnverifiedUsersCount'   => User::mobileUnverified()->count(),

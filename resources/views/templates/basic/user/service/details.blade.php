@@ -1,348 +1,517 @@
 @extends($activeTemplate.'layouts.master')
 
 @section('content')
-<div class="py-8 bg-[#0A0A0B] text-[#F5F5F7] min-h-screen font-sans space-y-6">
+@php
+    $isActive = ($service->status == 1);
+    $isPending = ($service->status == 2);
+    $isSuspended = ($service->status == 3);
+    $isTerminated = ($service->status == 4);
+    $isCancelled = ($service->status == 5);
+@endphp
+
+<div class="py-8 bg-[#F8FAFC] text-slate-900 min-h-screen font-sans space-y-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
         <!-- Breadcrumb Header -->
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2 text-xs text-neutral-400 font-medium">
-                <a href="{{ route('user.home') }}" class="hover:text-white transition-colors">@lang('Dashboard')</a>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-neutral-600"></i>
-                <a href="{{ route('user.service.list') }}" class="hover:text-white transition-colors">@lang('Services')</a>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-neutral-600"></i>
-                <span class="text-white font-semibold">{{ $service->domain ?? $product->name }}</span>
+            <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                <a href="{{ route('user.home') }}" class="hover:text-slate-900 transition-colors">@lang('Dashboard')</a>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <a href="{{ route('user.service.list') }}" class="hover:text-slate-900 transition-colors">@lang('Services')</a>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span class="text-slate-900 font-semibold">{{ $service->domain ?? $product->name }}</span>
             </div>
             
-            <a href="{{ route('user.service.list') }}" class="px-3 py-1.5 bg-[#1C1C1F] hover:bg-[#242429] border border-white/10 text-xs font-semibold rounded-lg transition-all text-neutral-300 flex items-center gap-1.5">
-                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-                <span>@lang('Back to Services')</span>
-            </a>
+            <div class="flex items-center gap-2">
+                @if(!$service->cancelRequest && !$isCancelled && !$isTerminated)
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#cancelModal" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs font-semibold rounded-lg transition-all text-rose-700 flex items-center gap-1.5 shadow-xs">
+                        <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
+                        <span>@lang('Request Cancellation')</span>
+                    </button>
+                @endif
+                <a href="{{ route('user.service.list') }}" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold rounded-lg transition-all text-slate-700 flex items-center gap-1.5 shadow-xs">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>@lang('Back to Services')</span>
+                </a>
+            </div>
         </div>
 
-        <!-- Hero Header Card (cPanel Replacement Banner) -->
-        <div class="p-6 lg:p-8 bg-[#141416] border border-white/10 rounded-2xl relative overflow-hidden space-y-6">
+        {{-- ── PROMINENT STATUS ALERTS (FOR PENDING, SUSPENDED, TERMINATED) ── --}}
+        @if($isPending)
+            <div class="p-6 bg-amber-50/90 border border-amber-200 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="clock" class="w-5 h-5 animate-pulse"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="text-sm font-bold text-amber-900 font-display">@lang('Service Provisioning Pending')</h4>
+                        <p class="text-xs text-amber-800 leading-relaxed max-w-2xl">
+                            @lang('Your hosting order for') <span class="font-bold font-mono">{{ $service->domain }}</span> @lang('has been received and is queued for automated server provisioning. Management utilities, direct control panel login, and database tools will unlock immediately once provisioning completes.')
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                    <a href="{{ route('user.invoice.list') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1.5">
+                        <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                        <span>@lang('View Invoices')</span>
+                    </a>
+                </div>
+            </div>
+        @elseif($isSuspended)
+            <div class="p-6 bg-rose-50/90 border border-rose-200 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="text-sm font-bold text-rose-900 font-display">@lang('Hosting Account Suspended')</h4>
+                        <p class="text-xs text-rose-800 leading-relaxed max-w-2xl">
+                            @lang('This service is currently suspended. Access to cPanel, webmail, and website execution is temporarily paused. To reactivate your instance immediately, please settle any outstanding invoices or contact support.')
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                    <a href="{{ route('user.invoice.list') }}" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1.5">
+                        <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+                        <span>@lang('Pay Overdue Invoice')</span>
+                    </a>
+                </div>
+            </div>
+        @elseif($isCancelled || $isTerminated)
+            <div class="p-6 bg-slate-100 border border-slate-200 rounded-2xl shadow-sm flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="archive" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-slate-900 font-display">
+                        {{ $isCancelled ? __('Service Cancelled') : __('Service Terminated') }}
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                        @lang('This hosting plan is no longer active and cannot be managed.')
+                    </p>
+                </div>
+            </div>
+        @endif
+
+        <!-- Hero Header Card -->
+        <div class="p-6 lg:p-8 bg-white border border-slate-200/80 rounded-2xl relative overflow-hidden space-y-6 shadow-sm">
             <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
                 <div class="space-y-2">
-                    <div class="flex items-center gap-3">
-                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 orb-pulse"></span>
-                            {{ strtoupper($service->showStatusText ?? 'Active') }}
+                    <div class="flex items-center gap-3 flex-wrap">
+                        @if($isActive)
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 orb-pulse"></span>
+                                @lang('Active')
+                            </span>
+                        @elseif($isPending)
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                @lang('Pending')
+                            </span>
+                        @elseif($isSuspended)
+                            <span class="px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                @lang('Suspended')
+                            </span>
+                        @else
+                            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">
+                                {{ @App\Models\Hosting::status()[$service->status] ?? 'Unknown' }}
+                            </span>
+                        @endif
+
+                        <span class="px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-mono">
+                            IP: {{ $service->server->ip_address ?? ($isActive ? 'Assigned' : 'Pending Allocation') }}
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-neutral-300 text-xs font-mono">
-                            IP: {{ $service->server->ip_address ?? '192.168.1.100' }}
-                        </span>
-                        <span class="text-xs text-neutral-400 flex items-center gap-1">
-                            🇺🇸 US-East Datacenter (N. Virginia)
+
+                        <span class="text-xs text-slate-500 flex items-center gap-1">
+                            <i data-lucide="server" class="w-3.5 h-3.5 text-indigo-600"></i>
+                            {{ $service->server->name ?? $service->server->hostname ?? 'Cloud Server Cluster' }}
                         </span>
                     </div>
 
                     <!-- Domain Name Copy to Clipboard -->
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl lg:text-4xl font-extrabold text-white tracking-tight">
-                            {{ $service->domain ?? 'example.com' }}
+                        <h1 class="text-2xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+                            {{ $service->domain ?? $product->name }}
                         </h1>
-                        <button onclick="navigator.clipboard.writeText('{{ $service->domain }}'); alert('Domain copied!')" 
-                            class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors" title="Copy domain">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
-                        </button>
+                        @if($service->domain)
+                            <button onclick="navigator.clipboard.writeText('{{ $service->domain }}'); alert('@lang('Domain copied to clipboard!')')" 
+                                class="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-500 hover:text-slate-900 transition-colors shadow-xs" title="@lang('Copy domain')">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                        @endif
                     </div>
-                    <p class="text-xs text-neutral-400">{{ $product->name }} • {{ $product->serviceCategory->name ?? 'NVMe Web Hosting' }}</p>
+                    <p class="text-xs text-slate-500">{{ $product->name }} • {{ $product->serviceCategory->name ?? 'Hosting' }}</p>
                 </div>
 
                 <!-- Primary CTA Bar -->
                 <div class="flex flex-wrap items-center gap-3">
-                    @if(isset($hasAccount) && $hasAccount)
+                    @if($isActive && $hasAccount)
                         <a href="{{ route('user.login.hosting', $service->id) }}" target="_blank" rel="noopener"
-                            class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg shadow-glow-accent transition-all flex items-center gap-2">
+                            class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2">
                             <i data-lucide="external-link" class="w-4 h-4"></i>
-                            <span>@lang('Open cPanel Direct')</span>
+                            <span>@lang('Login to Control Panel')</span>
                         </a>
+                        <a href="https://webmail.{{ $service->domain }}" target="_blank" rel="noopener"
+                            class="px-4 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 shadow-xs">
+                            <i data-lucide="mail" class="w-4 h-4 text-cyan-600"></i>
+                            <span>@lang('Webmail')</span>
+                        </a>
+                    @else
+                        <button disabled class="px-5 py-2.5 bg-slate-100 border border-slate-200 text-slate-400 text-sm font-semibold rounded-lg cursor-not-allowed flex items-center gap-2" title="@lang('Control Panel unlocks once account is Active')">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                            <span>@lang('Control Panel (Locked)')</span>
+                        </button>
                     @endif
-                    <a href="https://webmail.{{ $service->domain ?? 'example.com' }}" target="_blank" rel="noopener"
-                        class="px-4 py-2.5 bg-[#1C1C1F] hover:bg-[#242429] border border-white/10 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2">
-                        <i data-lucide="mail" class="w-4 h-4 text-cyan-400"></i>
-                        <span>@lang('Webmail')</span>
-                    </a>
-                    <button onclick="alert('Launching Web File Manager...')"
-                        class="px-4 py-2.5 bg-[#1C1C1F] hover:bg-[#242429] border border-white/10 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2">
-                        <i data-lucide="folder" class="w-4 h-4 text-amber-400"></i>
-                        <span>@lang('File Manager')</span>
-                    </button>
                 </div>
             </div>
 
             <!-- Tabbed Navigation Bar -->
-            <div class="border-t border-white/5 pt-4">
+            <div class="border-t border-slate-200/80 pt-4">
                 <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="serviceTabs">
-                    <button onclick="switchTab('overview')" id="tab-overview" class="service-tab-btn px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap">
+                    <button onclick="switchTab('overview')" id="tab-overview" class="service-tab-btn px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap shadow-xs">
                         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                         <span>@lang('Overview')</span>
                     </button>
-                    <button onclick="switchTab('files')" id="tab-files" class="service-tab-btn px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] text-neutral-300 hover:text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i data-lucide="database" class="w-4 h-4"></i>
-                        <span>@lang('Files & Databases')</span>
+                    <button onclick="switchTab('files')" id="tab-files" class="service-tab-btn px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap border border-slate-200">
+                        <i data-lucide="database" class="w-4 h-4 text-slate-500"></i>
+                        <span>@lang('Databases')</span>
                     </button>
-                    <button onclick="switchTab('email')" id="tab-email" class="service-tab-btn px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] text-neutral-300 hover:text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i data-lucide="mail" class="w-4 h-4"></i>
-                        <span>@lang('Email')</span>
+                    <button onclick="switchTab('email')" id="tab-email" class="service-tab-btn px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap border border-slate-200">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-500"></i>
+                        <span>@lang('Mailboxes')</span>
                     </button>
-                    <button onclick="switchTab('dns')" id="tab-dns" class="service-tab-btn px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] text-neutral-300 hover:text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i data-lucide="network" class="w-4 h-4"></i>
-                        <span>@lang('Domains & DNS')</span>
+                    <button onclick="switchTab('dns')" id="tab-dns" class="service-tab-btn px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap border border-slate-200">
+                        <i data-lucide="network" class="w-4 h-4 text-slate-500"></i>
+                        <span>@lang('DNS Zone')</span>
                     </button>
-                    <button onclick="switchTab('security')" id="tab-security" class="service-tab-btn px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] text-neutral-300 hover:text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>@lang('Security')</span>
+                    <button onclick="switchTab('security')" id="tab-security" class="service-tab-btn px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap border border-slate-200">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-slate-500"></i>
+                        <span>@lang('SSL Security')</span>
                     </button>
-                    <button onclick="switchTab('advanced')" id="tab-advanced" class="service-tab-btn px-4 py-2 bg-[#1C1C1F] hover:bg-[#242429] text-neutral-300 hover:text-white text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i data-lucide="terminal" class="w-4 h-4"></i>
-                        <span>@lang('Advanced')</span>
+                    <button onclick="switchTab('advanced')" id="tab-advanced" class="service-tab-btn px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap border border-slate-200">
+                        <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
+                        <span>@lang('PHP & Tools')</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB CONTENT SURFACES -->
+        {{-- ── TAB CONTENT SURFACES ── --}}
 
         <!-- 1. OVERVIEW TAB -->
         <div id="tab-content-overview" class="tab-pane space-y-6">
-            <!-- Resource Usage Circular Progress Gauges Grid -->
+            <!-- Resource Usage Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- CPU -->
-                <div class="p-5 bg-[#141416] border border-white/10 rounded-2xl text-center space-y-3">
-                    <div class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">@lang('CPU Usage')</div>
+                <!-- Disk Usage -->
+                <div class="p-5 bg-white border border-slate-200/80 rounded-2xl text-center space-y-3 shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">@lang('Disk Space')</div>
                     <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-white/5 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-cyan-400 stroke-current" stroke-width="3.5" stroke-dasharray="28, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="text-slate-100 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="text-indigo-600 stroke-current" stroke-width="3.5" stroke-dasharray="{{ min(100, max(0, $diskUsagePercent)) }}, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
-                        <span class="absolute text-lg font-bold font-mono text-white">28%</span>
+                        <span class="absolute text-lg font-bold font-mono text-slate-900">{{ round($diskUsagePercent) }}%</span>
                     </div>
-                    <div class="text-[11px] text-neutral-500 font-mono">1 Core / 2.8 GHz</div>
+                    <div class="text-[11px] text-slate-500 font-mono">
+                        {{ @$accountSummary['disk_used_text'] ?: ($isActive ? '0 MB' : '0 MB') }} / {{ $product->disk_space ?? '10 GB' }}
+                    </div>
                 </div>
 
-                <!-- RAM -->
-                <div class="p-5 bg-[#141416] border border-white/10 rounded-2xl text-center space-y-3">
-                    <div class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">@lang('RAM Usage')</div>
+                <!-- Bandwidth Usage -->
+                <div class="p-5 bg-white border border-slate-200/80 rounded-2xl text-center space-y-3 shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">@lang('Bandwidth')</div>
                     <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-white/5 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-amber-400 stroke-current" stroke-width="3.5" stroke-dasharray="64, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="text-slate-100 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="text-cyan-600 stroke-current" stroke-width="3.5" stroke-dasharray="{{ min(100, max(0, $bwUsagePercent)) }}, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         </svg>
-                        <span class="absolute text-lg font-bold font-mono text-white">64%</span>
+                        <span class="absolute text-lg font-bold font-mono text-slate-900">{{ round($bwUsagePercent) }}%</span>
                     </div>
-                    <div class="text-[11px] text-neutral-500 font-mono">1.28 GB / 2.0 GB</div>
+                    <div class="text-[11px] text-slate-500 font-mono">
+                        {{ @$accountSummary['bw_used_text'] ?: '0 MB' }} / {{ $product->bandwidth ?? 'Unlimited' }}
+                    </div>
                 </div>
 
-                <!-- Disk -->
-                <div class="p-5 bg-[#141416] border border-white/10 rounded-2xl text-center space-y-3">
-                    <div class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">@lang('Disk Space')</div>
-                    <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-white/5 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-cyan-400 stroke-current" stroke-width="3.5" stroke-dasharray="35, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <span class="absolute text-lg font-bold font-mono text-white">35%</span>
+                <!-- Databases -->
+                <div class="p-5 bg-white border border-slate-200/80 rounded-2xl text-center space-y-3 shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">@lang('Databases')</div>
+                    <div class="w-24 h-24 mx-auto rounded-full bg-slate-50 border border-slate-200 flex flex-col items-center justify-center">
+                        <i data-lucide="database" class="w-6 h-6 text-indigo-600 mb-1"></i>
+                        <span class="text-base font-extrabold font-mono text-slate-900">{{ count($databases) }}</span>
                     </div>
-                    <div class="text-[11px] text-neutral-500 font-mono">7.0 GB / 20.0 GB</div>
+                    <div class="text-[11px] text-slate-500 font-mono">
+                        {{ count($databases) }} @lang('Active Databases')
+                    </div>
                 </div>
 
-                <!-- Bandwidth -->
-                <div class="p-5 bg-[#141416] border border-white/10 rounded-2xl text-center space-y-3">
-                    <div class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">@lang('Bandwidth')</div>
-                    <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <path class="text-white/5 stroke-current" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            <path class="text-indigo-400 stroke-current" stroke-width="3.5" stroke-dasharray="18, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <span class="absolute text-lg font-bold font-mono text-white">18%</span>
+                <!-- Mailboxes -->
+                <div class="p-5 bg-white border border-slate-200/80 rounded-2xl text-center space-y-3 shadow-sm">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">@lang('Mail Accounts')</div>
+                    <div class="w-24 h-24 mx-auto rounded-full bg-slate-50 border border-slate-200 flex flex-col items-center justify-center">
+                        <i data-lucide="mail" class="w-6 h-6 text-cyan-600 mb-1"></i>
+                        <span class="text-base font-extrabold font-mono text-slate-900">{{ count($mailAccounts) }}</span>
                     </div>
-                    <div class="text-[11px] text-neutral-500 font-mono">180 GB / 1000 GB</div>
+                    <div class="text-[11px] text-slate-500 font-mono">
+                        {{ count($mailAccounts) }} @lang('Mailboxes Created')
+                    </div>
                 </div>
             </div>
 
-            <!-- Quick Links Grid -->
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
-                <h3 class="text-base font-semibold text-white">@lang('Quick Management Utilities')</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    <button onclick="alert('Launching phpMyAdmin...')" class="p-4 bg-[#1C1C1F] hover:bg-[#242429] border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group space-y-2">
-                        <i data-lucide="database" class="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">phpMyAdmin</div>
-                            <div class="text-[11px] text-neutral-400">Database admin</div>
+            <!-- Service Details & Credentials 2-Col Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Service Specifications & Credentials Card -->
+                <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-4 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 font-display flex items-center justify-between">
+                        <span>@lang('Control Panel & Access Credentials')</span>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            @lang('Active Node')
+                        </span>
+                    </h3>
+
+                    <div class="space-y-3 text-xs divide-y divide-slate-100">
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-slate-500">@lang('Control Panel URL')</span>
+                            <a href="https://zodserver.cloud:8083/login/" target="_blank" rel="noopener" class="font-mono text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1">
+                                https://zodserver.cloud:8083
+                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                            </a>
                         </div>
-                    </button>
-                    <button onclick="switchTab('email')" class="p-4 bg-[#1C1C1F] hover:bg-[#242429] border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group space-y-2">
-                        <i data-lucide="mail" class="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Email Accounts</div>
-                            <div class="text-[11px] text-neutral-400">Manage mailboxes</div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-slate-500">@lang('Username')</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-slate-900 font-bold text-sm" id="credUsernameVal">{{ $service->username }}</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $service->username }}'); alert('@lang('Username copied!')')" class="text-slate-400 hover:text-slate-900 p-1" title="@lang('Copy')">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         </div>
-                    </button>
-                    <button onclick="switchTab('security')" class="p-4 bg-[#1C1C1F] hover:bg-[#242429] border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group space-y-2">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">SSL Status</div>
-                            <div class="text-[11px] text-neutral-400">AutoSSL wizard</div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-slate-500">@lang('Password')</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-slate-900 font-bold text-sm" id="credPasswordMasked">••••••••••••</span>
+                                <span class="font-mono text-slate-900 font-bold text-sm hidden" id="credPasswordPlain">{{ $service->password }}</span>
+                                <button type="button" onclick="let m=document.getElementById('credPasswordMasked'), p=document.getElementById('credPasswordPlain'); if(p.classList.contains('hidden')){ p.classList.remove('hidden'); m.classList.add('hidden'); } else { p.classList.add('hidden'); m.classList.remove('hidden'); }" class="text-slate-400 hover:text-slate-900 p-1" title="@lang('Toggle view')">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $service->password }}'); alert('@lang('Password copied!')')" class="text-slate-400 hover:text-slate-900 p-1" title="@lang('Copy')">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         </div>
-                    </button>
-                    <button onclick="alert('Opening Backup Manager...')" class="p-4 bg-[#1C1C1F] hover:bg-[#242429] border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group space-y-2">
-                        <i data-lucide="archive" class="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Backup Wizard</div>
-                            <div class="text-[11px] text-neutral-400">Download snapshot</div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-slate-500">@lang('Server IP')</span>
+                            <span class="font-mono text-slate-900 font-semibold">{{ $service->server->ip_address ?? '169.58.176.53' }}</span>
                         </div>
-                    </button>
-                    <button onclick="switchTab('dns')" class="p-4 bg-[#1C1C1F] hover:bg-[#242429] border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group space-y-2">
-                        <i data-lucide="globe" class="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Subdomains</div>
-                            <div class="text-[11px] text-neutral-400">Manage domain aliases</div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-slate-500">@lang('Billing Cycle & Price')</span>
+                            <span class="font-medium text-slate-900">{{ @billingCycle($service->billing_cycle, true)['showText'] ?? 'Monthly' }} • {{ gs('cur_sym') }}{{ showAmount($service->price) }}</span>
                         </div>
-                    </button>
+                    </div>
+                </div>
+
+                <!-- Nameservers Card -->
+                <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-4 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 font-display">@lang('Assigned Nameservers')</h3>
+                    <p class="text-xs text-slate-500">@lang('Point your domain to these nameservers at your registrar to route traffic to this server.')</p>
+
+                    <div class="space-y-2 text-xs">
+                        @forelse($nameservers as $ns)
+                            <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between font-mono">
+                                <div>
+                                    <span class="text-indigo-600 font-bold me-2">{{ $ns['label'] }}:</span>
+                                    <span class="text-slate-900 font-semibold">{{ $ns['host'] }}</span>
+                                    @if(!empty($ns['ip']))
+                                        <span class="text-slate-400 text-[11px] ms-1">({{ $ns['ip'] }})</span>
+                                    @endif
+                                </div>
+                                <button onclick="navigator.clipboard.writeText('{{ $ns['host'] }}'); alert('@lang('Nameserver copied!')')" class="text-slate-400 hover:text-slate-900 p-1" title="@lang('Copy')">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        @empty
+                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 text-center">
+                                @lang('Nameservers will appear once the service node is fully assigned.')
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. FILES & DATABASES TAB -->
+        <!-- 2. DATABASES TAB -->
         <div id="tab-content-files" class="tab-pane hidden space-y-6">
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
+            <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-4 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-base font-semibold text-white">@lang('Databases (MySQL / MariaDB)')</h3>
-                    <button onclick="alert('Opening Create Database Modal')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500">
-                        + @lang('Create Database')
-                    </button>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 font-display">@lang('MySQL / MariaDB Databases')</h3>
+                        <p class="text-xs text-slate-500">@lang('Create and manage relational databases for your web applications.')</p>
+                    </div>
+                    @if($isActive)
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#createDbModal" class="px-3.5 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-xs flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>@lang('Create Database')</span>
+                        </button>
+                    @endif
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-neutral-300">
-                        <thead class="bg-[#1C1C1F] text-neutral-400 uppercase font-semibold text-[11px]">
-                            <tr>
-                                <th class="px-4 py-3 rounded-l-lg">Database Name</th>
-                                <th class="px-4 py-3">Size</th>
-                                <th class="px-4 py-3">User Count</th>
-                                <th class="px-4 py-3 rounded-r-lg text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr>
-                                <td class="px-4 py-3 font-mono text-white font-medium">db_wp_app_prod</td>
-                                <td class="px-4 py-3">42.8 MB</td>
-                                <td class="px-4 py-3">1 User (app_user)</td>
-                                <td class="px-4 py-3 text-right space-x-2">
-                                    <button class="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-neutral-300">phpMyAdmin</button>
-                                    <button class="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-neutral-300">Export</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 font-mono text-white font-medium">db_staging_test</td>
-                                <td class="px-4 py-3">12.1 MB</td>
-                                <td class="px-4 py-3">1 User (stage_user)</td>
-                                <td class="px-4 py-3 text-right space-x-2">
-                                    <button class="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-neutral-300">phpMyAdmin</button>
-                                    <button class="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-neutral-300">Export</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                @if(count($databases) > 0)
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-700">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[11px] border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">@lang('Database Name')</th>
+                                    <th class="px-4 py-3">@lang('DB User')</th>
+                                    <th class="px-4 py-3">@lang('Host')</th>
+                                    <th class="px-4 py-3 rounded-r-lg text-right">@lang('Status')</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono">
+                                @foreach($databases as $db)
+                                    <tr>
+                                        <td class="px-4 py-3 text-slate-900 font-bold">{{ $db['database'] ?? $db['name'] ?? 'db' }}</td>
+                                        <td class="px-4 py-3">{{ $db['dbuser'] ?? $db['user'] ?? 'user' }}</td>
+                                        <td class="px-4 py-3">localhost</td>
+                                        <td class="px-4 py-3 text-right">
+                                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-bold">@lang('Active')</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="p-8 text-center bg-slate-50 border border-slate-200/80 rounded-xl space-y-2">
+                        <i data-lucide="database" class="w-8 h-8 text-slate-400 mx-auto"></i>
+                        <p class="text-xs text-slate-600 font-semibold">@lang('No databases created yet for this hosting service.')</p>
+                        @if($isActive)
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#createDbModal" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>@lang('Create First Database')</span>
+                            </button>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
 
         <!-- 3. EMAIL TAB -->
         <div id="tab-content-email" class="tab-pane hidden space-y-6">
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
+            <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-4 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-base font-semibold text-white">@lang('Mailbox Accounts')</h3>
-                    <button onclick="document.getElementById('createMailModal').classList.remove('hidden')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500">
-                        + @lang('Create Account')
-                    </button>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 font-display">@lang('Custom Domain Mailboxes')</h3>
+                        <p class="text-xs text-slate-500">@lang('Manage branded email accounts for') {{ $service->domain ?? 'your domain' }}.</p>
+                    </div>
+                    @if($isActive)
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#createMailModal" class="px-3.5 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-xs flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>@lang('Create Mailbox')</span>
+                        </button>
+                    @endif
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-neutral-300">
-                        <thead class="bg-[#1C1C1F] text-neutral-400 uppercase font-semibold text-[11px]">
-                            <tr>
-                                <th class="px-4 py-3 rounded-l-lg">Mailbox</th>
-                                <th class="px-4 py-3">Quota Used</th>
-                                <th class="px-4 py-3">Status</th>
-                                <th class="px-4 py-3 rounded-r-lg text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr>
-                                <td class="px-4 py-3 font-medium text-white">admin@{{ $service->domain ?? 'example.com' }}</td>
-                                <td class="px-4 py-3 font-mono">145 MB / 1000 MB (14.5%)</td>
-                                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">Active</span></td>
-                                <td class="px-4 py-3 text-right">
-                                    <a href="https://webmail.{{ $service->domain }}" target="_blank" class="px-2.5 py-1 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded font-medium">Webmail</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 font-medium text-white">support@{{ $service->domain ?? 'example.com' }}</td>
-                                <td class="px-4 py-3 font-mono">420 MB / 1000 MB (42.0%)</td>
-                                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">Active</span></td>
-                                <td class="px-4 py-3 text-right">
-                                    <a href="https://webmail.{{ $service->domain }}" target="_blank" class="px-2.5 py-1 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded font-medium">Webmail</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                @if(count($mailAccounts) > 0)
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-700">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[11px] border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">@lang('Email Address')</th>
+                                    <th class="px-4 py-3">@lang('Quota')</th>
+                                    <th class="px-4 py-3 rounded-r-lg text-right">@lang('Webmail Access')</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono">
+                                @foreach($mailAccounts as $mail)
+                                    <tr>
+                                        <td class="px-4 py-3 text-slate-900 font-bold">{{ $mail['account'] ?? $mail['email'] }}@if(!str_contains($mail['account'] ?? '', '@')){{ '@' . $service->domain }}@endif</td>
+                                        <td class="px-4 py-3">{{ $mail['quota'] ?? '1000' }} MB</td>
+                                        <td class="px-4 py-3 text-right">
+                                            @if($isActive)
+                                                <a href="https://webmail.{{ $service->domain }}" target="_blank" class="text-indigo-600 hover:underline font-sans font-semibold">@lang('Launch Webmail ↗')</a>
+                                            @else
+                                                <span class="text-slate-400 font-sans">@lang('Pending')</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="p-8 text-center bg-slate-50 border border-slate-200/80 rounded-xl space-y-2">
+                        <i data-lucide="mail" class="w-8 h-8 text-slate-400 mx-auto"></i>
+                        <p class="text-xs text-slate-600 font-semibold">@lang('No custom mailboxes created yet.')</p>
+                        @if($isActive)
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#createMailModal" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>@lang('Create First Mailbox')</span>
+                            </button>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
 
-        <!-- 4. DOMAINS & DNS TAB -->
+        <!-- 4. DNS ZONE TAB -->
         <div id="tab-content-dns" class="tab-pane hidden space-y-6">
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
+            <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-4 shadow-sm">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-base font-semibold text-white">@lang('DNS Zone Editor')</h3>
-                        <p class="text-xs text-neutral-400">Manage domain DNS records and live cluster resolution.</p>
+                        <h3 class="text-base font-bold text-slate-900 font-display">@lang('DNS Zone & Routing') ({{ $service->domain ?? 'Domain' }})</h3>
+                        <p class="text-xs text-slate-500">@lang('Authoritative records configured for this hosting instance.')</p>
                     </div>
-                    <form action="{{ route('user.service.dns.repair', $service->id) }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-glow-accent transition-all flex items-center gap-1.5">
-                            <i data-lucide="network" class="w-3.5 h-3.5"></i>
-                            <span>@lang('Repair Live DNS')</span>
-                        </button>
-                    </form>
+                    @if($isActive)
+                        <form action="{{ route('user.service.dns.repair', $service->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg shadow-xs flex items-center gap-1.5 transition-colors">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                <span>@lang('Sync / Repair Zone')</span>
+                            </button>
+                        </form>
+                    @endif
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-neutral-300">
-                        <thead class="bg-[#1C1C1F] text-neutral-400 uppercase font-semibold text-[11px]">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[11px] border-b border-slate-200">
                             <tr>
-                                <th class="px-4 py-3 rounded-l-lg">Type</th>
-                                <th class="px-4 py-3">Host</th>
-                                <th class="px-4 py-3">Value</th>
-                                <th class="px-4 py-3">TTL</th>
-                                <th class="px-4 py-3 rounded-r-lg text-right">Action</th>
+                                <th class="px-4 py-3 rounded-l-lg">@lang('Record Name')</th>
+                                <th class="px-4 py-3">@lang('Type')</th>
+                                <th class="px-4 py-3">@lang('Target / Value')</th>
+                                <th class="px-4 py-3 rounded-r-lg text-right">@lang('TTL')</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-white/5 font-mono">
-                            <tr>
-                                <td class="px-4 py-3 font-semibold text-cyan-400">A</td>
-                                <td class="px-4 py-3 text-white">@</td>
-                                <td class="px-4 py-3">{{ $service->server->ip_address ?? '192.168.1.100' }}</td>
-                                <td class="px-4 py-3">14400</td>
-                                <td class="px-4 py-3 text-right"><button class="text-indigo-400 hover:underline">Edit</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 font-semibold text-indigo-400">CNAME</td>
-                                <td class="px-4 py-3 text-white">www</td>
-                                <td class="px-4 py-3">{{ $service->domain ?? 'example.com' }}</td>
-                                <td class="px-4 py-3">14400</td>
-                                <td class="px-4 py-3 text-right"><button class="text-indigo-400 hover:underline">Edit</button></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3 font-semibold text-amber-400">MX</td>
-                                <td class="px-4 py-3 text-white">@</td>
-                                <td class="px-4 py-3">mail.{{ $service->domain ?? 'example.com' }} (Priority: 10)</td>
-                                <td class="px-4 py-3">14400</td>
-                                <td class="px-4 py-3 text-right"><button class="text-indigo-400 hover:underline">Edit</button></td>
-                            </tr>
+                        <tbody class="divide-y divide-slate-100 font-mono">
+                            @if(count($dnsRecords) > 0)
+                                @foreach($dnsRecords as $rec)
+                                    <tr>
+                                        <td class="px-4 py-3 text-slate-900 font-bold">{{ $rec['name'] ?? '@' }}</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold">{{ $rec['type'] ?? 'A' }}</span></td>
+                                        <td class="px-4 py-3 text-slate-800">{{ $rec['value'] ?? $service->server->ip_address }}</td>
+                                        <td class="px-4 py-3 text-right text-slate-500">{{ $rec['ttl'] ?? 3600 }}</td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td class="px-4 py-3 text-slate-900 font-bold">@</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold">A</span></td>
+                                    <td class="px-4 py-3">{{ $service->server->ip_address ?? 'Auto-Assigned' }}</td>
+                                    <td class="px-4 py-3 text-right text-slate-500">3600</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-slate-900 font-bold">www</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 font-bold">CNAME</span></td>
+                                    <td class="px-4 py-3">{{ $service->domain ?? 'example.com' }}.</td>
+                                    <td class="px-4 py-3 text-right text-slate-500">3600</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-slate-900 font-bold">mail</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold">A</span></td>
+                                    <td class="px-4 py-3">{{ $service->server->ip_address ?? 'Auto-Assigned' }}</td>
+                                    <td class="px-4 py-3 text-right text-slate-500">3600</td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -351,35 +520,88 @@
 
         <!-- 5. SECURITY TAB -->
         <div id="tab-content-security" class="tab-pane hidden space-y-6">
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-base font-semibold text-white">@lang('SSL / TLS Certificate')</h3>
-                        <p class="text-xs text-neutral-400">Instant SAN SSL certificate active with automatic 0-second HTTPS redirection.</p>
+            <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-6 shadow-sm">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-display">@lang('SSL / TLS Certificates & Encryption')</h3>
+                    <p class="text-xs text-slate-500 mt-1">@lang('Automated SSL certificates and Force HTTPS redirection.')</p>
+                </div>
+
+                <div class="p-5 {{ $isActive ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200' }} border rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="shield-check" class="w-6 h-6 {{ $isActive ? 'text-emerald-600' : 'text-slate-400' }}"></i>
+                        <div>
+                            <div class="text-sm font-bold text-slate-900">
+                                {{ $isActive ? __('AutoSSL Active & Enforced') : __('SSL Provisioning on Activation') }}
+                            </div>
+                            <div class="text-xs text-slate-600 mt-0.5">
+                                @lang('Securing apex and subdomains for') {{ $service->domain ?? 'your domain' }}
+                            </div>
+                        </div>
                     </div>
-                    <form action="{{ route('user.service.ssl.issue', $service->id) }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 shadow-glow-accent transition-all">
-                            <i data-lucide="shield-check" class="w-4 h-4"></i>
-                            <span>@lang('Run Auto-SSL & Force HTTPS')</span>
-                        </button>
-                    </form>
+                    @if($isActive)
+                        <form action="{{ route('user.service.ssl.issue', $service->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-white hover:bg-slate-50 border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-lg shadow-xs transition-colors">
+                                @lang('Re-issue / Force AutoSSL')
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
 
         <!-- 6. ADVANCED TAB -->
         <div id="tab-content-advanced" class="tab-pane hidden space-y-6">
-            <div class="p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4">
-                <h3 class="text-base font-semibold text-white">@lang('PHP Version & INI Settings')</h3>
-                <div class="flex items-center gap-4">
-                    <label class="text-xs text-neutral-400">Select PHP Version:</label>
-                    <select class="px-3 py-2 bg-[#1C1C1F] border border-white/10 rounded-lg text-xs font-mono text-white">
-                        <option selected>PHP 8.2 (Recommended)</option>
-                        <option>PHP 8.1</option>
-                        <option>PHP 8.0</option>
-                    </select>
-                    <button onclick="alert('PHP version updated!')" class="px-3 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg">Save</button>
+            <div class="p-6 bg-white border border-slate-200/80 rounded-2xl space-y-6 shadow-sm">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-display">@lang('PHP Runtime & Server Utilities')</h3>
+                    <p class="text-xs text-slate-500 mt-1">@lang('Adjust active PHP version engine and maintenance scripts.')</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- PHP Version Switcher -->
+                    <div class="p-5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-slate-800">@lang('Active PHP Version')</label>
+                            <p class="text-[11px] text-slate-500">@lang('Select the PHP runtime for your web apps.')</p>
+                        </div>
+                        @if($isActive)
+                            <form action="{{ route('user.service.php.change', $service->id) }}" method="POST" class="space-y-3">
+                                @csrf
+                                <select name="php_version" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 font-mono">
+                                    <option value="8.3" @selected($phpVersion == '8.3')>PHP 8.3 (Latest & Recommended)</option>
+                                    <option value="8.2" @selected($phpVersion == '8.2')>PHP 8.2 (Stable)</option>
+                                    <option value="8.1" @selected($phpVersion == '8.1')>PHP 8.1</option>
+                                    <option value="8.0" @selected($phpVersion == '8.0')>PHP 8.0</option>
+                                    <option value="7.4" @selected($phpVersion == '7.4')>PHP 7.4 (Legacy)</option>
+                                </select>
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors">
+                                    @lang('Apply PHP Version')
+                                </button>
+                            </form>
+                        @else
+                            <p class="text-xs text-slate-500 italic">@lang('Available once hosting is active.')</p>
+                        @endif
+                    </div>
+
+                    <!-- Webmail Maintenance -->
+                    <div class="p-5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-slate-800">@lang('Webmail Router Repair')</label>
+                            <p class="text-[11px] text-slate-500">@lang('Rebuild webmail DNS aliases and roundcube authentication.')</p>
+                        </div>
+                        @if($isActive)
+                            <form action="{{ route('user.service.zodpanel.webmail.repair', $service->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2">
+                                    <i data-lucide="wrench" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                    <span>@lang('Repair Webmail Alias')</span>
+                                </button>
+                            </form>
+                        @else
+                            <p class="text-xs text-slate-500 italic">@lang('Available once hosting is active.')</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -387,76 +609,136 @@
     </div>
 </div>
 
-<!-- Modal: Create Mail Account -->
-<div id="createMailModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <form action="{{ route('user.service.email.create', $service->id) }}" method="POST" class="bg-[#141416] border border-white/10 rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-        @csrf
-        <div class="flex items-center justify-between border-b border-white/5 pb-2">
-            <div>
-                <h3 class="text-base font-bold text-white">Create Mailbox Account</h3>
-                <p class="text-[11px] text-neutral-400">Select any domain or subdomain to provision instant webmail access.</p>
-            </div>
-            <button type="button" onclick="document.getElementById('createMailModal').classList.add('hidden')" class="text-neutral-400 hover:text-white text-lg">&times;</button>
-        </div>
-        <div class="space-y-4 text-xs">
-            <div>
-                <label class="block text-neutral-300 font-medium mb-1.5">Email Address</label>
-                <div class="flex items-center gap-1.5">
-                    <input type="text" name="v_account" required class="flex-1 bg-[#1C1C1F] border border-white/10 rounded-lg p-2.5 text-white placeholder:text-neutral-600 focus:outline-none focus:border-indigo-500" placeholder="username (e.g. info, support)">
-                    <span class="font-bold text-neutral-400 text-sm px-1">@</span>
-                    <select name="v_domain" required class="flex-1 bg-[#1C1C1F] border border-white/10 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-indigo-500">
-                        <option value="{{ $service->domain ?? 'example.com' }}">{{ $service->domain ?? 'example.com' }}</option>
-                        <option value="sub.{{ $service->domain ?? 'example.com' }}">sub.{{ $service->domain ?? 'example.com' }}</option>
-                        <option value="api.{{ $service->domain ?? 'example.com' }}">api.{{ $service->domain ?? 'example.com' }}</option>
-                        <option value="app.{{ $service->domain ?? 'example.com' }}">app.{{ $service->domain ?? 'example.com' }}</option>
-                    </select>
-                </div>
-            </div>
+{{-- ── MODALS ── --}}
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-neutral-300 font-medium mb-1.5">Storage Quota</label>
-                    <select name="v_quota" class="w-full bg-[#1C1C1F] border border-white/10 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-indigo-500">
-                        <option value="500">500 MB</option>
-                        <option value="1000" selected>1000 MB (1 GB)</option>
-                        <option value="5000">5000 MB (5 GB)</option>
-                        <option value="10000">10000 MB (10 GB)</option>
-                        <option value="0">Unlimited</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-neutral-300 font-medium mb-1.5">Password</label>
-                    <div class="flex gap-1.5">
-                        <input type="text" name="v_password" id="genMailPass" required class="w-full bg-[#1C1C1F] border border-white/10 rounded-lg p-2.5 text-white font-mono text-xs focus:outline-none focus:border-indigo-500" value="x9$K#mP2!vL8">
-                        <button type="button" onclick="document.getElementById('genMailPass').value = Math.random().toString(36).slice(-10) + '!A9';" class="px-2.5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg text-xs" title="Generate password">
-                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-                        </button>
+<!-- Create Database Modal -->
+@if($isActive)
+<div class="modal fade" id="createDbModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-2xl">
+            <div class="modal-header border-b border-slate-100 p-5">
+                <h5 class="modal-title text-sm font-bold text-slate-900 font-display">@lang('Create MySQL Database')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('user.service.database.create', $service->id) }}" method="POST">
+                @csrf
+                <div class="modal-body p-5 space-y-4 text-xs">
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Database Name')</label>
+                        <input type="text" name="database" required placeholder="app_db" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Database Username')</label>
+                        <input type="text" name="dbuser" required placeholder="db_user" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('User Password')</label>
+                        <input type="password" name="password" required placeholder="••••••••••••" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 font-mono">
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer border-t border-slate-100 p-4">
+                    <button type="button" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg" data-bs-dismiss="modal">@lang('Cancel')</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-xs">@lang('Create Database')</button>
+                </div>
+            </form>
         </div>
-        <div class="pt-3 flex justify-end gap-2 border-t border-white/5">
-            <button type="button" onclick="document.getElementById('createMailModal').classList.add('hidden')" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-neutral-300 text-xs font-semibold rounded-lg">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-glow-accent transition-all">
-                Create Mailbox
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
 
+<!-- Create Mailbox Modal -->
+<div class="modal fade" id="createMailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-2xl">
+            <div class="modal-header border-b border-slate-100 p-5">
+                <h5 class="modal-title text-sm font-bold text-slate-900 font-display">@lang('Create New Mailbox')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('user.service.email.create', $service->id) }}" method="POST">
+                @csrf
+                <input type="hidden" name="v_domain" value="{{ $service->domain }}">
+                <div class="modal-body p-5 space-y-4 text-xs">
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Email Account Prefix')</label>
+                        <div class="flex items-center gap-2 font-mono">
+                            <input type="text" name="v_account" required placeholder="contact" class="flex-1 bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900">
+                            <span class="text-slate-500 font-bold">@ {{ $service->domain }}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Mailbox Password')</label>
+                        <input type="password" name="v_password" required placeholder="••••••••••••" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Storage Quota (MB)')</label>
+                        <input type="number" name="v_quota" value="1000" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 font-mono">
+                    </div>
+                </div>
+                <div class="modal-footer border-t border-slate-100 p-4">
+                    <button type="button" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg" data-bs-dismiss="modal">@lang('Cancel')</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-xs">@lang('Create Mailbox')</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Cancellation Modal -->
+@if(!$service->cancelRequest)
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-2xl">
+            <div class="modal-header border-b border-slate-100 p-5">
+                <h5 class="modal-title text-sm font-bold text-slate-900 font-display">@lang('Request Service Cancellation')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('user.service.cancel.request') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id" value="{{ $service->id }}">
+                <div class="modal-body p-5 space-y-4 text-xs">
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Cancellation Type')</label>
+                        <select name="cancellation_type" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900">
+                            @foreach($cancelRequestTypes as $key => $type)
+                                <option value="{{ $key }}">{{ trans($type) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-700">@lang('Reason for Cancellation')</label>
+                        <textarea name="reason" required rows="3" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900" placeholder="@lang('Please describe why you wish to cancel this service...')"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-t border-slate-100 p-4">
+                    <button type="button" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg" data-bs-dismiss="modal">@lang('Keep Service')</button>
+                    <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow-xs">@lang('Confirm Cancellation Request')</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
 <script>
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.service-tab-btn').forEach(el => {
-        el.classList.remove('bg-indigo-600', 'text-white');
-        el.classList.add('bg-[#1C1C1F]', 'text-neutral-300');
-    });
-    
-    document.getElementById('tab-content-' + tabName).classList.remove('hidden');
-    const activeBtn = document.getElementById('tab-' + tabName);
-    activeBtn.classList.remove('bg-[#1C1C1F]', 'text-neutral-300');
-    activeBtn.classList.add('bg-indigo-600', 'text-white');
-}
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+        const activeContent = document.getElementById('tab-content-' + tabId);
+        if (activeContent) activeContent.classList.remove('hidden');
+
+        document.querySelectorAll('.service-tab-btn').forEach(btn => {
+            btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs');
+            btn.classList.add('bg-slate-50', 'text-slate-700', 'border', 'border-slate-200');
+        });
+
+        const activeBtn = document.getElementById('tab-' + tabId);
+        if (activeBtn) {
+            activeBtn.classList.remove('bg-slate-50', 'text-slate-700', 'border', 'border-slate-200');
+            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-xs');
+        }
+
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
 </script>
 @endsection

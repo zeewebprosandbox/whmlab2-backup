@@ -28,9 +28,9 @@
 
         @include($activeTemplate.'partials.breadcrumb')
 
-        <div class="service-category bg--light whm-page-body whm-client-page-body">
-            <div class="container px-3">
-                <div class="row gy-4 justify-content-center">
+        <div class="service-category whm-page-body whm-client-page-body py-4">
+            <div class="container-fluid px-3 px-xl-4" style="max-width: 1560px; margin: 0 auto;">
+                <div class="row gy-4">
                     @yield('content')
                 </div>
             </div>

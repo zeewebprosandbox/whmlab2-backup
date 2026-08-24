@@ -91,6 +91,12 @@ class DomainRegisterController extends Controller{
     }
 
     public function status($id){
+        $register = DomainRegister::findOrFail($id);
+        if (!$register->status && !$register->setup_done) {
+            $notify[] = ['error', 'Configure '.$register->name.' credentials before enabling it'];
+            return back()->withNotify($notify);
+        }
+
         return DomainRegister::changeStatus($id);
     }
 

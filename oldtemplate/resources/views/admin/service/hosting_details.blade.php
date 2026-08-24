@@ -81,6 +81,90 @@
                 </div>
             @endif
 
+            @if (@$serverGroup->type == 4 && $hasAccount)
+                @php
+                    $zodBlockers = collect(data_get($zodPanelDiagnostics, 'data.blockers', []))->filter()->values();
+                    $zodWebmailUrl = data_get($zodPanelDiagnostics, 'data.webmail.url')
+                        ?: data_get($zodPanelDiagnostics, 'data.webmail_url')
+                        ?: ($hosting->domain ? 'https://webmail.'.$hosting->domain.'/' : null);
+                    $zodPhpCurrent = data_get($zodPanelPhp, 'data.current');
+                    $zodPhpBackends = collect(data_get($zodPanelPhp, 'data.backends', []))->map(function ($backend) {
+                        if (is_array($backend)) {
+                            return [
+                                'template' => $backend['template'] ?? $backend['name'] ?? $backend['value'] ?? null,
+                                'label' => $backend['label'] ?? $backend['name'] ?? $backend['template'] ?? $backend['value'] ?? null,
+                                'switchable' => $backend['switchable'] ?? true,
+                            ];
+                        }
+
+                        return ['template' => $backend, 'label' => $backend, 'switchable' => true];
+                    })->filter(fn ($backend) => !empty($backend['template']) && $backend['switchable'])->values();
+                @endphp
+                <div class="col-lg-12">
+                    <div class="zod-ops-panel">
+                        <div class="zod-ops-panel__head">
+                            <div>
+                                <span>@lang('ZodPanel Operations')</span>
+                                <h5>@lang('Live service health and repair controls')</h5>
+                            </div>
+                            <a href="{{ route('admin.order.hosting.zodpanel.diagnostics', $hosting->id) }}" class="btn btn-sm btn-outline--primary">
+                                <i class="las la-sync"></i>@lang('Refresh')
+                            </a>
+                        </div>
+
+                        <div class="zod-ops-grid">
+                            <div class="zod-ops-card zod-ops-card--wide">
+                                <div class="zod-ops-card__label">@lang('Domain Health')</div>
+                                <strong>{{ $hosting->domain ?: __('No domain') }}</strong>
+                                @if($zodBlockers->count())
+                                    <ul class="zod-ops-list">
+                                        @foreach($zodBlockers->take(4) as $blocker)
+                                            <li><i class="las la-exclamation-triangle"></i>{{ __($blocker) }}</li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p class="zod-ops-ok"><i class="las la-check-circle"></i>@lang('No active DNS, SSL, or webmail blockers reported.')</p>
+                                @endif
+                            </div>
+
+                            <div class="zod-ops-card">
+                                <div class="zod-ops-card__label">@lang('Webmail')</div>
+                                <strong>@lang('Roundcube readiness')</strong>
+                                <div class="zod-ops-actions">
+                                    @if($zodWebmailUrl)
+                                        <a href="{{ $zodWebmailUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline--info">
+                                            <i class="las la-envelope-open"></i>@lang('Open')
+                                        </a>
+                                    @endif
+                                    <button type="submit" form="zod-webmail-repair-form" class="btn btn-sm btn--primary">
+                                        <i class="las la-tools"></i>@lang('Repair')
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="zod-ops-card">
+                                <div class="zod-ops-card__label">@lang('PHP Runtime')</div>
+                                <strong>{{ $zodPhpCurrent ?: __('Unknown') }}</strong>
+                                <div class="zod-ops-actions zod-ops-actions--stack">
+                                    <select name="template" form="zod-php-form" class="form-control">
+                                        @forelse($zodPhpBackends as $backend)
+                                            <option value="{{ $backend['template'] }}" @selected($backend['template'] == $zodPhpCurrent)>
+                                                {{ __($backend['label']) }}
+                                            </option>
+                                        @empty
+                                            <option value="">@lang('No PHP backends found')</option>
+                                        @endforelse
+                                    </select>
+                                    <button type="submit" form="zod-php-form" class="btn btn-sm btn--info" @disabled(!$zodPhpBackends->count())>
+                                        <i class="las la-code-branch"></i>@lang('Apply')
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <div
                 class="col-xl-{{ $product->server_group_id ? '8' : '12' }} col-md-{{ $product->server_group_id ? '8' : '12' }} mb-30">
                 <div class="card overflow-hidden box--shadow1">
@@ -380,6 +464,17 @@
         @endpermit
     </form>
 
+    @if (@$serverGroup->type == 4 && $hasAccount)
+        <form id="zod-webmail-repair-form" action="{{ route('admin.order.hosting.zodpanel.webmail.repair', $hosting->id) }}" method="POST">
+            @csrf
+            <input type="hidden" name="create_mail_domain" value="1">
+        </form>
+
+        <form id="zod-php-form" action="{{ route('admin.order.hosting.zodpanel.php', $hosting->id) }}" method="POST">
+            @csrf
+        </form>
+    @endif
+
     {{-- Module Modal --}}
     <div id="moduleModal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -446,8 +541,11 @@
 
         @permit('admin.module.login.hosting')
             @if ($product->server_group_id)
+                @php
+                    $panelLoginLabel = @$serverGroup->type == 4 ? 'Login ZodPanel' : 'Login to '.(@$serverGroup->getType ?? 'Control Panel');
+                @endphp
                 <form class="d-init breadcrumb-button__form" action="{{ route('admin.module.login.hosting') }}"
-                    method="post">
+                    method="post" target="_blank" rel="noopener">
                     @csrf
                     <input type="hidden" name="hosting_id" value="{{ $hosting->id }}" required>
                     <button 
@@ -455,10 +553,9 @@
                         class="btn btn-sm btn-outline--info breadcrumb-button__three"
                         @disabled(!$hasAccount)
                     >
-                        <i class="las la-sign-in-alt"></i>@lang('Login to ' . @$serverGroup->getType ?? 'Control Panel')
+                        <i class="las la-sign-in-alt"></i>@lang($panelLoginLabel)
                     </button>
                 </form>
-                <a href="{{ session()->get('hostingLoginUrl') ?? '#' }}" class="hostingLogin" target="_blank"></a>
             @endif
         @endpermit
     </div>
@@ -555,6 +652,123 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
+        .zod-ops-panel {
+            margin: 0 0 24px;
+            padding: 18px;
+            border: 1px solid #dbe7f5;
+            border-radius: 16px;
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, .10), transparent 34%),
+                linear-gradient(135deg, #ffffff, #f8fafc);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
+        }
+
+        .zod-ops-panel__head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .zod-ops-panel__head span,
+        .zod-ops-card__label {
+            display: block;
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .zod-ops-panel__head h5 {
+            margin: 4px 0 0;
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .zod-ops-grid {
+            display: grid;
+            grid-template-columns: minmax(260px, 1.35fr) repeat(2, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .zod-ops-card {
+            min-height: 148px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .82);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+        }
+
+        .zod-ops-card strong {
+            display: block;
+            margin-top: 6px;
+            color: #0f172a;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .zod-ops-list {
+            display: grid;
+            gap: 8px;
+            margin: 12px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .zod-ops-list li,
+        .zod-ops-ok {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .zod-ops-list i {
+            color: #d97706;
+            font-size: 16px;
+            margin-top: 1px;
+        }
+
+        .zod-ops-ok i {
+            color: #059669;
+            font-size: 16px;
+            margin-top: 1px;
+        }
+
+        .zod-ops-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .zod-ops-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 36px;
+            border-radius: 9px;
+        }
+
+        .zod-ops-actions--stack {
+            align-items: stretch;
+        }
+
+        .zod-ops-actions--stack .form-control {
+            flex: 1 1 150px;
+            min-height: 38px;
+            border-color: #dbe3ef;
+            border-radius: 9px;
+        }
+
         @media (max-width: 991px) {
             .table-responsive--md tbody tr:nth-child(odd) {
                 background-color: #1208080d;
@@ -571,6 +785,15 @@
             .service-config-panel__head span {
                 display: inline-flex;
                 margin-top: 12px;
+            }
+
+            .zod-ops-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .zod-ops-panel__head {
+                align-items: flex-start;
+                flex-direction: column;
             }
         }
     </style>
@@ -793,12 +1016,6 @@
             var selectOption = hostingConfigs[i]['configurable_group_sub_option_id'];
 
             $(`select[name='config_options[${selectName}]'] option[value=${selectOption}]`).prop('selected', true);
-            }
-
-            var hostingLoginUrl = @json(session()->get('hostingLoginUrl'));
-
-            if (hostingLoginUrl) {
-                document.querySelector('.hostingLogin').click();
             }
 
         })(jQuery);

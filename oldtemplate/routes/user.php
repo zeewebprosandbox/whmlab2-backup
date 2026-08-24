@@ -100,6 +100,12 @@ Route::middleware('auth')->name('user.')->group(function () {
             Route::controller('ServiceController')->prefix('service')->name('service.')->group(function(){
                 Route::get('/list', 'list')->name('list');
                 Route::get('/details/{id}', 'details')->name('details');
+                Route::post('/{id}/zodpanel/webmail/repair', 'repairZodPanelWebmail')->name('zodpanel.webmail.repair');
+                Route::post('/{id}/ssl/issue', 'issueSsl')->name('ssl.issue');
+                Route::post('/{id}/dns/repair', 'repairDns')->name('dns.repair');
+                Route::post('/{id}/email/create', 'createMailbox')->name('email.create');
+                Route::post('/{id}/database/create', 'createDatabase')->name('database.create');
+                Route::post('/{id}/php/change', 'changePhp')->name('php.change');
                 Route::post('service/cancel/request', 'cancelRequest')->name('cancel.request');
             });
 

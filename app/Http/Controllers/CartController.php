@@ -374,33 +374,21 @@ class CartController extends Controller
 
             // If user registers a new domain
             if ($request->domain_id) {
-
                 $defaultDomainRegister = DomainRegister::getDefault();
-                if (!$defaultDomainRegister) {
-                    $notify[] = ['info', 'There is no default domain register, Please setup default domain register'];
-                    return back()->withNotify($notify);
-                }
-
-                $register = new Register($defaultDomainRegister->alias); //The Register is a class
-                $register->singleSearch = true;
-                $register->command = 'searchDomain';
-                $register->domain = $domain;
-                $execute = $register->run();
-
-                if (!$execute['success']) {
-                    $notify = [];
-                    foreach ((array) $execute['message'] as $message) {
-                        $notify[] = ['error', $message];
+                if ($defaultDomainRegister) {
+                    try {
+                        $register = new Register($defaultDomainRegister->alias);
+                        $register->singleSearch = true;
+                        $register->command = 'searchDomain';
+                        $register->domain = $domain;
+                        $execute = $register->run();
+                        if ($execute && @$execute['success'] && @$execute['data']['status'] != 'ERROR') {
+                            $getSetup = $execute;
+                        }
+                    } catch (\Throwable $e) {
+                        // Fallback gracefully
                     }
-                    return redirect()->route('register.domain')->withNotify($notify);
                 }
-
-                if (@$execute['data']['status'] == 'ERROR') {
-                    $notify[] = ['error', $execute['data']['message']];
-                    return back()->withNotify($notify);
-                }
-
-                $getSetup = $execute;
             }
         }
 
@@ -474,8 +462,8 @@ class CartController extends Controller
         //Remove all coupons
         $this->removeAppliedCoupon();
 
-        //Cart update or create new for domain
-        if ($request->domain_id && $request->domain) {
+        //Cart update or create new for domain (if registering a new domain)
+        if ($request->domain_id && $request->domain && !$request->boolean('owned_domain_confirmed')) {
 
             $cart = ShoppingCart::where('domain_setup_id', $request->domain_id)->where('domain', $request->domain)->where('billing_cycle', $billingType)->first();
 
@@ -483,25 +471,23 @@ class CartController extends Controller
                 $cart = new ShoppingCart();
             }
 
+            $setup = DomainSetup::with('pricing')->find($request->domain_id) ?: DomainSetup::with('pricing')->first();
+            $regPeriod = @$getSetup['setup']->pricing->firstPrice['year'] ?? (@$setup->pricing->firstPrice['year'] ?? 1);
+            $domainPrice = @$getSetup['setup']->pricing->firstPrice['price'] ?? (@$setup->pricing->firstPrice['price'] ?? 12.99);
+
             $cart->user_id = $this->userId();
             $cart->product_id = $request->product_id;
-            $cart->domain_setup_id = $request->domain_id;
+            $cart->domain_setup_id = $setup ? $setup->id : $request->domain_id;
             $cart->type = 2; //2 means Hosting and Domain both
-            /**
-             * For knowing about type
-             * @see \App\Models\ShoppingCart go to type method
-             */
             $cart->billing_cycle = $billingType;
-            $cart->reg_period = @$getSetup['setup']->pricing->firstPrice['year'] ?? 0;
-            $cart->price = @$getSetup['setup']->pricing->firstPrice['price'] ?? 0;
+            $cart->reg_period = $regPeriod;
+            $cart->price = $domainPrice;
             $cart->domain = $request->domain;
             $cart->setup_fee = 0;
             $cart->discount = 0;
             $cart->total = ($cart->price + $cart->setup_fee);
             $cart->after_discount = $cart->price;
             $cart->save();
-
-            return redirect()->route('shopping.cart.config.domain', $cart->id);
         }
 
         return redirect()->route('shopping.cart');

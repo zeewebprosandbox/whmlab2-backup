@@ -556,6 +556,56 @@ class ManageUsersController extends Controller
         $user = User::findOrFail($id);
         $pageTitle = $user->username .' - Domains';
         $domains = Domain::where('user_id', $user->id)->orderBy('id', 'DESC')->with('user')->paginate(getPaginate());
-        return view('admin.domains', compact('pageTitle', 'domains'));
+        return view('admin.domains', compact('pageTitle', 'domains', 'user'));
+    }
+
+    public function quickToggle(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $field = $request->field;
+        $allowedFields = ['status', 'ev', 'sv', 'kv', 'ts'];
+
+        if (!in_array($field, $allowedFields)) {
+            return response()->json(['success' => false, 'message' => 'Invalid setting field.'], 422);
+        }
+
+        $val = $request->boolean('value') || $request->value == 1 ? 1 : 0;
+
+        if ($field == 'status') {
+            $user->status = $val;
+            if ($val == 0) {
+                $user->ban_reason = $request->ban_reason ?: 'Suspended by Administrator';
+            } else {
+                $user->ban_reason = null;
+            }
+        } elseif ($field == 'kv') {
+            // KYC Verification: 1 = Verified, 0 = Unverified
+            $user->kv = $val;
+        } else {
+            $user->$field = $val;
+        }
+
+        $user->save();
+
+        $labels = [
+            'status' => $val ? 'Account Activated' : 'Account Banned',
+            'ev' => $val ? 'Email Verified' : 'Email Unverified',
+            'sv' => $val ? 'Mobile Verified' : 'Mobile Unverified',
+            'kv' => $val ? 'KYC Verified' : 'KYC Unverified',
+            'ts' => $val ? '2FA Enabled' : '2FA Disabled',
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => ($labels[$field] ?? 'Updated') . ' for ' . $user->username,
+            'user' => [
+                'id' => $user->id,
+                'status' => $user->status,
+                'ev' => $user->ev,
+                'sv' => $user->sv,
+                'kv' => $user->kv,
+                'ts' => $user->ts,
+            ]
+        ]);
     }
 }

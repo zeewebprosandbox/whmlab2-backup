@@ -10,6 +10,7 @@ use App\Models\ConfigurableGroup;
 use App\Models\ServerGroup;
 use App\Models\ServiceCategory;
 use App\Models\Pricing;
+use App\Support\WhmPanelFeatureBlueprint;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -57,7 +58,11 @@ class ProductController extends Controller
 
             'module_option' => 'sometimes|between:1,3',
             'server_group' => $request->server_group ? 'required|exists:server_groups,id' : 'nullable',
-            'package_name' => $request->server_group ? 'required' : 'nullable',
+            'package_name' => $this->requiresPackageName($request->server_group) ? 'required' : 'nullable',
+            'zodpanel_features' => 'sometimes|array',
+            'zodpanel_limits' => 'sometimes|array',
+            'zodpanel_limits.*' => 'nullable|integer|gte:0',
+            'zodpanel_limit_unlimited' => 'sometimes|array',
 
             'slug' => [
                 'required',
@@ -72,15 +77,15 @@ class ProductController extends Controller
         $product = new Product();
         $product->module_option = $request->module_option ?? 3;
 
-        $product->package_name = $request->package_name;
-        $product->server_id = $request->server_id ?? 0;
-
         $product->category_id = $request->service_category;
         $product->server_group_id = $request->server_group ?? 0;
         $product->product_type = $request->product_type;
 
         $product->name = $request->name;
         $product->slug = $request->slug;
+        $product->package_name = $this->packageNameForRequest($request);
+        $product->server_id = $request->server_id ?? 0;
+        $product->whmpanel_features = WhmPanelFeatureBlueprint::fromProduct($product);
         $product->save();
 
         $pricing = new Pricing();
@@ -115,8 +120,9 @@ class ProductController extends Controller
         $serverGroup = @$product->serverGroup;
         $execute = HostingManager::init($serverGroup)->getPackage($serverGroup);
         $packages = $execute['data'] ?? [];
+        $whmpanelBlueprint = WhmPanelFeatureBlueprint::fromProduct($product);
         
-        return view('admin.product.edit', compact('pageTitle', 'categories', 'configGroups', 'serverGroups', 'product', 'packages'));
+        return view('admin.product.edit', compact('pageTitle', 'categories', 'configGroups', 'serverGroups', 'product', 'packages', 'whmpanelBlueprint'));
     }
 
     public function updateProduct(Request $request)
@@ -143,7 +149,7 @@ class ProductController extends Controller
             'module_option' => 'sometimes|between:1,3',
 
             'server_group' => $request->server_group ? 'required|exists:server_groups,id' : 'nullable',
-            'package_name' => $request->server_group ? 'required' : 'nullable',
+            'package_name' => $this->requiresPackageName($request->server_group) ? 'required' : 'nullable',
 
             'slug' => [
                 'required',
@@ -177,7 +183,7 @@ class ProductController extends Controller
         $product->module_option = $request->module_option ?? 3;
 
         $product->server_id = $request->server_id ?? 0;
-        $product->package_name = $request->package_name;
+        $product->package_name = $this->packageNameForRequest($request, $product);
 
         $product->name = $request->name;
         $product->slug = $request->slug;
@@ -188,6 +194,7 @@ class ProductController extends Controller
         $product->stock_control = $request->stock_control;
         $product->stock_quantity = $request->stock_quantity;
         $product->description = $request->description;
+        $product->whmpanel_features = $this->zodPanelBlueprintForRequest($request, $product);
 
         $product->save();
 
@@ -257,10 +264,13 @@ class ProductController extends Controller
             ->when((int) $serverGroup->type === 1, function ($query) {
                 $query->where('product_type', 1);
             })
+            ->when((int) $serverGroup->type === 4, function ($query) {
+                $query->whereIn('product_type', [1, 3]);
+            })
             ->get();
 
         if (!$products->count()) {
-            $notify[] = ['error', 'No active shared hosting products were found for package sync'];
+            $notify[] = ['error', 'No active hosting or VPS products were found for package sync'];
             return back()->withNotify($notify);
         }
 
@@ -279,6 +289,7 @@ class ProductController extends Controller
                 'server_group_id' => $serverGroup->id,
                 'server_id' => $packageData['server_id'] ?? 0,
                 'package_name' => $packageData['package_name'] ?? null,
+                'whmpanel_features' => isset($packageData['blueprint']) ? json_encode($packageData['blueprint']) : null,
                 'module_option' => 1,
             ]);
         }
@@ -293,5 +304,58 @@ class ProductController extends Controller
     public function status($id)
     {
         return Product::changeStatus($id);
+    }
+
+    private function requiresPackageName($serverGroupId): bool
+    {
+        if (!$serverGroupId) {
+            return false;
+        }
+
+        $serverGroup = ServerGroup::find($serverGroupId);
+
+        return $serverGroup && (int) $serverGroup->type !== 4;
+    }
+
+    private function packageNameForRequest(Request $request, ?Product $product = null): ?string
+    {
+        if (!$request->server_group) {
+            return null;
+        }
+
+        if ($request->package_name) {
+            return $request->package_name;
+        }
+
+        $serverGroup = ServerGroup::find($request->server_group);
+        if (!$serverGroup || (int) $serverGroup->type !== 4) {
+            return $request->package_name;
+        }
+
+        $name = $request->slug ?: $request->name ?: @$product->slug ?: @$product->name;
+        $name = strtolower(trim((string) $name));
+        $name = preg_replace('/[^a-z0-9_]+/', '_', $name);
+        $name = preg_replace('/_+/', '_', $name);
+
+        return trim($name, '_') ?: 'zod_plan_' . ($product->id ?? time());
+    }
+
+    private function zodPanelBlueprintForRequest(Request $request, Product $product): array
+    {
+        $serverGroup = ServerGroup::find($request->server_group);
+
+        if (!$serverGroup || (int) $serverGroup->type !== 4) {
+            return WhmPanelFeatureBlueprint::fromProduct($product);
+        }
+
+        if (!$request->has('zodpanel_limits') && !$request->has('zodpanel_features')) {
+            return WhmPanelFeatureBlueprint::fromProduct($product);
+        }
+
+        return WhmPanelFeatureBlueprint::fromRequest($product, [
+            'features' => $request->input('zodpanel_features', []),
+            'limits' => $request->input('zodpanel_limits', []),
+            'limit_unlimited' => $request->input('zodpanel_limit_unlimited', []),
+        ]);
     }
 }

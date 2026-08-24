@@ -37,19 +37,26 @@ class ServiceController extends Controller{
 
         $server = @$service->server;
         $serverGroup = @$server->group;
-        
-        $execute = HostingManager::init($serverGroup)->accountSummary($service);
-        $accountSummary = @$execute['processed_data'];
+        $product = $service->product;
+        $status = $service->status;
         $cancelRequestTypes = CancelRequest::type();
 
-        $product = $service->product;
-        $status = $service->status;  
-        $diskUsagePercent = @$accountSummary['disk_usage_percent'];
-        $hasAccount = @$execute['raw_data'];
+        $accountSummary = null;
+        $hasAccount = false;
         $zodPanelDiagnostics = null;
+        $diskUsagePercent = 0;
+        $bwUsagePercent = 0;
 
-        if (@$serverGroup->type == 4 && $hasAccount) {
-            $zodPanelDiagnostics = $this->zodPanelAction($service, 'serviceDiagnostics');
+        if ($serverGroup && $status == 1) {
+            $execute = HostingManager::init($serverGroup)->accountSummary($service);
+            $accountSummary = @$execute['processed_data'];
+            $hasAccount = (bool) @$execute['raw_data'];
+            $diskUsagePercent = (float) (@$accountSummary['disk_usage_percent'] ?: 0);
+            $bwUsagePercent = (float) (@$accountSummary['bw_usage_percent'] ?: 0);
+
+            if (@$serverGroup->type == 4 && $hasAccount) {
+                $zodPanelDiagnostics = $this->zodPanelAction($service, 'serviceDiagnostics');
+            }
         }
 
         $nameservers = collect([
@@ -59,7 +66,31 @@ class ServiceController extends Controller{
             ['label' => 'NS4', 'host' => @$server->ns4, 'ip' => @$server->ns4_ip],
         ])->filter(fn ($record) => !empty($record['host']))->values();
 
-        return view('Template::user.service.details', compact('pageTitle', 'service', 'accountSummary', 'serverGroup', 'execute', 'cancelRequestTypes', 'diskUsagePercent', 'product', 'status', 'hasAccount', 'nameservers', 'zodPanelDiagnostics'));
+        $databases = @$zodPanelDiagnostics['databases'] ?: [];
+        $mailAccounts = @$zodPanelDiagnostics['mail_accounts'] ?: [];
+        $dnsRecords = @$zodPanelDiagnostics['dns_records'] ?: [];
+        $sslInfo = @$zodPanelDiagnostics['ssl'] ?: null;
+        $phpVersion = @$zodPanelDiagnostics['php_version'] ?: '8.2';
+
+        return view('Template::user.service.details', compact(
+            'pageTitle',
+            'service',
+            'accountSummary',
+            'serverGroup',
+            'cancelRequestTypes',
+            'diskUsagePercent',
+            'bwUsagePercent',
+            'product',
+            'status',
+            'hasAccount',
+            'nameservers',
+            'zodPanelDiagnostics',
+            'databases',
+            'mailAccounts',
+            'dnsRecords',
+            'sslInfo',
+            'phpVersion'
+        ));
     }
 
     public function cancelRequest(Request $request){
@@ -93,6 +124,11 @@ class ServiceController extends Controller{
             ->with('server.group')
             ->findOrFail($id);
 
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
+
         $execute = $this->zodPanelAction($service, 'repairWebmail', [
             'create_mail_domain' => true,
         ]);
@@ -107,6 +143,11 @@ class ServiceController extends Controller{
             ->with('server.group')
             ->findOrFail($id);
 
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
+
         $execute = $this->zodPanelAction($service, 'issueSsl');
 
         $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Auto-SSL & Force HTTPS issued successfully'];
@@ -118,6 +159,11 @@ class ServiceController extends Controller{
         $service = Hosting::whereBelongsTo(auth()->user())
             ->with('server.group')
             ->findOrFail($id);
+
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
 
         $execute = $this->zodPanelAction($service, 'repairDns');
 
@@ -137,6 +183,11 @@ class ServiceController extends Controller{
         $service = Hosting::whereBelongsTo(auth()->user())
             ->with('server.group')
             ->findOrFail($id);
+
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
 
         $execute = $this->zodPanelAction($service, 'createMailAccount', [
             'account' => $request->v_account,
@@ -161,6 +212,11 @@ class ServiceController extends Controller{
             ->with('server.group')
             ->findOrFail($id);
 
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
+
         $execute = $this->zodPanelAction($service, 'createDatabase', [
             'database' => $request->database,
             'dbuser' => $request->dbuser,
@@ -168,6 +224,29 @@ class ServiceController extends Controller{
         ]);
 
         $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Database ' . $request->database . ' created successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function changePhp(Request $request, $id)
+    {
+        $request->validate([
+            'php_version' => 'required|string|in:7.4,8.0,8.1,8.2,8.3,8.4',
+        ]);
+
+        $service = Hosting::whereBelongsTo(auth()->user())
+            ->with('server.group')
+            ->findOrFail($id);
+
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
+
+        $execute = $this->zodPanelAction($service, 'changePhpVersion', [
+            'php_version' => $request->php_version,
+        ]);
+
+        $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'PHP version updated to ' . $request->php_version];
         return back()->withNotify($notify);
     }
 

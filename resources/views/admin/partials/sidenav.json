@@ -278,6 +278,62 @@
             }
         ] 
     },
+    "manage_services": {
+        "title": "Manage Services",
+        "icon": "las la-cube",
+        "menu_active": ["admin.services", "admin.active.services", "admin.domains", "admin.active.domains", "admin.order.hosting.details", "admin.order.domain.details"],
+        "submenu": [
+            {
+                "keyword": ["All Services", "Services", "Hosting accounts", "Client services", "Web hosting"],
+                "title": "All Services",
+                "route_name": "admin.services",
+                "menu_active": "admin.services"
+            },
+            {
+                "keyword": ["Active Services", "Live hosting", "Active accounts"],
+                "title": "Active Services",
+                "route_name": "admin.active.services",
+                "menu_active": "admin.active.services"
+            },
+            {
+                "keyword": ["All Domains", "Domains", "Domain list", "Registered domains"],
+                "title": "All Domains",
+                "route_name": "admin.domains",
+                "menu_active": "admin.domains"
+            },
+            {
+                "keyword": ["Active Domains", "Live domains"],
+                "title": "Active Domains",
+                "route_name": "admin.active.domains",
+                "menu_active": "admin.active.domains"
+            }
+        ]
+    },
+    "manage_servers": {
+        "title": "Manage Servers",
+        "icon": "las la-server",
+        "menu_active": ["admin.servers", "admin.server.add.page", "admin.server.edit.page", "admin.groups.server"],
+        "submenu": [
+            {
+                "keyword": ["All Servers", "Servers", "Server management", "Nodes", "ZodPanel servers", "Manage servers"],
+                "title": "All Servers",
+                "route_name": "admin.servers",
+                "menu_active": "admin.servers"
+            },
+            {
+                "keyword": ["Add Server", "New Server", "Add Node", "Create Server"],
+                "title": "Add New Server",
+                "route_name": "admin.server.add.page",
+                "menu_active": "admin.server.add.page"
+            },
+            {
+                "keyword": ["Server Groups", "Groups", "Clusters", "Server pools"],
+                "title": "Server Groups",
+                "route_name": "admin.groups.server",
+                "menu_active": "admin.groups.server"
+            }
+        ]
+    },
     "automation_errors": {
         "keyword": ["Automation Errors", "Automation", "Errors"],
         "title": "Automation Errors",

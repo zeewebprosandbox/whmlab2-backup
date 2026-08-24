@@ -77,7 +77,14 @@ class DomainController extends Controller{
         $contactInfo = $execute['response'];
         $countries = json_decode(file_get_contents(resource_path('views/partials/country.json')));
 
-        return view('Template::user.domain.contact.'.$domain->register->alias, compact('pageTitle', 'domain', 'countries', 'contactInfo'));
+        $alias = $domain->register->alias;
+        $view = 'Template::user.domain.contact.'.$alias;
+        $aliasViewPath = resource_path('views/templates/'.activeTemplateName().'/user/domain/contact/'.$alias.'.blade.php');
+        if (!file_exists($aliasViewPath)) {
+            $view = 'Template::user.domain.contact.Resell';
+        }
+
+        return view($view, compact('pageTitle', 'domain', 'countries', 'contactInfo'));
     }
 
     public function contactUpdate(Request $request){

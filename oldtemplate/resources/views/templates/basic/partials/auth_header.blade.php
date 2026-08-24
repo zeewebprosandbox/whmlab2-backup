@@ -24,19 +24,19 @@
     }
 @endphp
 
-<header class="whm-desktop-nav whm-client-desktop-nav d-none d-lg-flex">
-    <a href="{{ route('user.home') }}" class="whm-brand">
-        <span class="whm-brand-mark"><i data-lucide="server"></i></span>
+<header class="tw-nav whm-client-desktop-nav">
+    <a href="{{ route('user.home') }}" class="tw-brand">
+        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
         <span>
-            <strong>{{ gs('site_name') }}</strong>
-            <small>@lang('Client Area')</small>
+            <strong class="tw-brand-title">{{ gs('site_name') }}</strong>
+            <small class="tw-brand-subtitle">@lang('Client Area')</small>
         </span>
     </a>
 
-    <nav class="whm-desktop-menu">
-        <a href="{{ route('user.home') }}" class="{{ request()->routeIs('user.home') ? 'active' : '' }}">@lang('Overview')</a>
+    <nav class="tw-menu">
+        <a href="{{ route('user.home') }}" class="tw-menu-link {{ request()->routeIs('user.home') ? 'active' : '' }}">@lang('Overview')</a>
         <div class="whm-menu-dropdown">
-            <button type="button">@lang('My Services') <i data-lucide="chevron-down"></i></button>
+            <button type="button" class="tw-menu-button">@lang('My Services') <i data-lucide="chevron-down"></i></button>
             <div class="whm-dropdown-panel">
                 <a href="{{ route('user.service.list') }}">@lang('Services')</a>
                 <a href="{{ route('user.domain.list') }}">@lang('Domains')</a>
@@ -44,8 +44,8 @@
                 <a href="{{ route('register.domain') }}">@lang('Register Domain')</a>
             </div>
         </div>
-        <a href="{{ route('user.invoice.list') }}" class="{{ request()->routeIs('user.invoice.*') ? 'active' : '' }}">@lang('Invoices')</a>
-        <a href="{{ route('ticket.index') }}" class="{{ request()->routeIs('ticket.*') ? 'active' : '' }}">@lang('Support')</a>
+        <a href="{{ route('user.invoice.list') }}" class="tw-menu-link {{ request()->routeIs('user.invoice.*') ? 'active' : '' }}">@lang('Invoices')</a>
+        <a href="{{ route('ticket.index') }}" class="tw-menu-link {{ request()->routeIs('ticket.*') ? 'active' : '' }}">@lang('Support')</a>
     </nav>
 
     <div class="whm-desktop-actions">
@@ -58,13 +58,13 @@
     </div>
 </header>
 
-<header class="whm-mobile-header d-lg-none">
+<header class="tw-mobile-nav">
     <button type="button" class="whm-mobile-toggle" data-whm-toggle>
         <i data-lucide="menu"></i>
     </button>
-    <a href="{{ route('user.home') }}" class="whm-mobile-brand">
-        <span class="whm-brand-mark"><i data-lucide="server"></i></span>
-        <span>{{ gs('site_name') }}</span>
+    <a href="{{ route('user.home') }}" class="tw-brand">
+        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
+        <span class="font-black text-ink">{{ gs('site_name') }}</span>
     </a>
     @include($activeTemplate . 'partials.cart_widget')
 </header>

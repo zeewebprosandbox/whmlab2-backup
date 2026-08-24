@@ -134,7 +134,7 @@
                     </div>
                     <div class="modal-body">
                         <p class="text-muted">
-                            @lang('This will create matching server packages from active shared hosting products and attach the exact package names back to the products.')
+                            @lang('This will create or update matching server packages from active hosting and VPS products, then attach the exact package names back to the products.')
                         </p>
                         <div class="form-group">
                             <label>@lang('Server Group')</label>
@@ -146,7 +146,7 @@
                             </select>
                         </div>
                         <small class="text-muted d-block">
-                            @lang('For cPanel, WHMLab creates WHM-safe package names automatically from the product slug or name.')
+                            @lang('For ZodPanel, WHMLab reads each plan description for storage, bandwidth, websites, email, databases, and backups, then syncs those limits to the node. DNS and SSL are automated during account provisioning when public DNS points to the node.')
                         </small>
                     </div>
                     <div class="modal-footer">

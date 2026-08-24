@@ -5952,20 +5952,20 @@ body:has(.whm-auth-shell) {
   }
 }
 
-/* Client area concept reset: centered auth, quiet workspace, dark rail */
+/* Client area concept reset: centered auth, quiet workspace, sleek light rail */
 :root {
-  --studio-bg: #f6f7f4;
-  --studio-rail: #101820;
-  --studio-rail-2: #17212b;
+  --studio-bg: #f8fafc;
+  --studio-rail: #ffffff;
+  --studio-rail-2: #f1f5f9;
   --studio-panel: #ffffff;
-  --studio-ink: #111827;
-  --studio-text: #4b5565;
-  --studio-muted: #7b8494;
-  --studio-line: rgba(17, 24, 39, 0.1);
-  --studio-blue: #2251d1;
-  --studio-teal: #0f766e;
-  --studio-gold: #b7791f;
-  --studio-shadow: 0 16px 36px rgba(16, 24, 32, 0.08);
+  --studio-ink: #0f172a;
+  --studio-text: #334155;
+  --studio-muted: #64748b;
+  --studio-line: rgba(15, 23, 42, 0.08);
+  --studio-blue: #4f46e5;
+  --studio-teal: #0284c7;
+  --studio-gold: #d97706;
+  --studio-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
 body:has(.whm-auth-shell) {
@@ -6113,33 +6113,31 @@ body:has(.whm-auth-shell) {
   background: var(--studio-rail-2) !important;
 }
 
-/* ── Barlow Condensed Typography Weights & Spacing (Lighter & Clean) ── */
-body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title {
-  font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.03em !important;
+/* ── Modern Tech Typography Weights & Spacing ($70K+ Caliber) ── */
+body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title, p, span, div, a {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
 }
 
-h1, h2, h3, h4, h5, h6, strong, b, .font-extrabold, .font-black, .font-bold, .fw-bold, .fw-semibold, .font-semibold {
-  font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.03em !important;
+h1, h2, h3, h4, h5, h6, .tw-brand-title, .whm-brand strong {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
+  letter-spacing: -0.025em !important;
 }
 
 /* ── Domain Page Cards, Badges & Pill Buttons Styling ── */
 .domain-card-box {
-  background-color: #141416 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
   border-radius: 16px !important;
   padding: 24px !important;
-  color: #ffffff !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 16px -2px rgba(15, 23, 42, 0.03) !important;
 }
 
 .tld-row-item {
   padding: 16px 0 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 1px solid #F1F5F9 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -6152,8 +6150,8 @@ h1, h2, h3, h4, h5, h6, strong, b, .font-extrabold, .font-black, .font-bold, .fw
 
 .btn-add-cart-pill {
   padding: 8px 24px !important;
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background-color: #4F46E5 !important;
+  border: 1px solid #4F46E5 !important;
   border-radius: 9999px !important;
   color: #ffffff !important;
   font-size: 13px !important;
@@ -6167,9 +6165,10 @@ h1, h2, h3, h4, h5, h6, strong, b, .font-extrabold, .font-black, .font-bold, .fw
 }
 
 .btn-add-cart-pill:hover {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
+  background-color: #4338CA !important;
+  color: #ffffff !important;
+  border-color: #4338CA !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
 }
 
 body:has(.whm-client-main) {
@@ -6204,24 +6203,23 @@ body:has(.whm-client-main) {
 
 .whm-client-sidebar .whm-sidebar-brand {
   min-height: 72px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   padding: 16px;
 }
 
-.whm-client-sidebar .whm-brand strong,
-.whm-client-sidebar .whm-brand small {
-  color: #ffffff !important;
+.whm-client-sidebar .whm-brand strong {
+  color: #0f172a !important;
 }
 
 .whm-client-sidebar .whm-brand small {
-  opacity: 0.58;
+  color: #4f46e5 !important;
 }
 
 .whm-client-sidebar .whm-brand-mark {
-  background: #ffffff !important;
-  color: var(--studio-rail) !important;
+  background: var(--gradient-brand) !important;
+  color: #ffffff !important;
   border-radius: 8px !important;
-  box-shadow: none !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
 }
 
 .whm-client-sidebar .whm-sidebar-nav {
@@ -6233,7 +6231,7 @@ body:has(.whm-client-main) {
 }
 
 .whm-client-sidebar .whm-nav-group p {
-  color: rgba(255, 255, 255, 0.42) !important;
+  color: #94a3b8 !important;
   font-size: 10px;
   letter-spacing: 0.1em;
   margin: 0 10px 7px;
@@ -6243,29 +6241,30 @@ body:has(.whm-client-main) {
   min-height: 40px;
   border: 0 !important;
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.72) !important;
+  color: #475569 !important;
   padding: 9px 10px;
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .whm-client-sidebar .whm-nav-item svg {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: #64748b !important;
 }
 
 .whm-client-sidebar .whm-nav-item:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #ffffff !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
   box-shadow: none !important;
 }
 
 .whm-client-sidebar .whm-nav-item.active {
-  background: #ffffff !important;
-  color: var(--studio-rail) !important;
+  background: rgba(79, 70, 229, 0.08) !important;
+  color: #4f46e5 !important;
+  font-weight: 700 !important;
 }
 
 .whm-client-sidebar .whm-nav-item.active svg {
-  color: var(--studio-blue) !important;
+  color: #4f46e5 !important;
 }
 
 .whm-client-sidebar .whm-nav-subitem {
@@ -6273,31 +6272,30 @@ body:has(.whm-client-main) {
 }
 
 .whm-client-sidebar .whm-nav-subitem b {
-  background: rgba(255, 255, 255, 0.13);
-  color: #ffffff;
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .whm-client-sidebar .whm-nav-subitem.active b {
-  background: #e9eefc;
-  color: var(--studio-blue);
+  background: #e0e7ff;
+  color: #4338ca;
 }
 
 .whm-sidebar-user {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f8fafc;
 }
 
-.whm-sidebar-user strong,
-.whm-sidebar-user span {
-  color: #ffffff !important;
+.whm-sidebar-user strong {
+  color: #0f172a !important;
 }
 
 .whm-sidebar-user span {
-  opacity: 0.55;
+  color: #64748b !important;
 }
 
 .whm-sidebar-user a {
-  color: rgba(255, 255, 255, 0.72) !important;
+  color: #475569 !important;
 }
 
 .whm-client-main {

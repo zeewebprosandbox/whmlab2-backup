@@ -8,8 +8,8 @@
         $checkoutPayable = $cartTotal + $taxAmount;
         $canPayWithBalance = auth()->check() && gs('deposit_module') && auth()->user()->balance >= $checkoutPayable;
     @endphp
-    <div class="col-lg-9">
-        <div class="row g-3">
+    <div class="col-12 max-w-6xl mx-auto py-6 font-sans">
+        <div class="row g-4">
             <div class="col-lg-8">
                 <h4>@lang('Cart')</h4>
                 @forelse($carts as $cart)

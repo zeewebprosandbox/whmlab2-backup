@@ -74,9 +74,11 @@ body {
     font-family: var(--body-font);
     background-color: hsl(var(--light)) !important;
 }
-.text-bold{
+
+.text-bold {
     font-weight: 500;
 }
+
 p {
     margin: 0;
     padding: 0;
@@ -851,6 +853,7 @@ h6 {
     pointer-events: inherit;
     cursor: no-drop !important;
 }
+
 .btn--dark:hover {
     color: hsl(var(--white));
     background-color: hsl(var(--dark) / 0.9);
@@ -3034,7 +3037,7 @@ body {
 
 .disabled {
     cursor: no-drop;
-} 
+}
 
 .announcements .announcement article {
     margin-bottom: 1rem;
@@ -3128,7 +3131,7 @@ body {
 }
 
 .widgets-icons-2 i {
-    color: #4634ff;
+    color: #e10000;
 }
 
 .custom-border-top-success {
@@ -3144,7 +3147,7 @@ body {
 }
 
 .custom-border-top-primary {
-    border-top: 3px #4634ff solid;
+    border-top: 3px #e10000 solid;
 }
 
 .has-anchor {
@@ -3860,17 +3863,19 @@ button .spinner-border {
     border: 1px solid hsl(var(--base));
 }
 
-.login-or{
+.login-or {
     position: relative;
     padding: 12px 0px;
 }
-.login-or span{
+
+.login-or span {
     padding: 4px 10px;
     background-color: hsl(var(--white));
     z-index: 1;
     font-weight: 500;
 }
-.login-or:before{
+
+.login-or:before {
     position: absolute;
     content: '';
     width: 100%;
@@ -3887,170 +3892,171 @@ button .spinner-border {
 
 /* ////////////////// select 2 css //////////////// */
 .select2-dropdown {
-	border: 0 !important;
-	margin-top: 8px !important;
-	border-radius: 5px !important;
-	box-shadow: 0 3px 9px rgba(50, 50, 9, 0.05), 6px 4px 19px rgb(115 103 240 / 20%)
+    border: 0 !important;
+    margin-top: 8px !important;
+    border-radius: 5px !important;
+    box-shadow: 0 3px 9px rgba(50, 50, 9, 0.05), 6px 4px 19px rgb(115 103 240 / 20%)
 }
 
 .select2-search--dropdown {
-	padding: 10px 10px !important;
-	border-color: #ced4da !important;
+    padding: 10px 10px !important;
+    border-color: #ced4da !important;
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field {
-	border-color: #eaeaea !important;
-	padding: 10px 20px;
-	background: transparent !important;
-	color: hsl(var(--white)) !important;
-	border-radius: 4px;
+    border-color: #eaeaea !important;
+    padding: 10px 20px;
+    background: transparent !important;
+    color: hsl(var(--white)) !important;
+    border-radius: 4px;
 }
 
 .select2-results__option.select2-results__option--selected,
 .select2-results__option--selectable,
 .select2-container--default .select2-results__option--disabled {
-	padding: 12px 14px !important;
-	border-bottom: 1px solid #eee;
+    padding: 12px 14px !important;
+    border-bottom: 1px solid #eee;
 }
 
 .select2-results__option.select2-results__message {
-	text-align: center !important;
-	padding: 12px 14px !important;
+    text-align: center !important;
+    padding: 12px 14px !important;
 }
 
 .select2-container--default .select2-results>.select2-results__options::-webkit-scrollbar {
-	width: 8px;
-	border-radius: 5px;
+    width: 8px;
+    border-radius: 5px;
 }
 
 .select2-container--default .select2-results>.select2-results__options::-webkit-scrollbar-track {
-	background: #f1f1f1;
-	border-radius: 5px;
+    background: #f1f1f1;
+    border-radius: 5px;
 }
 
 .select2-container--default .select2-results>.select2-results__options::-webkit-scrollbar-thumb {
-	background: #ddd;
+    background: #ddd;
 }
 
 .select2-container--default .select2-results>.select2-results__options::-webkit-scrollbar-thumb:hover {
-	background: #ddd;
+    background: #ddd;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow b {
-	display: none;
+    display: none;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow:after {
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	content: "\f107";
-	font-family: "Line Awesome Free";
-	font-weight: 900;
-	transition: .3s;
-	transform: translateY(-50%);
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    content: "\f107";
+    font-family: "Line Awesome Free";
+    font-weight: 900;
+    transition: .3s;
+    transform: translateY(-50%);
 }
 
 .selection {
-	width: 100%;
+    width: 100%;
 }
 
 .select2-selection.select2-selection--single {
-	background: hsl(var(--base-two));
-	border-color: #eaeaea !important;
-	color: hsl(var(--dark));
-	padding: .375rem .75rem !important;
-	line-height: 1.2;
-	height: 45px !important;
+    background: hsl(var(--base-two));
+    border-color: #eaeaea !important;
+    color: hsl(var(--dark));
+    padding: .375rem .75rem !important;
+    line-height: 1.2;
+    height: 45px !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-	height: 45px !important;
+    height: 45px !important;
 }
 
 .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow:after {
-	content: "\f106";
+    content: "\f106";
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-	color: hsl(var(--dark)/.7) !important;
-	line-height: 32px !important;
+    color: hsl(var(--dark)/.7) !important;
+    line-height: 32px !important;
 }
 
 .select2-results__option:last-child {
-	border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .select2-results__option:first-child {
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .select2-results__option.select2-results__option--selected,
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-	background-color: #f1f1f1 !important;
-	color: #000 !important;
+    background-color: #f1f1f1 !important;
+    color: #000 !important;
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-	outline: 0 !important;
+    outline: 0 !important;
 }
 
 .select2-dropdown .country-flag {
-	width: 25px;
-	height: 25px;
-	border-radius: 8px;
+    width: 25px;
+    height: 25px;
+    border-radius: 8px;
 }
 
 .select2-dropdown {
-	background-color: #fff !important;
+    background-color: #fff !important;
 }
 
 .select2-dropdown .gateway-title {
-	font-size: 14px;
-	font-weight: 600;
-	margin-bottom: 0px !important;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 0px !important;
 }
 
 .select2-dropdown .gateway-subtitle {
-	font-size: 12px;
-	margin-bottom: 0px !important;
+    font-size: 12px;
+    margin-bottom: 0px !important;
 }
 
 .select2-container--open .select2-selection.select2-selection--single,
 .select2-container--open .select2-selection.select2-selection--multiple {
-	border-color: rgba(255, 88, 81, 0.7) !important;
-	border-radius: .375rem !important;
+    border-color: rgba(255, 88, 81, 0.7) !important;
+    border-radius: .375rem !important;
 }
 
 .select2-results__option.select2-results__option--selected,
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-	background-color: hsl(var(--dark) / 0.04) !important;
-	color: hsl(var(--dark)) !important;
+    background-color: hsl(var(--dark) / 0.04) !important;
+    color: hsl(var(--dark)) !important;
 }
 
 .select2-results__option.select2-results__option--selected,
 .select2-results__option--selectable,
 .select2-container--default .select2-results__option--disabled {
-	border: 1px solid hsl(var(--dark)/.1) !important;
+    border: 1px solid hsl(var(--dark)/.1) !important;
 }
 
 .select2 .dropdown-wrapper {
-	display: none;
+    display: none;
 }
 
 .select2-container:has(.select2-selection--single) {
-	width: 100% !important;
+    width: 100% !important;
 }
 
-.select2-results__option.select2-results__option--selected, .select2-results__option--selectable, .select2-container--default .select2-results__option--disabled{
+.select2-results__option.select2-results__option--selected,
+.select2-results__option--selectable,
+.select2-container--default .select2-results__option--disabled {
     border-bottom: none !important;
 }
 
 
-.notification-alert .card-header{
+.notification-alert .card-header {
     background-color: hsl(var(--dark)) !important;
     color: hsl(var(--white));
-} 
-
+}

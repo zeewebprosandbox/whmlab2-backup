@@ -167,37 +167,27 @@
 
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 @lang('Email Verification')
-                                @if($user->ev)
-                                    <span class="badge badge--success">@lang('Verified')</span>
-                                @else
-                                    <span class="badge badge--warning">@lang('Unverified')</span>
-                                @endif
+                                <button type="button" class="btn btn-xs btn-detail-toggle {{ $user->ev ? 'btn--success' : 'btn--danger' }}" data-field="ev" data-value="{{ $user->ev ? 0 : 1 }}">
+                                    <i class="las la-{{ $user->ev ? 'check' : 'times' }}"></i> {{ $user->ev ? __('Verified') : __('Unverified') }}
+                                </button>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 @lang('Mobile Verification')
-                                @if($user->sv)
-                                    <span class="badge badge--success">@lang('Verified')</span>
-                                @else
-                                    <span class="badge badge--warning">@lang('Unverified')</span>
-                                @endif
+                                <button type="button" class="btn btn-xs btn-detail-toggle {{ $user->sv ? 'btn--success' : 'btn--warning' }}" data-field="sv" data-value="{{ $user->sv ? 0 : 1 }}">
+                                    <i class="las la-{{ $user->sv ? 'check' : 'times' }}"></i> {{ $user->sv ? __('Verified') : __('Unverified') }}
+                                </button>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 @lang('2FA Verification')
-                                @if($user->ts)
-                                    <span class="badge badge--success">@lang('Enabled')</span>
-                                @else
-                                    <span class="badge badge--warning">@lang('Disabled')</span>
-                                @endif
+                                <button type="button" class="btn btn-xs btn-detail-toggle {{ $user->ts ? 'btn--success' : 'btn--secondary' }}" data-field="ts" data-value="{{ $user->ts ? 0 : 1 }}">
+                                    <i class="las la-shield-alt"></i> {{ $user->ts ? __('Enabled') : __('Disabled') }}
+                                </button>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 @lang('KYC Status')
-                                @if($user->kv == 0)
-                                    <span class="badge badge--warning">@lang('Unverified')</span>
-                                @elseif($user->kv == 1)
-                                    <span class="badge badge--success">@lang('Verified')</span>
-                                @else
-                                    <span class="badge badge--danger">@lang('Pending')</span>
-                                @endif
+                                <button type="button" class="btn btn-xs btn-detail-toggle {{ $user->kv ? 'btn--success' : 'btn--dark' }}" data-field="kv" data-value="{{ $user->kv ? 0 : 1 }}">
+                                    <i class="las la-user-check"></i> {{ $user->kv ? __('Verified') : __('Unverified') }}
+                                </button>
                             </li>
 
                         </ul>
@@ -528,6 +518,46 @@
                 $('#information-tab').addClass('active');
                 $('#information').addClass('active show');
             }
+
+            $('.btn-detail-toggle').on('click', function() {
+                const btn = $(this);
+                const field = btn.data('field');
+                const nextVal = btn.data('value');
+
+                btn.prop('disabled', true).addClass('opacity-50');
+
+                $.ajax({
+                    url: "{{ route('admin.users.quick.toggle', $user->id) }}",
+                    method: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        field: field,
+                        value: nextVal
+                    },
+                    success: function(res) {
+                        btn.prop('disabled', false).removeClass('opacity-50');
+                        if (res.success) {
+                            notify('success', res.message);
+                            const isVerified = (res.user[field] == 1);
+                            btn.data('value', isVerified ? 0 : 1);
+
+                            if (field === 'ts') {
+                                btn.removeClass('btn--success btn--secondary').addClass(isVerified ? 'btn--success' : 'btn--secondary');
+                                btn.html(`<i class="las la-shield-alt"></i> ${isVerified ? '@lang("Enabled")' : '@lang("Disabled")'}`);
+                            } else {
+                                btn.removeClass('btn--success btn--danger btn--warning btn--dark').addClass(isVerified ? 'btn--success' : (field === 'sv' ? 'btn--warning' : (field === 'kv' ? 'btn--dark' : 'btn--danger')));
+                                btn.html(`<i class="las la-${isVerified ? 'check' : 'times'}"></i> ${isVerified ? '@lang("Verified")' : '@lang("Unverified")'}`);
+                            }
+                        } else {
+                            notify('error', res.message || '@lang("Update failed")');
+                        }
+                    },
+                    error: function(xhr) {
+                        btn.prop('disabled', false).removeClass('opacity-50');
+                        notify('error', xhr.responseJSON ? xhr.responseJSON.message : '@lang("Server error")');
+                    }
+                });
+            });
         })(jQuery);
     </script>
 @endpush

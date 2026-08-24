@@ -1,5 +1,5 @@
 @php
-    $sideBarLinks = json_decode($sidenav);
+    $sideBarLinks = json_decode($sidenav ?? file_get_contents(resource_path('views/admin/partials/sidenav.json')));
 @endphp
 
 <div class="sidebar bg--dark">

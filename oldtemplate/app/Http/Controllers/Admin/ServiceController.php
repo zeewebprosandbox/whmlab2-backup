@@ -30,8 +30,15 @@ class ServiceController extends Controller{
         $accountSummary = @$execute['processed_data'];
         $product = $hosting->product; 
         $hasAccount = @$execute['raw_data'];
+        $zodPanelDiagnostics = null;
+        $zodPanelPhp = null;
 
-        return view('admin.service.hosting_details', compact('pageTitle', 'hosting', 'productDropdown', 'accountSummary', 'serverGroup', 'execute', 'product', 'hasAccount'));
+        if (@$serverGroup->type == 4 && $hasAccount) {
+            $zodPanelDiagnostics = $this->zodPanelAction($hosting, 'serviceDiagnostics');
+            $zodPanelPhp = $this->zodPanelAction($hosting, 'phpOptions');
+        }
+
+        return view('admin.service.hosting_details', compact('pageTitle', 'hosting', 'productDropdown', 'accountSummary', 'serverGroup', 'execute', 'product', 'hasAccount', 'zodPanelDiagnostics', 'zodPanelPhp'));
     }    
     
     public function hostingUpdate(Request $request){
@@ -196,18 +203,84 @@ class ServiceController extends Controller{
 
         $server = $hosting->server;
         $serverGroup = @$server->group; 
+        $targetServerId = $product->server_id ?: $hosting->server_id;
 
         $execute = HostingManager::init($serverGroup)->accountSummary($hosting);
         if(@$execute['raw_data']){
-            $notify[] = ['error', 'Already '.@$serverGroup->getType.' account exists on this hosting. Please terminate the account first.'];
+            if ($targetServerId != $hosting->server_id) {
+                $notify[] = ['error', 'This service already has a panel account. Move it only after terminating or migrating the account manually.'];
+                return back()->withNotify($notify);
+            }
+
+            $oldProductId = $hosting->product_id;
+            $oldServerId = $hosting->server_id;
+            $oldPackageName = $hosting->package_name;
+
+            $hosting->product_id = $productId;
+            $hosting->server_id = $targetServerId;
+            $hosting->save();
+            $hosting->load('product', 'server.group');
+
+            $changePackage = HostingManager::init($hosting->server->group)->changePackage($hosting);
+
+            if (!is_array($changePackage) || !@$changePackage['success']) {
+                $hosting->product_id = $oldProductId;
+                $hosting->server_id = $oldServerId;
+                $hosting->package_name = $oldPackageName;
+                $hosting->save();
+
+                $notify[] = ['error', @$changePackage['message'] ?: 'Panel package change failed'];
+                return back()->withNotify($notify);
+            }
+
+            $notify[] = ['success', @$changePackage['message'] ?: 'Product and panel package updated successfully'];
             return back()->withNotify($notify);
         }
 
         $hosting->product_id = $productId;
-        $hosting->server_id = $product->server_id;
+        $hosting->server_id = $targetServerId;
         $hosting->save();
 
         $notify[] = ['success', 'Your changes saved successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function zodPanelDiagnostics($id)
+    {
+        $hosting = Hosting::with('server.group')->findOrFail($id);
+        $execute = $this->zodPanelAction($hosting, 'serviceDiagnostics');
+
+        if (request()->expectsJson()) {
+            return response()->json($execute);
+        }
+
+        $notify[] = [@$execute['success'] ? 'success' : 'warning', @$execute['message'] ?: 'ZodPanel diagnostics refreshed'];
+        return back()->withNotify($notify);
+    }
+
+    public function repairZodPanelWebmail(Request $request, $id)
+    {
+        $hosting = Hosting::with('server.group')->findOrFail($id);
+        $execute = $this->zodPanelAction($hosting, 'repairWebmail', [
+            'create_mail_domain' => $request->boolean('create_mail_domain'),
+        ]);
+
+        $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'ZodPanel webmail repair completed'];
+        return back()->withNotify($notify);
+    }
+
+    public function changeZodPanelPhp(Request $request, $id)
+    {
+        $request->validate([
+            'template' => 'required|string|max:80',
+        ]);
+
+        $hosting = Hosting::with('server.group')->findOrFail($id);
+        $execute = $this->zodPanelAction($hosting, 'changeDomainPhp', [
+            'template' => $request->template,
+        ]);
+
+        $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'ZodPanel PHP runtime updated'];
         return back()->withNotify($notify);
     }
 
@@ -287,5 +360,32 @@ class ServiceController extends Controller{
         }
 
         return $changed;
+    }
+
+    private function zodPanelAction($hosting, string $method, array $payload = []): array
+    {
+        $serverGroup = @$hosting->server->group;
+
+        if (@$serverGroup->type != 4) {
+            return [
+                'success' => false,
+                'message' => 'This service is not connected to a ZodPanel server group',
+            ];
+        }
+
+        try {
+            $data = $payload ? array_merge(['hosting' => $hosting], $payload) : $hosting;
+            $execute = HostingManager::init($serverGroup)->{$method}($data);
+
+            return is_array($execute) ? $execute : [
+                'success' => false,
+                'message' => 'ZodPanel returned an invalid response',
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'success' => false,
+                'message' => 'ZodPanel action failed: ' . $exception->getMessage(),
+            ];
+        }
     }
 }

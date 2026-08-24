@@ -14,7 +14,7 @@ class DomainRegister extends Model
     protected $casts = ['params'=>'object'];
 
     public static function getDefault(){
-        return Self::default()->active()->first(); 
+        return Self::default()->active()->where('setup_done', 1)->first(); 
     }
 
     public function scopeActive($query){

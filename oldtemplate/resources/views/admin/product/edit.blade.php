@@ -82,7 +82,7 @@
                                             <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                                         </label> 
                                         <select name="package_name" class="form-control">
-                                            <option value="">@lang('Select One')</option>
+                                            <option value="">@lang('Auto-create from plan specs')</option>
                                             @foreach($packages as $id => $package)
                                                 @foreach($package as $packageName)
                                                     <option 
@@ -100,6 +100,9 @@
                                                 </option>
                                             @endif
                                         </select>
+                                        <small class="text-muted d-block mt-1">
+                                            @lang('For ZodPanel, leave this on auto to create or update a package from this product description.')
+                                        </small>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mt-2">
@@ -114,6 +117,119 @@
                                 </div>
                             </div>
                         </div> 
+
+                        @if((int) @$product->serverGroup->type === 4)
+                            @php
+                                $zodFeatureLabels = [
+                                    'file_manager' => 'File Manager',
+                                    'auto_dns' => 'Auto DNS',
+                                    'auto_ssl' => 'Auto SSL',
+                                    'force_https' => 'Force HTTPS',
+                                    'webmail' => 'Webmail',
+                                    'terminal' => 'Terminal',
+                                    'php_selector' => 'PHP Version Selector',
+                                    'nodejs' => 'Node.js Apps',
+                                    'python' => 'Python Apps',
+                                    'composer' => 'Composer',
+                                    'backups' => 'Backups',
+                                ];
+
+                                $zodLimitLabels = [
+                                    'disk_limit_mb' => ['label' => 'Disk Space', 'help' => 'MB'],
+                                    'bandwidth_limit_mb' => ['label' => 'Bandwidth', 'help' => 'MB'],
+                                    'cpu_quota' => ['label' => 'CPU Quota', 'help' => '100 = 1 vCPU'],
+                                    'cpu_quota_period' => ['label' => 'CPU Period', 'help' => 'Usually 100000'],
+                                    'memory_limit' => ['label' => 'Memory', 'help' => 'MB'],
+                                    'swap_limit' => ['label' => 'Swap', 'help' => 'MB'],
+                                    'web_domains' => ['label' => 'Web Domains', 'help' => 'Sites'],
+                                    'web_aliases' => ['label' => 'Web Aliases', 'help' => 'Aliases'],
+                                    'dns_domains' => ['label' => 'DNS Domains', 'help' => 'Zones'],
+                                    'dns_records' => ['label' => 'DNS Records', 'help' => 'Records'],
+                                    'mail_domains' => ['label' => 'Mail Domains', 'help' => 'Domains'],
+                                    'mail_accounts' => ['label' => 'Mail Accounts', 'help' => 'Accounts'],
+                                    'databases' => ['label' => 'Databases', 'help' => 'MySQL databases'],
+                                    'cron_jobs' => ['label' => 'Cron Jobs', 'help' => 'Jobs'],
+                                    'backups' => ['label' => 'Backups', 'help' => 'Restore points'],
+                                ];
+                            @endphp
+                            <div class="border-line-area style-two mt-4">
+                                <h5 class="border-line-title">@lang('ZodPanel Capability Blueprint')</h5>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="card border--primary my-2">
+                                    <div class="card-body">
+                                        <h6 class="mb-3">@lang('Feature Access')</h6>
+                                        <div class="row gy-3">
+                                            @foreach($zodFeatureLabels as $feature => $label)
+                                                @php $enabled = (bool) data_get($whmpanelBlueprint, "features.$feature", false); @endphp
+                                                <div class="col-xl-3 col-md-4 col-sm-6">
+                                                    <div class="zod-capability-box">
+                                                        <div>
+                                                            <span class="fw-bold d-block">{{ __($label) }}</span>
+                                                            <small class="text-muted">@lang('Enable or disable for this plan')</small>
+                                                        </div>
+                                                        <input
+                                                            type="checkbox"
+                                                            data-width="92"
+                                                            data-size="small"
+                                                            data-onstyle="-success"
+                                                            data-offstyle="-danger"
+                                                            data-bs-toggle="toggle"
+                                                            data-on="@lang('On')"
+                                                            data-off="@lang('Off')"
+                                                            name="zodpanel_features[{{ $feature }}]"
+                                                            value="1"
+                                                            @checked($enabled)
+                                                        >
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                        <h6 class="mb-3 mt-4">@lang('Capacity Limits')</h6>
+                                        <div class="row gy-3">
+                                            @foreach($zodLimitLabels as $limit => $meta)
+                                                @php
+                                                    $value = data_get($whmpanelBlueprint, "limits.$limit", 0);
+                                                    $isUnlimited = $value === 'unlimited';
+                                                @endphp
+                                                <div class="col-xl-4 col-md-6">
+                                                    <div class="zod-capacity-box">
+                                                        <div class="d-flex align-items-start justify-content-between gap-3">
+                                                            <div>
+                                                                <label class="fw-bold mb-1">{{ __($meta['label']) }}</label>
+                                                                <small class="text-muted d-block">{{ __($meta['help']) }}</small>
+                                                            </div>
+                                                            <label class="zod-unlimited-switch">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    class="zod-limit-unlimited"
+                                                                    name="zodpanel_limit_unlimited[{{ $limit }}]"
+                                                                    value="1"
+                                                                    @checked($isUnlimited)
+                                                                >
+                                                                <span>@lang('Unlimited')</span>
+                                                            </label>
+                                                        </div>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            class="form-control mt-2 zod-limit-value"
+                                                            name="zodpanel_limits[{{ $limit }}]"
+                                                            value="{{ $isUnlimited ? 0 : $value }}"
+                                                            @disabled($isUnlimited)
+                                                        >
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <small class="text-muted d-block mt-3">
+                                            @lang('Save this product, then sync packages to push these capacity limits and feature flags to ZodPanel.')
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="border-line-area style-two mt-4">
                             <h5 class="border-line-title">@lang('Others')</h5>
@@ -430,7 +546,33 @@
 
 @push('style')
     <style>
+        .zod-capability-box,
+        .zod-capacity-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            height: 100%;
+            padding: 14px;
+        }
 
+        .zod-capability-box {
+            align-items: center;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .zod-unlimited-switch {
+            align-items: center;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 6px;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .zod-unlimited-switch input {
+            margin: 0;
+        }
     </style>
 @endpush
    
@@ -564,6 +706,20 @@
                 return form.find('input[name=module_option]').prop({
                     'disabled': false
                 });
+            });
+
+            function toggleZodLimitInput(checkbox){
+                var limitBox = checkbox.closest('.zod-capacity-box');
+                var input = limitBox.find('.zod-limit-value');
+                input.prop('disabled', checkbox.is(':checked'));
+            }
+
+            form.find('.zod-limit-unlimited').each(function(){
+                toggleZodLimitInput($(this));
+            });
+
+            form.find('.zod-limit-unlimited').on('change', function(){
+                toggleZodLimitInput($(this));
             });
 
             var slugRule = /^[0-9a-zA-Z -]+$/; 

@@ -46,7 +46,7 @@ class Register{
 
 		// Case-insensitive lookup fallback to Namecheap to prevent Undefined array key errors
 		foreach ($methods as $key => $class) {
-			if (strcasecmp($key, (string)$alias) === 0) {
+			if (strcasecmp($key, $alias) === 0) {
 				return $class;
 			}
 		}
@@ -54,4 +54,6 @@ class Register{
 		return Namecheap::class;
 	}
 
+
 }
+

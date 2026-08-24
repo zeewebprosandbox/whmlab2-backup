@@ -219,7 +219,12 @@ class DomainModuleController extends Controller{
         $contactInfo = $execute['response'];
         $countries = json_decode(file_get_contents(resource_path('views/partials/country.json')));
 
-        return view('admin.service.domain_contact.'.$domain->register->alias, compact('pageTitle', 'domain', 'contactInfo', 'countries'));
+        $view = 'admin.service.domain_contact.'.$domain->register->alias;
+        if (!view()->exists($view)) {
+            $view = 'admin.service.domain_contact.Resell';
+        }
+
+        return view($view, compact('pageTitle', 'domain', 'contactInfo', 'countries'));
     } 
 
 

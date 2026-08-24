@@ -10,6 +10,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\UpdatePermissions::class,
         Commands\CreateRolePermission::class,
+        Commands\PushZodPanelVersion::class,
+        Commands\PullLiveZodPanelCustom::class,
     ];
     
     /**

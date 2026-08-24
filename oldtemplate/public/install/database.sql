@@ -420,7 +420,12 @@ CREATE TABLE `domain_registers` (
 
 INSERT INTO `domain_registers` (`id`, `name`, `alias`, `ns1`, `ns2`, `ns3`, `ns4`, `params`, `test_mode`, `default`, `status`, `setup_done`, `created_at`, `updated_at`) VALUES
 (1, 'Namecheap', 'Namecheap', 'ns1.nc.com', 'ns2.nc.com', 'ns3.nc.com', 'ns4.nc.com', '{\"username\":{\"title\":\"Username\",\"value\":\"...\"},\"sandbox_username\":{\"title\":\"Sandbox Username <br\\/><code>(This will be used only if you set the test mode on)<\\/code>\",\"value\":\"...\",\"test_mode\":true},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"...\"}}', 1, 0, 1, 1, NULL, '2023-01-31 12:50:10'),
-(4, 'Resell Biz', 'Resell', 'ns1.rb.com', 'ns2.rb.com', 'ns3.rb.com', 'ns4.rb.com', '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"...\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"...\"}}', 1, 1, 1, 1, NULL, '2023-02-04 10:09:02');
+(4, 'Resell Biz', 'Resell', 'ns1.rb.com', 'ns2.rb.com', 'ns3.rb.com', 'ns4.rb.com', '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"...\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"...\"}}', 1, 1, 1, 1, NULL, '2023-02-04 10:09:02'),
+(5, 'NameSilo', 'NameSilo', 'ns1.dnsowl.com', 'ns2.dnsowl.com', 'ns3.dnsowl.com', NULL, '{\"api_key\":{\"title\":\"API Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
+(6, 'ResellerClub', 'ResellerClub', 'ns1.resellerclub.com', 'ns2.resellerclub.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
+(7, 'NetEarthOne', 'NetEarthOne', 'ns1.netearthone.com', 'ns2.netearthone.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
+(8, 'LogicBoxes', 'LogicBoxes', 'ns1.logicboxes.com', 'ns2.logicboxes.com', NULL, NULL, '{\"auth_user_id\":{\"title\":\"Auth User Id (Reseller ID)\",\"required\":true,\"value\":\"\"},\"api_key\":{\"title\":\"Api Key\",\"required\":true,\"value\":\"\"}}', 1, 0, 0, 0, NULL, NULL),
+(9, 'Porkbun', 'Porkbun', 'curitiba.ns.porkbun.com', 'fortaleza.ns.porkbun.com', 'maceio.ns.porkbun.com', 'salvador.ns.porkbun.com', '{\"api_key\":{\"title\":\"API Key\",\"required\":true,\"value\":\"\"},\"secret_api_key\":{\"title\":\"Secret API Key\",\"required\":true,\"value\":\"\"}}', 0, 0, 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1359,6 +1364,8 @@ CREATE TABLE `servers` (
   `server_group_id` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `name` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
+  `service_role` varchar(40) NOT NULL DEFAULT 'any',
+  `location` varchar(120) DEFAULT NULL,
   `hostname` varchar(255) NOT NULL,
   `protocol` varchar(45) DEFAULT NULL,
   `port` varchar(45) DEFAULT NULL,
@@ -1366,6 +1373,15 @@ CREATE TABLE `servers` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `ip_address` varchar(255) DEFAULT NULL,
+  `max_accounts` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `current_accounts` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `health_status` varchar(30) NOT NULL DEFAULT 'unknown',
+  `health_message` varchar(255) DEFAULT NULL,
+  `health_checked_at` timestamp NULL DEFAULT NULL,
+  `deployment_status` varchar(40) NOT NULL DEFAULT 'manual',
+  `deployment_version` varchar(120) DEFAULT NULL,
+  `deployment_log` longtext DEFAULT NULL,
+  `last_deployed_at` timestamp NULL DEFAULT NULL,
   `api_token` text NOT NULL,
   `security_token` varchar(255) NOT NULL,
   `ns1` varchar(255) NOT NULL,
@@ -2041,7 +2057,7 @@ ALTER TABLE `domain_pricings`
 -- AUTO_INCREMENT for table `domain_registers`
 --
 ALTER TABLE `domain_registers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `domain_setups`

@@ -135,7 +135,7 @@ ul li {
 }
 
 .installation-wrapper {
-    background: #071251;
+    background: #000000;
     border-radius: 10px;
     margin-bottom: 40px;
 }
@@ -510,7 +510,7 @@ a {
 }
 
 .bg--dark {
-    background-color: #071251 !important;
+    background-color: #000000 !important;
 }
 
 .passed-btn {
@@ -722,27 +722,30 @@ input::placeholder {
     content: "\2716";
 }
 
-.review-alert{
+.review-alert {
     padding: 0 200px;
 }
 
 @media (max-width: 1399px) {
-    .review-alert{
+    .review-alert {
         padding: 0 150px;
     }
 }
+
 @media (max-width: 1199px) {
-    .review-alert{
+    .review-alert {
         padding: 0 100px;
     }
 }
+
 @media (max-width: 991px) {
-    .review-alert{
+    .review-alert {
         padding: 0 40px;
     }
 }
+
 @media (max-width: 991px) {
-    .review-alert{
+    .review-alert {
         padding: 0 10px;
     }
 }

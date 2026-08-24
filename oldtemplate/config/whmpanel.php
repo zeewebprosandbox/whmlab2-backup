@@ -3,7 +3,7 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | WHMPanel Control Panel Domain
+    | ZodPanel Control Panel Domain
     |--------------------------------------------------------------------------
     |
     | Set this to a full hostname such as panel.example.com to serve the

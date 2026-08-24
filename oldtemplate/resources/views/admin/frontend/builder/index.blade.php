@@ -391,7 +391,7 @@
         }
 
         .cog-btn:hover i {
-            color: #4634ff !important
+            color: #e10000 !important
         }
 
         .simple_with_drop .remove-icon {
@@ -467,7 +467,7 @@
         }
 
         #page_sections.dropping {
-            border: 2px solid #4634FF;
+            border: 2px solid #e10000;
             border-radius: 10px;
             border: 2px dotted #ccc !important;
             padding: 0 1rem !important;

@@ -1,16 +1,16 @@
 @extends($activeTemplate . 'layouts.side_bar')
 
 @section('data')
-    <div class="col-lg-12 space-y-6 text-white font-sans">
+    <div class="col-lg-12 space-y-6 text-slate-900 font-sans">
 
         <!-- Domain Search Banner Card -->
-        <div class="domain-card-box p-6 bg-[#141416] border border-white/10 rounded-2xl space-y-4 shadow-xl">
+        <div class="domain-card-box p-6 bg-white border border-slate-200/80 rounded-2xl space-y-4 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h1 class="text-xl font-bold text-white tracking-tight" style="color: #ffffff !important; font-size: 20px !important;">@lang('Domain Search & Availability')</h1>
-                    <p class="text-xs text-neutral-400 mt-0.5" style="color: #a3a3a3 !important; font-size: 12px !important;">@lang('Enter a domain name or brand to search live availability and claim your name.')</p>
+                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight font-display">@lang('Domain Search & Availability')</h1>
+                    <p class="text-xs text-slate-500 mt-0.5">@lang('Enter a domain name or brand to search live availability and claim your name.')</p>
                 </div>
-                <a href="{{ route('shopping.cart') }}" class="btn-add-cart-pill px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-medium rounded-full transition-all flex items-center gap-2 self-start sm:self-auto">
+                <a href="{{ route('shopping.cart') }}" class="btn-add-cart-pill px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-full transition-all flex items-center gap-2 self-start sm:self-auto shadow-xs">
                     <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
                     <span>@lang('View Cart')</span>
                 </a>
@@ -19,10 +19,10 @@
             <!-- Search Form Bar -->
             <form action="{{ route('register.domain') }}" method="GET" class="flex flex-col sm:flex-row items-stretch gap-2">
                 <div class="relative flex-1">
-                    <i data-lucide="search" class="w-4 h-4 text-neutral-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
-                    <input type="text" name="domain" value="{{ $searchDomain }}" placeholder="@lang('Type domain or keyword (e.g. shpayco.com, mybrand.store)')" class="w-full bg-[#1C1C1F] border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white font-mono text-sm placeholder:text-neutral-500 focus:outline-none focus:border-indigo-500 transition-all" style="background-color: #1c1c1f !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.15) !important;">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" name="domain" value="{{ $searchDomain }}" placeholder="@lang('Type domain or keyword (e.g. shpayco.com, mybrand.store)')" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-slate-900 font-mono text-sm placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all">
                 </div>
-                <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow-glow-accent transition-all flex items-center justify-center gap-2" style="background-color: #4f46e5 !important; color: #ffffff !important; border-radius: 12px !important;">
+                <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-2">
                     <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
                     <span>@lang('Search Domain')</span>
                 </button>
@@ -30,22 +30,22 @@
         </div>
 
         @if($primaryResult)
-            <!-- Top Primary Search Result Card (Reference Top Box Design) -->
-            <div class="domain-card-box p-6 bg-[#141416] border {{ $primaryResult['available'] ? 'border-white/20' : 'border-rose-500/30' }} rounded-2xl shadow-xl transition-all" style="background-color: #141416 !important; border: 1px solid rgba(255,255,255,0.15) !important; border-radius: 16px !important; padding: 24px !important;">
+            <!-- Top Primary Search Result Card -->
+            <div class="domain-card-box p-6 bg-white border {{ $primaryResult['available'] ? 'border-indigo-200' : 'border-rose-200' }} rounded-2xl shadow-sm transition-all">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <!-- Left: Domain Name + Savings Badge -->
                     <div class="flex items-center gap-3 flex-wrap">
-                        <h2 class="text-2xl font-bold font-sans text-white tracking-tight" style="color: #ffffff !important; font-size: 24px !important; font-weight: 700 !important;">{{ $primaryResult['domain'] }}</h2>
+                        <h2 class="text-2xl font-extrabold font-sans text-slate-900 tracking-tight">{{ $primaryResult['domain'] }}</h2>
                         @if($primaryResult['available'])
-                            <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold tracking-wide" style="background-color: rgba(99,102,241,0.2) !important; color: #a5b4fc !important; border: 1px solid rgba(99,102,241,0.3) !important; border-radius: 9999px !important; padding: 4px 12px !important; font-size: 12px !important;">
+                            <span class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-semibold tracking-wide">
                                 @lang('Save 60%')
                             </span>
-                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-medium flex items-center gap-1" style="color: #34d399 !important;">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 orb-pulse"></span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-[11px] font-medium flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 orb-pulse"></span>
                                 @lang('Available')
                             </span>
                         @else
-                            <span class="px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold" style="color: #fb7185 !important;">
+                            <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100 text-xs font-semibold">
                                 @lang('Already Taken')
                             </span>
                         @endif
@@ -55,18 +55,18 @@
                     @if($primaryResult['available'])
                         <div class="flex items-center gap-4 self-end sm:self-center">
                             <div class="text-right">
-                                <div class="text-xs text-neutral-400 line-through font-mono" style="color: #a3a3a3 !important; text-decoration: line-through !important;">
+                                <div class="text-xs text-slate-400 line-through font-mono">
                                     {{ showAmount($primaryResult['pricing']['renew'] ?? ($primaryResult['pricing']['price'] * 1.5)) }}
                                 </div>
-                                <div class="text-xl font-bold text-white font-sans" style="color: #ffffff !important; font-size: 20px !important; font-weight: 700 !important;">
-                                    {{ showAmount($primaryResult['pricing']['price']) }}<span class="text-xs font-normal text-neutral-400" style="color: #a3a3a3 !important; font-size: 12px !important;">/1st yr</span>
+                                <div class="text-xl font-extrabold text-slate-900 font-sans">
+                                    {{ showAmount($primaryResult['pricing']['price']) }}<span class="text-xs font-normal text-slate-500">/1st yr</span>
                                 </div>
                             </div>
                             <form action="{{ route('shopping.cart.add.domain') }}" method="POST" class="inline">
                                 @csrf
                                 <input type="hidden" name="domain" value="{{ $primaryResult['domain'] }}">
                                 <input type="hidden" name="domain_setup_id" value="{{ @$primaryResult['pricing']['setup']->id }}">
-                                <button type="submit" class="btn-add-cart-pill px-6 py-2.5 bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white font-semibold text-xs rounded-full transition-all">
+                                <button type="submit" class="btn-add-cart-pill px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-full transition-all shadow-sm">
                                     @lang('Add to cart')
                                 </button>
                             </form>
@@ -77,29 +77,29 @@
 
             <!-- "More options" Section Title & Filter Pills -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-xl font-bold text-white tracking-tight" style="color: #ffffff !important; font-size: 20px !important; font-weight: 700 !important;">@lang('More options')</h3>
+                <h3 class="text-xl font-bold text-slate-900 tracking-tight font-display">@lang('More options')</h3>
 
                 <!-- Category Filter Tabs -->
                 <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white text-black font-semibold shadow transition-all" data-category="all" style="background-color: #ffffff !important; color: #000000 !important; border-radius: 9999px !important; padding: 6px 16px !important; font-weight: 600 !important;">
+                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-indigo-600 text-white font-semibold shadow-xs transition-all" data-category="all">
                         @lang('Popular')
                     </button>
-                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 font-medium transition-all" data-category="tech" style="background-color: rgba(255,255,255,0.05) !important; color: #d4d4d4 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 9999px !important; padding: 6px 16px !important;">
+                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-medium transition-all" data-category="tech">
                         @lang('Technology')
                     </button>
-                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 font-medium transition-all" data-category="business" style="background-color: rgba(255,255,255,0.05) !important; color: #d4d4d4 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 9999px !important; padding: 6px 16px !important;">
+                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-medium transition-all" data-category="business">
                         @lang('Business')
                     </button>
-                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 font-medium transition-all" data-category="international" style="background-color: rgba(255,255,255,0.05) !important; color: #d4d4d4 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 9999px !important; padding: 6px 16px !important;">
+                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-medium transition-all" data-category="international">
                         @lang('International')
                     </button>
-                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-neutral-300 font-medium transition-all" data-category="all" style="background-color: rgba(255,255,255,0.05) !important; color: #d4d4d4 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 9999px !important; padding: 6px 16px !important;">
+                    <button type="button" class="tld-filter-tab px-4 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-medium transition-all" data-category="all">
                         @lang('All')
                     </button>
                 </div>
 
-                <!-- Straight Line Options List Container (Reference Image Layout) -->
-                <div class="domain-card-box bg-[#141416] border border-white/10 rounded-2xl p-4 sm:p-6" style="background-color: #141416 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 16px !important; padding: 24px !important;">
+                <!-- Suggestions List Container -->
+                <div class="domain-card-box bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-6 shadow-sm">
                     @php
                         $allSuggestions = array_merge($tldSuggestions, $variantSuggestions);
                         $discountPercentages = [89, 57, 18, 97, 50, 75, 65, 40, 80, 70];
@@ -110,26 +110,26 @@
                             $discount = $discountPercentages[$idx % count($discountPercentages)];
                             $origPrice = showAmount($item['pricing']['renew'] ?? ($item['pricing']['price'] * 1.8));
                         @endphp
-                        <div class="tld-row-item py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style="padding: 16px 0 !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; display: flex !important; align-items: center !important; justify-content: space-between !important;">
+                        <div class="tld-row-item py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 last:border-0">
                             <!-- Left: Domain Name + Discount Badge -->
-                            <div class="flex items-center gap-3 flex-wrap" style="display: flex !important; align-items: center !important; gap: 12px !important;">
-                                <span class="text-base font-bold font-sans text-white tracking-tight" style="color: #ffffff !important; font-size: 16px !important; font-weight: 700 !important;">{{ $item['domain'] }}</span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold" style="background-color: rgba(99,102,241,0.2) !important; color: #a5b4fc !important; border: 1px solid rgba(99,102,241,0.3) !important; border-radius: 9999px !important; padding: 2px 10px !important; font-size: 11px !important;">
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <span class="text-base font-bold font-sans text-slate-900 tracking-tight">{{ $item['domain'] }}</span>
+                                <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-semibold">
                                     @lang('Save') {{ $discount }}%
                                 </span>
                             </div>
 
                             <!-- Right: Pricing & Add to Cart Button -->
-                            <div class="flex items-center gap-4 self-end sm:self-center" style="display: flex !important; align-items: center !important; gap: 16px !important;">
-                                <div class="text-right" style="text-align: right !important;">
-                                    <span class="text-xs text-neutral-400 line-through font-mono me-1.5" style="color: #a3a3a3 !important; text-decoration: line-through !important; font-size: 12px !important; margin-right: 6px !important;">{{ $origPrice }}</span>
-                                    <span class="text-base font-bold text-white font-sans" style="color: #ffffff !important; font-size: 16px !important; font-weight: 700 !important;">{{ showAmount($item['pricing']['price']) }}<span class="text-xs font-normal text-neutral-400" style="color: #a3a3a3 !important; font-size: 12px !important;">/1st yr</span></span>
+                            <div class="flex items-center gap-4 self-end sm:self-center">
+                                <div class="text-right">
+                                    <span class="text-xs text-slate-400 line-through font-mono me-1.5">{{ $origPrice }}</span>
+                                    <span class="text-base font-bold text-slate-900 font-sans">{{ showAmount($item['pricing']['price']) }}<span class="text-xs font-normal text-slate-500">/1st yr</span></span>
                                 </div>
-                                <form action="{{ route('shopping.cart.add.domain') }}" method="POST" class="inline" style="display: inline !important;">
+                                <form action="{{ route('shopping.cart.add.domain') }}" method="POST" class="inline">
                                     @csrf
                                     <input type="hidden" name="domain" value="{{ $item['domain'] }}">
                                     <input type="hidden" name="domain_setup_id" value="{{ @$item['pricing']['setup']->id }}">
-                                    <button type="submit" class="btn-add-cart-pill px-5 py-2 bg-white/10 hover:bg-white hover:text-black border border-white/20 text-white font-semibold text-xs rounded-full transition-all">
+                                    <button type="submit" class="btn-add-cart-pill px-5 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-full transition-all">
                                         @lang('Add to cart')
                                     </button>
                                 </form>
@@ -140,11 +140,11 @@
             </div>
         @endif
 
-        <!-- Full TLD Pricing Directory (Straight Line List Container) -->
+        <!-- Full TLD Pricing Directory -->
         <div class="space-y-4 pt-4">
-            <h3 class="text-xl font-bold text-white tracking-tight" style="color: #ffffff !important; font-size: 20px !important; font-weight: 700 !important;">@lang('All Domain Extensions & Rates')</h3>
+            <h3 class="text-xl font-bold text-slate-900 tracking-tight font-display">@lang('All Domain Extensions & Rates')</h3>
 
-            <div class="domain-card-box bg-[#141416] border border-white/10 rounded-2xl p-4 sm:p-6" style="background-color: #141416 !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 16px !important; padding: 24px !important;">
+            <div class="domain-card-box bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-6 shadow-sm">
                 @foreach($domainSetups as $setup)
                     @php
                         $pricing = $setup->pricing;
@@ -152,20 +152,20 @@
                         $regPrice = isset($firstPrice['price']) ? $firstPrice['price'] : 12.99;
                         $renewPrice = $pricing && isset($pricing->one_year_renew) && $pricing->one_year_renew >= 0 ? $pricing->one_year_renew : $regPrice;
                     @endphp
-                    <div class="tld-row-item py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style="padding: 14px 0 !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; display: flex !important; align-items: center !important; justify-content: space-between !important;">
-                        <div class="flex items-center gap-3" style="display: flex !important; align-items: center !important; gap: 12px !important;">
-                            <span class="text-base font-bold font-sans text-white tracking-tight" style="color: #ffffff !important; font-size: 16px !important; font-weight: 700 !important;">.{{ ltrim($setup->extension, '.') }}</span>
-                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-medium" style="color: #34d399 !important;">
+                    <div class="tld-row-item py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 last:border-0">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base font-bold font-sans text-slate-900 tracking-tight">.{{ ltrim($setup->extension, '.') }}</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-medium">
                                 @lang('Free ID Protection')
                             </span>
                         </div>
 
-                        <div class="flex items-center gap-4 self-end sm:self-center" style="display: flex !important; align-items: center !important; gap: 16px !important;">
-                            <div class="text-right" style="text-align: right !important;">
-                                <span class="text-xs text-neutral-400 me-2" style="color: #a3a3a3 !important; font-size: 12px !important; margin-right: 8px !important;">@lang('Renew'): {{ showAmount($renewPrice) }}/yr</span>
-                                <span class="text-base font-bold text-emerald-400 font-sans" style="color: #34d399 !important; font-size: 16px !important; font-weight: 700 !important;">{{ showAmount($regPrice) }}<span class="text-xs font-normal text-neutral-400" style="color: #a3a3a3 !important; font-size: 12px !important;">/1st yr</span></span>
+                        <div class="flex items-center gap-4 self-end sm:self-center">
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 me-2">@lang('Renew'): {{ showAmount($renewPrice) }}/yr</span>
+                                <span class="text-base font-bold text-emerald-600 font-sans">{{ showAmount($regPrice) }}<span class="text-xs font-normal text-slate-400">/1st yr</span></span>
                             </div>
-                            <a href="{{ route('register.domain') }}?domain=mybrand.{{ ltrim($setup->extension, '.') }}" class="btn-add-cart-pill px-4 py-1.5 bg-white/5 hover:bg-white/15 border border-white/10 text-neutral-200 hover:text-white font-semibold text-xs rounded-full transition-all">
+                            <a href="{{ route('register.domain') }}?domain=mybrand.{{ ltrim($setup->extension, '.') }}" class="btn-add-cart-pill px-4 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-xs rounded-full transition-all">
                                 @lang('Search')
                             </a>
                         </div>
@@ -182,11 +182,9 @@
         (function ($) {
             "use strict";
             $('.tld-filter-tab').on('click', function () {
-                $('.tld-filter-tab').removeClass('bg-white text-black font-semibold').addClass('bg-white/5 text-neutral-300 font-medium');
-                $(this).removeClass('bg-white/5 text-neutral-300 font-medium').addClass('bg-white text-black font-semibold');
+                $('.tld-filter-tab').removeClass('bg-indigo-600 text-white font-semibold').addClass('bg-white text-slate-600 font-medium');
+                $(this).removeClass('bg-white text-slate-600 font-medium').addClass('bg-indigo-600 text-white font-semibold');
             });
         })(jQuery);
     </script>
 @endpush
-on
-

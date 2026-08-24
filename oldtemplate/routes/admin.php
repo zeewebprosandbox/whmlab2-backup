@@ -62,12 +62,18 @@ Route::middleware(['admin', 'admin.permission'])->group(function () {
 
         Route::get('domains', 'domains')->name('domains');
         Route::get('services', 'services')->name('services');
+        Route::post('service/merge-server', 'mergeServiceServer')->name('service.merge.server');
+        Route::post('service/delete/{id}', 'deleteService')->name('service.delete');
+        Route::post('services/delete-all', 'deleteAllServices')->name('services.delete.all');
     });
 
     //Service
     Route::controller('ServiceController')->group(function(){
         Route::get('hosting/details/{id}', 'hostingDetails')->name('order.hosting.details');
         Route::post('hosting/update/', 'hostingUpdate')->name('order.hosting.update');
+        Route::get('hosting/{id}/zodpanel/diagnostics', 'zodPanelDiagnostics')->name('order.hosting.zodpanel.diagnostics');
+        Route::post('hosting/{id}/zodpanel/webmail/repair', 'repairZodPanelWebmail')->name('order.hosting.zodpanel.webmail.repair');
+        Route::post('hosting/{id}/zodpanel/php', 'changeZodPanelPhp')->name('order.hosting.zodpanel.php');
         Route::get('change/order/hosting/product/{hostingId}/{productId}', 'ServiceController@changeHostingProduct')->name('change.order.hosting.product');
 
         Route::get('domain/details/{id}', 'domainDetails')->name('order.domain.details');
@@ -213,10 +219,16 @@ Route::middleware(['admin', 'admin.permission'])->group(function () {
         Route::get('server/login/{id}','serverLogin')->name('server.login');
         Route::post('server/health/{id}','serverHealth')->name('server.health');
         Route::post('server/status/{id}', 'serverStatus')->name('server.status');
+
         Route::post('server/test/connection','testConnection')->name('server.test.connection');
         Route::post('server/zodpanel/bootstrap/preview','zodPanelBootstrapPreview')->name('server.zodpanel.bootstrap.preview');
         Route::get('server/reinstall/stream','reinstallServerStream')->name('server.reinstall.stream');
         Route::post('server/reinstall/stream','reinstallServerStream')->name('server.reinstall.stream.post');
+        Route::post('server/delete/{id}', 'deleteServer')->name('server.delete');
+        Route::get('server/accounts/{id}', 'serverAccounts')->name('server.accounts');
+        Route::post('server/sync-accounts/{id}', 'syncServerAccounts')->name('server.sync.accounts');
+        Route::post('server/sync-design/{id}', 'syncServerDesign')->name('server.sync.design');
+        Route::get('server/sync-design-stream/{id}', 'syncDesignStream')->name('server.sync.design.stream');
     });
 
     // Billing Setting
@@ -258,6 +270,7 @@ Route::middleware(['admin', 'admin.permission'])->group(function () {
         Route::post('send-notification/{id}', 'sendNotificationSingle')->name('notification.single.send');
         Route::get('login/{id}', 'login')->name('login');
         Route::post('status/{id}', 'status')->name('status');
+        Route::post('quick-toggle/{id}', 'quickToggle')->name('quick.toggle');
 
         Route::get('send-notification', 'showNotificationAllForm')->name('notification.all');
         Route::post('send-notification', 'sendNotificationAll')->name('notification.all.send');

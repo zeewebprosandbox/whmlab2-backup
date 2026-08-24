@@ -598,14 +598,14 @@ function getSld($domain){
     return explode('.', $domain)[0];
 }
 
-function domainSearchPrimaryExtension($domainSetup)
+function domainSearchPrimaryExtension($domainSetup, $requestedTld = null)
 {
-    if (!$domainSetup || $domainSetup->isEmpty()) {
-        return '.com';
+    if ($requestedTld && $domainSetup->where('extension', $requestedTld)->first()) {
+        return $requestedTld;
     }
 
-    $comSetup = $domainSetup->firstWhere('extension', '.com');
-    if ($comSetup) {
+    $preferred = $domainSetup->where('extension', '.com')->first();
+    if ($preferred) {
         return '.com';
     }
 
@@ -666,7 +666,7 @@ function productModule() {
             1 => 'cPanel',
             2 => 'Directadmin',
             3 => 'Plesk',
-            4 => 'WHMPanel',
+            4 => 'ZodPanel',
         ];
 
         return $array;
@@ -873,7 +873,7 @@ function getProductModuleLogo($type){
         $class = 'plesk-logo';
     }
     elseif($type == 4){
-        return "<span class='badge badge--primary'>WHMPanel</span>";
+        return "<span class='badge badge--primary'>ZodPanel</span>";
     }
 
     $src = getImage(getFilePath('productModule'). "/$image");
