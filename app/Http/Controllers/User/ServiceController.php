@@ -47,6 +47,13 @@ class ServiceController extends Controller{
         $diskUsagePercent = 0;
         $bwUsagePercent = 0;
 
+        $databases = [];
+        $mailAccounts = [];
+        $dnsRecords = [];
+        $sslInfo = null;
+        $phpVersion = '8.3';
+        $availablePhp = [];
+
         if ($serverGroup && $status == 1) {
             $execute = HostingManager::init($serverGroup)->accountSummary($service);
             $accountSummary = @$execute['processed_data'];
@@ -55,9 +62,32 @@ class ServiceController extends Controller{
             $bwUsagePercent = (float) (@$accountSummary['bw_usage_percent'] ?: 0);
 
             if (@$serverGroup->type == 4 && $hasAccount) {
-                $zodPanelDiagnostics = $this->zodPanelAction($service, 'serviceDiagnostics');
+                $diagRes = $this->zodPanelAction($service, 'serviceDiagnostics');
+                $zodPanelDiagnostics = @$diagRes['data'] ?: [];
+
+                $dbRes = $this->zodPanelAction($service, 'databases');
+                $databases = @$dbRes['data'] ?: [];
+
+                $mailRes = $this->zodPanelAction($service, 'mailAccounts', ['domain' => $service->domain]);
+                $mailAccounts = @$mailRes['data'] ?: [];
+
+                $phpRes = $this->zodPanelAction($service, 'phpOptions');
+                $phpData = @$phpRes['data'] ?: [];
+                $phpVersion = $phpData['current'] ?? $phpData['backend'] ?? 'default';
+                $availablePhp = $phpData['available'] ?? $phpData['backends'] ?? [];
+
+                $dnsRecords = $zodPanelDiagnostics['dns']['required_records'] ?? $zodPanelDiagnostics['dns_records'] ?? [];
+                $sslInfo = $zodPanelDiagnostics['web'] ?? $zodPanelDiagnostics['ssl'] ?? null;
             }
         }
+
+        $nodeHost = $server?->ip_address ?: (parse_url($server?->hostname ?: '', PHP_URL_HOST) ?: '169.58.176.53');
+        $ssoLinks = [
+            'panel' => route('user.login.hosting', $service->id),
+            'phpmyadmin' => "https://{$nodeHost}:8083/open/phpmyadmin/",
+            'file_manager' => "https://{$nodeHost}:8083/fm/?domain=" . urlencode($service->domain ?: ''),
+            'webmail' => "https://webmail." . ($service->domain ?: 'local') . "/",
+        ];
 
         $nameservers = collect([
             ['label' => 'NS1', 'host' => $service->ns1 ?: @$server->ns1, 'ip' => @$server->ns1_ip],
@@ -65,12 +95,6 @@ class ServiceController extends Controller{
             ['label' => 'NS3', 'host' => @$server->ns3, 'ip' => @$server->ns3_ip],
             ['label' => 'NS4', 'host' => @$server->ns4, 'ip' => @$server->ns4_ip],
         ])->filter(fn ($record) => !empty($record['host']))->values();
-
-        $databases = @$zodPanelDiagnostics['databases'] ?: [];
-        $mailAccounts = @$zodPanelDiagnostics['mail_accounts'] ?: [];
-        $dnsRecords = @$zodPanelDiagnostics['dns_records'] ?: [];
-        $sslInfo = @$zodPanelDiagnostics['ssl'] ?: null;
-        $phpVersion = @$zodPanelDiagnostics['php_version'] ?: '8.2';
 
         return view('Template::user.service.details', compact(
             'pageTitle',
@@ -89,7 +113,9 @@ class ServiceController extends Controller{
             'mailAccounts',
             'dnsRecords',
             'sslInfo',
-            'phpVersion'
+            'phpVersion',
+            'availablePhp',
+            'ssoLinks'
         ));
     }
 
@@ -130,6 +156,7 @@ class ServiceController extends Controller{
         }
 
         $execute = $this->zodPanelAction($service, 'repairWebmail', [
+            'domain' => $service->domain,
             'create_mail_domain' => true,
         ]);
 
@@ -148,7 +175,9 @@ class ServiceController extends Controller{
             return back()->withNotify($notify);
         }
 
-        $execute = $this->zodPanelAction($service, 'issueSsl');
+        $execute = $this->zodPanelAction($service, 'issueSsl', [
+            'domain' => $service->domain,
+        ]);
 
         $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Auto-SSL & Force HTTPS issued successfully'];
         return back()->withNotify($notify);
@@ -165,7 +194,9 @@ class ServiceController extends Controller{
             return back()->withNotify($notify);
         }
 
-        $execute = $this->zodPanelAction($service, 'repairDns');
+        $execute = $this->zodPanelAction($service, 'repairDns', [
+            'domain' => $service->domain,
+        ]);
 
         $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Live DNS records repaired successfully'];
         return back()->withNotify($notify);
@@ -175,7 +206,7 @@ class ServiceController extends Controller{
     {
         $request->validate([
             'v_account' => 'required|string|max:64',
-            'v_domain' => 'required|string|max:255',
+            'v_domain' => 'nullable|string|max:255',
             'v_password' => 'required|string|min:6',
             'v_quota' => 'nullable|string',
         ]);
@@ -191,12 +222,12 @@ class ServiceController extends Controller{
 
         $execute = $this->zodPanelAction($service, 'createMailAccount', [
             'account' => $request->v_account,
-            'domain' => $request->v_domain,
+            'domain' => $request->v_domain ?: $service->domain,
             'password' => $request->v_password,
-            'quota' => $request->v_quota ?: '1000',
+            'quota_mb' => (int) ($request->v_quota ?: 1000),
         ]);
 
-        $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Mailbox ' . $request->v_account . '@' . $request->v_domain . ' created successfully'];
+        $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Mailbox ' . $request->v_account . '@' . ($request->v_domain ?: $service->domain) . ' created successfully'];
         return back()->withNotify($notify);
     }
 
@@ -204,7 +235,7 @@ class ServiceController extends Controller{
     {
         $request->validate([
             'database' => 'required|string|max:64',
-            'dbuser' => 'required|string|max:64',
+            'dbuser' => 'nullable|string|max:64',
             'password' => 'required|string|min:6',
         ]);
 
@@ -219,7 +250,7 @@ class ServiceController extends Controller{
 
         $execute = $this->zodPanelAction($service, 'createDatabase', [
             'database' => $request->database,
-            'dbuser' => $request->dbuser,
+            'db_user' => $request->dbuser ?: $request->database,
             'password' => $request->password,
         ]);
 
@@ -230,7 +261,7 @@ class ServiceController extends Controller{
     public function changePhp(Request $request, $id)
     {
         $request->validate([
-            'php_version' => 'required|string|in:7.4,8.0,8.1,8.2,8.3,8.4',
+            'php_version' => 'required|string',
         ]);
 
         $service = Hosting::whereBelongsTo(auth()->user())
@@ -242,7 +273,8 @@ class ServiceController extends Controller{
             return back()->withNotify($notify);
         }
 
-        $execute = $this->zodPanelAction($service, 'changePhpVersion', [
+        $execute = $this->zodPanelAction($service, 'changeDomainPhp', [
+            'template' => $request->php_version,
             'php_version' => $request->php_version,
         ]);
 

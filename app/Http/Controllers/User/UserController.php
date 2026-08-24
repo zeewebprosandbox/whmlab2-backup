@@ -32,10 +32,37 @@ class UserController extends Controller
         $totalInvoice = Invoice::where('user_id', $user->id)->count();
         $totalDomain = Domain::where('user_id', $user->id)->count();
         $totalService = Hosting::where('user_id', $user->id)->count();
+        $activeServicesCount = Hosting::where('user_id', $user->id)->where('status', 1)->count();
+        $activeDomainsCount = Domain::where('user_id', $user->id)->count();
+        $unpaidInvoicesCount = Invoice::unpaid()->where('user_id', $user->id)->count();
+        $openTicketsCount = SupportTicket::where('user_id', $user->id)->whereIn('status', [0, 1, 2])->count();
         $totalOverDueInvoice = Invoice::unpaid()->where('user_id', $user->id)->selectRaw('count(*) as total, sum(amount) as totalDue')->first();
+        $recentServices = Hosting::where('user_id', $user->id)->with('product.serviceCategory', 'server')->orderBy('id', 'desc')->take(4)->get();
+        $recentInvoices = Invoice::where('user_id', $user->id)->unpaid()->latest()->take(3)->get();
         $supportPin = $this->activeSupportPin($user);
 
-        return view('Template::user.dashboard', compact('pageTitle', 'user', 'totalTicket', 'totalInvoice', 'totalDomain', 'totalService', 'totalOverDueInvoice', 'supportPin'));
+        $widget = [
+            'active_services' => $activeServicesCount,
+            'active_domains' => $activeDomainsCount,
+            'unpaid_invoices' => $unpaidInvoicesCount,
+            'open_tickets' => $openTicketsCount,
+            'total_services' => $totalService,
+            'total_invoices' => $totalInvoice,
+        ];
+
+        return view('Template::user.dashboard', compact(
+            'pageTitle',
+            'user',
+            'totalTicket',
+            'totalInvoice',
+            'totalDomain',
+            'totalService',
+            'totalOverDueInvoice',
+            'supportPin',
+            'recentServices',
+            'recentInvoices',
+            'widget'
+        ));
     }
 
     public function regenerateSupportPin()

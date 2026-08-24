@@ -111,6 +111,7 @@ function getAmount($amount, $length = 2)
 
 function showAmount($amount, $decimal = 2, $separate = true, $exceptZeros = false, $currencyFormat = true)
 {
+    $amount = (float) ($amount ?? 0);
     $separator = '';
     if ($separate) {
         $separator = ',';
