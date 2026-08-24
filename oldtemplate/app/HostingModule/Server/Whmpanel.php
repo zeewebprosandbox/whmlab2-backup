@@ -17,6 +17,22 @@ class Whmpanel implements HostingManagerInterface
 {
     public function create($hosting)
     {
+        if (!$hosting->server) {
+            $server = null;
+            if ($hosting->product && $hosting->product->serverGroup) {
+                $server = $hosting->product->serverGroup->servers()->where('status', 1)->first()
+                       ?: $hosting->product->serverGroup->servers()->first();
+            }
+            if (!$server) {
+                $server = \App\Models\Server::where('status', 1)->first() ?: \App\Models\Server::first();
+            }
+            if ($server) {
+                $hosting->server_id = $server->id;
+                $hosting->setRelation('server', $server);
+                $hosting->save();
+            }
+        }
+
         if ($this->usesBridge($hosting->server)) {
             if ((int) $hosting->product->product_type === 3) {
                 return $this->createKvmVm($hosting);
@@ -1309,15 +1325,25 @@ class Whmpanel implements HostingManagerInterface
         ];
     }
 
-    private function nodeForServer($server): WhmPanelNode
+    private function nodeForServer($server = null): WhmPanelNode
     {
+        if (!$server) {
+            $server = \App\Models\Server::where('status', 1)->first() ?: \App\Models\Server::first();
+        }
+
+        $serverId = $server ? $server->id : 1;
+        $serverName = $server ? ($server->name ?: 'ZodServer Cloud') : 'ZodServer Cloud';
+        $serverHost = $server ? ($server->hostname ?: 'https://zodpanel.zodserver.cloud:8083') : 'https://zodpanel.zodserver.cloud:8083';
+        $serverIp = $server ? ($server->ip_address ?: '169.58.176.53') : '169.58.176.53';
+        $serverToken = $server ? ($server->api_token ?: Str::random(48)) : Str::random(48);
+
         return WhmPanelNode::firstOrCreate(
-            ['server_id' => $server->id],
+            ['server_id' => $serverId],
             [
-                'name' => $server->name ?: 'Local ZodPanel',
-                'hostname' => $server->hostname ?: config('app.url'),
-                'ip_address' => $server->ip_address ?: '127.0.0.1',
-                'api_token' => $server->api_token ?: Str::random(48),
+                'name' => $serverName,
+                'hostname' => $serverHost,
+                'ip_address' => $serverIp,
+                'api_token' => $serverToken,
                 'status' => 'online',
                 'last_sync_at' => now(),
             ]
