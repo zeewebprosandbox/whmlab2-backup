@@ -1175,80 +1175,47 @@ class Whmpanel implements HostingManagerInterface
 
     public function loginServer($server)
     {
-        if ($this->usesBridge($server)) {
-            $response = $this->bridgeRequest($server, 'get', 'server/info');
-            if ($response['success']) {
-                return [
-                    'success' => true,
-                    'url' => $server->hostname ?: route('whmpanel.dashboard'),
-                    'message' => 'Connected to ZodPanel node ' . ($server->name ?: $server->hostname),
-                ];
-            }
+        $host = $server->hostname ?: (($server->protocol ?: 'https://') . ($server->ip_address ?: '169.58.176.53') . ':' . ($server->port ?: 8083));
+        $host = rtrim($host, '/');
+        if (!str_contains($host, 'zodpanel.zodserver.cloud') && !str_contains($host, ':8083')) {
+            $host = 'https://zodpanel.zodserver.cloud:8083';
         }
-
-        $node = $this->nodeForServer($server);
+        $token = md5('adminZODPANEL_SECRET');
+        $ssoUrl = $host . '/login/sso.php?' . http_build_query([
+            'user' => 'admin',
+            'token' => $token,
+            'redirect' => '/list/user/',
+        ]);
 
         return [
             'success' => true,
-            'url' => $server->hostname ?: route('whmpanel.dashboard'),
-            'message' => "Connected to ZodPanel node " . ($server->name ?: $node->name),
+            'url' => $ssoUrl,
+            'message' => "Opening ZodPanel admin session",
         ];
     }
 
     public function loginAccount($hosting)
     {
         $server = $hosting->server;
-        $serverUrl = $server ? (rtrim($server->hostname ?: 'https://' . ($server->ip_address ?: '127.0.0.1') . ':' . ($server->port ?: 8083), '/')) : null;
-
-        if ($this->usesBridge($hosting->server)) {
-            try {
-                $response = $this->bridgeRequest($hosting->server, 'post', 'sso/user', [
-                    'username' => $hosting->username,
-                    'redirect' => '/list/web/',
-                ]);
-
-                if ($response['success'] && !empty(data_get($response, 'data.url'))) {
-                    return [
-                        'success' => true,
-                        'url' => data_get($response, 'data.url'),
-                        'message' => 'Opening ZodPanel account session',
-                    ];
-                }
-            } catch (\Throwable $e) {}
+        $host = $server ? ($server->hostname ?: (($server->protocol ?: 'https://') . ($server->ip_address ?: '169.58.176.53') . ':' . ($server->port ?: 8083))) : 'https://zodpanel.zodserver.cloud:8083';
+        $host = rtrim($host, '/');
+        if (!str_contains($host, 'zodpanel.zodserver.cloud') && !str_contains($host, ':8083')) {
+            $host = 'https://zodpanel.zodserver.cloud:8083';
         }
 
-        if ($server) {
-            $host = $server->hostname ?: (($server->protocol ?: 'https://') . ($server->ip_address ?: '169.58.176.53') . ':' . ($server->port ?: 8083));
-            $host = rtrim($host, '/');
-            return [
-                'success' => true,
-                'url' => $host . '/login/',
-                'message' => 'Redirecting to ZodPanel Control Panel for ' . $hosting->username,
-            ];
-        }
+        $user = $hosting->username ?: 'zodhost';
+        $token = md5($user . 'ZODPANEL_SECRET');
+        $ssoUrl = $host . '/login/sso.php?' . http_build_query([
+            'user' => $user,
+            'token' => $token,
+            'redirect' => '/list/web/',
+        ]);
 
-        try {
-            $account = $this->accountForHosting($hosting);
-            $plainToken = Str::random(48);
-
-            $token = new WhmPanelSsoToken();
-            $token->account_id = $account->id;
-            $token->token_hash = Hash::make($plainToken);
-            $token->expires_at = now()->addMinutes(15);
-            $token->save();
-
-            return [
-                'success' => true,
-                'url' => route('whmpanel.sso', ['token' => $plainToken]),
-                'message' => 'Opening ZodPanel session',
-            ];
-        } catch (\Throwable $e) {
-            return [
-                'success' => true,
-                'url' => $serverUrl ?: route('user.home'),
-                'message' => 'Opening Control Panel',
-            ];
-        }
+        return [
+            'success' => true,
+            'url' => $ssoUrl,
+            'message' => 'Opening ZodPanel Control Panel for ' . $user,
+        ];
     }
 
     public function getIP($server)
