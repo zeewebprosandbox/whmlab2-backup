@@ -94,16 +94,72 @@
                 </div>
             </div>
 
-            @if($heroPills->count())
-                <div class="zod-hero-pills" aria-label="@lang('Available service categories')">
-                    @foreach($heroPills as $pill)
-                        <a href="{{ route('service.category') }}?all" class="zod-hero-pill-link">
-                            <i data-lucide="{{ $pill['icon'] }}"></i>
-                            <span>{{ $pill['name'] }}</span>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
+            <!-- 4 Modern Quick Service Cards -->
+            <div class="zod-quick-services-grid" aria-label="@lang('Core hosting infrastructure services')">
+                <a href="{{ route('service.category') }}" class="zod-quick-card">
+                    <div class="zod-quick-card-icon zod-icon-indigo">
+                        <i data-lucide="server"></i>
+                    </div>
+                    <div class="zod-quick-card-body">
+                        <div class="zod-quick-card-head">
+                            <h4>@lang('Web Hosting')</h4>
+                            <span class="zod-quick-tag">@lang('NVMe Fast')</span>
+                        </div>
+                        <p>@lang('Ultra-fast PCIe Gen4 NVMe storage with automated 1-click app installs & free SSL.')</p>
+                        <div class="zod-quick-card-foot">
+                            <span class="zod-quick-explore">@lang('Explore Plans') <i data-lucide="arrow-up-right"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('service.category') }}" class="zod-quick-card">
+                    <div class="zod-quick-card-icon zod-icon-cyan">
+                        <i data-lucide="cpu"></i>
+                    </div>
+                    <div class="zod-quick-card-body">
+                        <div class="zod-quick-card-head">
+                            <h4>@lang('Cloud VPS')</h4>
+                            <span class="zod-quick-tag">@lang('Root Access')</span>
+                        </div>
+                        <p>@lang('Dedicated KVM compute instances with instant provisioning & 10Gbps network.')</p>
+                        <div class="zod-quick-card-foot">
+                            <span class="zod-quick-explore">@lang('Configure VPS') <i data-lucide="arrow-up-right"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('register.domain') }}" class="zod-quick-card">
+                    <div class="zod-quick-card-icon zod-icon-teal">
+                        <i data-lucide="globe"></i>
+                    </div>
+                    <div class="zod-quick-card-body">
+                        <div class="zod-quick-card-head">
+                            <h4>@lang('Domains & DNS')</h4>
+                            <span class="zod-quick-tag">@lang('Anycast')</span>
+                        </div>
+                        <p>@lang('Register global TLDs with instant propagation, WHOIS privacy & DNSSEC.')</p>
+                        <div class="zod-quick-card-foot">
+                            <span class="zod-quick-explore">@lang('Search Domain') <i data-lucide="arrow-up-right"></i></span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="{{ route('service.category') }}" class="zod-quick-card">
+                    <div class="zod-quick-card-icon zod-icon-emerald">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div class="zod-quick-card-body">
+                        <div class="zod-quick-card-head">
+                            <h4>@lang('Security & Mail')</h4>
+                            <span class="zod-quick-tag">@lang('100% Inbox')</span>
+                        </div>
+                        <p>@lang('Business email clusters with DMARC/DKIM authentication & DDoS protection.')</p>
+                        <div class="zod-quick-card-foot">
+                            <span class="zod-quick-explore">@lang('View Services') <i data-lucide="arrow-up-right"></i></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
     </section>
 
