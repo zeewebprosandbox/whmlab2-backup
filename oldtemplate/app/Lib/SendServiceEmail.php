@@ -32,6 +32,8 @@ class SendServiceEmail{
             'client_ip'=>$order->ip_address,
             'order_items'=>$itemsDescription,
         ]);
+
+        \App\Services\TelegramService::notifyNewOrder($order, $items->pluck('description')->toArray());
     } 
 
     public static function serviceNotify($hosting){
@@ -40,6 +42,8 @@ class SendServiceEmail{
         $server = @$hosting->server;
         $act = welcomeEmail()[$product->welcome_email]['act'] ?? null; 
         $user = $hosting->user;
+
+        \App\Services\TelegramService::notifyServiceProvisioned($hosting);
 
         if(!$act){
             return false;

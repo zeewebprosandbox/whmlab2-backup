@@ -89,11 +89,60 @@
 
                         </div>
 
+                        <!-- Telegram Bot Real-Time Notification Settings -->
+                        <div class="row mt-4 pt-3 border-top">
+                            <div class="col-12 mb-3">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <h5 class="text--primary m-0 d-flex align-items-center gap-2">
+                                        <i class="fab fa-telegram-plane"></i> @lang('Telegram Real-Time Channel Notifications')
+                                    </h5>
+                                    @if(gs('telegram_bot_token') && gs('telegram_chat_id'))
+                                        <button type="button" class="btn btn-sm btn--dark" onclick="document.getElementById('testTelegramForm').submit();">
+                                            <i class="fas fa-paper-plane"></i> @lang('Send Test Alert to Channel')
+                                        </button>
+                                    @endif
+                                </div>
+                                <small class="text-muted">@lang('Receive instant live alerts in your Telegram channel for new customer registrations, orders, payments, server provisioning, support tickets, and contact messages.')</small>
+                            </div>
+
+                            <div class="col-xl-5 col-sm-6">
+                                <div class="form-group">
+                                    <label>@lang('Telegram Bot Token')</label>
+                                    <input class="form-control" type="password" name="telegram_bot_token" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ" value="{{ gs('telegram_bot_token') }}">
+                                    <small class="text-muted">@lang('Create a bot via @BotFather on Telegram and paste the token here.')</small>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-sm-6">
+                                <div class="form-group">
+                                    <label>@lang('Telegram Channel / Chat ID')</label>
+                                    <input class="form-control" type="text" name="telegram_chat_id" placeholder="@your_channel_name or -100123456789" value="{{ gs('telegram_chat_id') }}">
+                                    <small class="text-muted">@lang('Add your bot as Admin in your channel with post message permission.')</small>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-sm-12">
+                                <div class="form-group">
+                                    <label>@lang('Live Notifications')</label>
+                                    <div class="form-check form-switch form--switch mt-2">
+                                        <input class="form-check-input" type="checkbox" name="telegram_notification" value="1" id="telegram_notification" @checked(gs('telegram_notification'))>
+                                        <label class="form-check-label" for="telegram_notification">@lang('Enable Channel Alerts')</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group mt-4">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
                         </div>
 
                     </form>
+
+                    @if(gs('telegram_bot_token') && gs('telegram_chat_id'))
+                        <form id="testTelegramForm" action="{{ route('admin.setting.general.telegram.test') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

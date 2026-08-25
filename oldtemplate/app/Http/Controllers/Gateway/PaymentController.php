@@ -183,6 +183,8 @@ class PaymentController extends Controller
                 $afterPayment = new AfterPayment();
                 $afterPayment->pay($invoice);
             }
+
+            \App\Services\TelegramService::notifyPaymentReceived(@$invoice ?? (object)['invoice_number' => $deposit->trx, 'user' => $user], $deposit->amount, $methodName, $deposit->trx);
         }
     }
 

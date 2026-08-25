@@ -133,6 +133,10 @@ class GeneralSettingController extends Controller
         $general->invoice_increment = $request->invoice_increment;
         $general->tax = $request->tax;
 
+        $general->telegram_bot_token = $request->telegram_bot_token;
+        $general->telegram_chat_id = $request->telegram_chat_id;
+        $general->telegram_notification = $request->telegram_notification ? 1 : 0;
+
         $general->save();
 
         $timezoneFile = config_path('timezone.php');
@@ -140,6 +144,27 @@ class GeneralSettingController extends Controller
         file_put_contents($timezoneFile, $content);
         RequiredConfig::configured('general_setting');
         $notify[] = ['success', 'General setting updated successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function testTelegram(Request $request)
+    {
+        $token = gs('telegram_bot_token') ?: env('TELEGRAM_BOT_TOKEN');
+        $chatId = gs('telegram_chat_id') ?: env('TELEGRAM_CHAT_ID');
+
+        if (empty($token) || empty($chatId)) {
+            $notify[] = ['error', 'Telegram Bot Token and Channel/Chat ID must be configured first.'];
+            return back()->withNotify($notify);
+        }
+
+        $success = \App\Services\TelegramService::sendTestAlert();
+
+        if ($success) {
+            $notify[] = ['success', 'Telegram test notification dispatched successfully to your channel!'];
+        } else {
+            $notify[] = ['error', 'Failed to send Telegram test notification. Please verify your Bot Token and Channel ID.'];
+        }
+
         return back()->withNotify($notify);
     }
 

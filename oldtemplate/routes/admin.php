@@ -379,6 +379,7 @@ Route::middleware(['admin', 'admin.permission'])->group(function () {
         // General Setting
         Route::get('general-setting', 'general')->name('setting.general');
         Route::post('general-setting', 'generalUpdate')->name('setting.general.update');
+        Route::post('general-setting/test-telegram', 'testTelegram')->name('setting.general.telegram.test');
 
         Route::get('setting/social/credentials', 'socialiteCredentials')->name('setting.socialite.credentials');
         Route::post('setting/social/credentials/update/{key}', 'updateSocialiteCredential')->name('setting.socialite.credentials.update');

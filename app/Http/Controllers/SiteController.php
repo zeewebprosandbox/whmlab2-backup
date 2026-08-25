@@ -101,6 +101,8 @@ class SiteController extends Controller
         $message->message = $request->message;
         $message->save();
 
+        \App\Services\TelegramService::notifyContactMessage($request->name, $request->email, $request->subject, $request->message);
+
         $notify[] = ['success', 'Ticket created successfully!'];
 
         return to_route('ticket.view', [$ticket->ticket])->withNotify($notify);

@@ -93,6 +93,8 @@ trait SupportTicketManager
         $adminNotification->click_url = urlPath('admin.ticket.view', $ticket->id);
         $adminNotification->save();
 
+        \App\Services\TelegramService::notifySupportTicket($ticket, 'Opened');
+
         if ($request->hasFile('attachments')) {
             $uploadAttachments = $this->storeSupportAttachments($message->id);
             if ($uploadAttachments != 200){
@@ -244,6 +246,8 @@ trait SupportTicketManager
                 'link' => route('ticket.view', $ticket->ticket),
             ], $sendVia, $createLog);
         }
+
+        \App\Services\TelegramService::notifySupportTicket($ticket, $this->userType == 'admin' ? 'Answered by Admin' : 'Customer Replied');
 
         if($this->apiRequest){
             $notify[] = 'Ticket replied successfully';

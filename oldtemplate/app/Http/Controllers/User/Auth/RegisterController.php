@@ -126,6 +126,8 @@ class RegisterController extends Controller
         $adminNotification->click_url = urlPath('admin.users.detail', $user->id);
         $adminNotification->save();
 
+        \App\Services\TelegramService::notifyNewUser($user);
+
 
         //Login Log Create
         $ip        = getRealIP();
