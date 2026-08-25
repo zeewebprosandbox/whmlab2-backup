@@ -103,7 +103,7 @@ class CronController extends Controller{
         }
     }
 
-    protected function invoiceGenerate(){
+    public function invoiceGenerate(){
         
         $billingSetting = $this->billingSetting;
 
@@ -269,7 +269,7 @@ class CronController extends Controller{
         $item->save();
     }
 
-    protected function unpaidInvoiceReminder(){
+    public function unpaidInvoiceReminder(){
         
         $billingSetting = $this->billingSetting;
 
@@ -294,7 +294,7 @@ class CronController extends Controller{
 
     }
     
-    protected function firstOverdueReminder(){
+    public function firstOverdueReminder(){
       
         $billingSetting = $this->billingSetting;
 
@@ -319,7 +319,7 @@ class CronController extends Controller{
 
     }
 
-    protected function secondOverdueReminder(){           
+    public function secondOverdueReminder(){           
         
         $billingSetting = $this->billingSetting;
 
@@ -344,7 +344,7 @@ class CronController extends Controller{
 
     }
 
-    protected function thirdOverdueReminder(){             
+    public function thirdOverdueReminder(){             
         
         $billingSetting = $this->billingSetting;
 
@@ -369,7 +369,7 @@ class CronController extends Controller{
 
     }
 
-    protected function addLateFee(){       
+    public function addLateFee(){       
         
         $billingSetting = $this->billingSetting;
 
@@ -468,7 +468,7 @@ class CronController extends Controller{
         } 
     }
 
-    private function removeShoppingCarts(){
+    public function removeShoppingCarts(){
         ShoppingCart::whereDoesntHave('user')->where('created_at', '<', Carbon::now()->subHours(3))->delete();
     }
 

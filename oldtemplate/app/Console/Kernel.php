@@ -12,6 +12,10 @@ class Kernel extends ConsoleKernel
         Commands\CreateRolePermission::class,
         Commands\PushZodPanelVersion::class,
         Commands\PullLiveZodPanelCustom::class,
+        Commands\RunAllAutomationsCron::class,
+        Commands\SeedAppleEmailTemplates::class,
+        Commands\SeedEducationSeoGuides::class,
+        Commands\TestTelegramNotification::class,
     ];
     
     /**
@@ -22,7 +26,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Run all ZodPanel / WHMLab billing, expiry reminders, auto-suspensions, and DNS sync every minute
+        $schedule->command('zodpanel:cron-run --silent')->everyMinute()->withoutOverlapping();
     }
 
     /**
