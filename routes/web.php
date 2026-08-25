@@ -58,6 +58,9 @@ Route::controller('SiteController')->group(function () {
     Route::get('announcements', 'blogs')->name('blogs');
     Route::get('announcements/{slug}', 'blogDetails')->name('blog.details');
 
+    Route::get('sitemap.xml', 'sitemap')->name('sitemap');
+    Route::get('robots.txt', 'robots')->name('robots');
+
     Route::get('policy/{slug}', 'policyPages')->name('policy.pages');
 
     Route::get('placeholder-image/{size}', 'placeholderImage')->withoutMiddleware('maintenance')->name('placeholder.image');

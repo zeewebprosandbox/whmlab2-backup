@@ -123,18 +123,68 @@ class SiteController extends Controller
         return back();
     }
 
-    public function blogs() {
-        $pageTitle = 'Announcements';
+    public function blogs(Request $request) {
+        $pageTitle = 'Knowledgebase & Technical Guides';
         $sections = Page::where('tempname', activeTemplate())->where('slug', 'announcements')->first();
-        return view('Template::blogs', compact('pageTitle', 'sections'));
+        
+        $query = Frontend::where('data_keys', 'blog.element');
+
+        if ($request->category) {
+            $query->where('data_values->category', $request->category);
+        }
+
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('data_values->title', 'LIKE', "%{$search}%")
+                  ->orWhere('data_values->description', 'LIKE', "%{$search}%")
+                  ->orWhere('data_values->tags', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $blogs = $query->orderBy('id', 'DESC')->paginate(12)->withQueryString();
+        
+        $categories = [
+            'NVMe Hosting',
+            'Cloud VPS',
+            'WordPress',
+            'DNS & Domains',
+            'Email Deliverability',
+            'Security & SSL',
+            'Developer Stacks',
+            'eCommerce & Scale'
+        ];
+
+        return view('Template::blogs', compact('pageTitle', 'sections', 'blogs', 'categories'));
     }
 
     public function blogDetails($slug){
-        $blog = Frontend::where('slug',$slug)->where('data_keys','blog.element')->firstOrFail();
+        $blog = Frontend::where('slug',$slug)->where('data_keys','blog.element')->first();
+        if (!$blog) {
+            $blog = Frontend::where('data_keys','blog.element')
+                ->where('data_values->title', 'LIKE', str_replace('-', ' ', $slug))
+                ->firstOrFail();
+        }
         $pageTitle = $blog->data_values->title;
         $seoContents = $blog->seo_content;
         $seoImage = @$seoContents->image ? frontendImage('blog',$seoContents->image,getFileSize('seo'),true) : null;
-        return view('Template::blog_details',compact('blog','pageTitle','seoContents','seoImage'));
+        
+        $relatedBlogs = Frontend::where('data_keys','blog.element')
+            ->where('id', '!=', $blog->id)
+            ->where('data_values->category', @$blog->data_values->category)
+            ->take(3)
+            ->get();
+            
+        if ($relatedBlogs->count() < 3) {
+            $moreBlogs = Frontend::where('data_keys','blog.element')
+                ->where('id', '!=', $blog->id)
+                ->whereNotIn('id', $relatedBlogs->pluck('id'))
+                ->take(3 - $relatedBlogs->count())
+                ->get();
+            $relatedBlogs = $relatedBlogs->concat($moreBlogs);
+        }
+
+        return view('Template::blog_details',compact('blog','pageTitle','seoContents','seoImage','relatedBlogs'));
     }
 
 
@@ -487,5 +537,75 @@ class SiteController extends Controller
                 'suggestions' => $allSuggestions,
             ],
         ]);
+    }
+
+    public function sitemap() {
+        $categories = \App\Models\ServiceCategory::active()->get();
+        $blogs = \App\Models\Frontend::where('data_keys', 'blog.element')->latest()->get();
+        
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
+        
+        $staticPages = [
+            ['loc' => route('home'), 'priority' => '1.0', 'changefreq' => 'daily'],
+            ['loc' => route('register.domain'), 'priority' => '0.9', 'changefreq' => 'daily'],
+            ['loc' => route('service.category'), 'priority' => '0.9', 'changefreq' => 'daily'],
+            ['loc' => route('blogs'), 'priority' => '0.8', 'changefreq' => 'daily'],
+            ['loc' => route('contact'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+        ];
+
+        foreach ($staticPages as $page) {
+            $xml .= '<url>';
+            $xml .= '<loc>' . htmlspecialchars($page['loc']) . '</loc>';
+            $xml .= '<lastmod>' . date('Y-m-d') . '</lastmod>';
+            $xml .= '<changefreq>' . $page['changefreq'] . '</changefreq>';
+            $xml .= '<priority>' . $page['priority'] . '</priority>';
+            $xml .= '</url>';
+        }
+
+        foreach ($categories as $cat) {
+            $xml .= '<url>';
+            $xml .= '<loc>' . htmlspecialchars(route('service.category', $cat->slug)) . '</loc>';
+            $xml .= '<lastmod>' . ($cat->updated_at ? $cat->updated_at->format('Y-m-d') : date('Y-m-d')) . '</lastmod>';
+            $xml .= '<changefreq>weekly</changefreq>';
+            $xml .= '<priority>0.85</priority>';
+            $xml .= '</url>';
+        }
+
+        foreach ($blogs as $blog) {
+            $xml .= '<url>';
+            $xml .= '<loc>' . htmlspecialchars(route('blog.details', [slug(@$blog->data_values->title)])) . '</loc>';
+            $xml .= '<lastmod>' . ($blog->updated_at ? $blog->updated_at->format('Y-m-d') : date('Y-m-d')) . '</lastmod>';
+            $xml .= '<changefreq>monthly</changefreq>';
+            $xml .= '<priority>0.8</priority>';
+            $xml .= '</url>';
+        }
+
+        $xml .= '</urlset>';
+
+        return response($xml, 200, ['Content-Type' => 'application/xml; charset=utf-8']);
+    }
+
+    public function robots() {
+        $sitemapUrl = url('/sitemap.xml');
+        $robots = "User-agent: *\n";
+        $robots .= "Allow: /\n";
+        $robots .= "Disallow: /user/\n";
+        $robots .= "Disallow: /admin/\n";
+        $robots .= "Disallow: /ticket/\n";
+        $robots .= "Disallow: /cart/\n";
+        $robots .= "\n";
+        $robots .= "User-agent: GPTBot\n";
+        $robots .= "Allow: /\n";
+        $robots .= "User-agent: ChatGPT-User\n";
+        $robots .= "Allow: /\n";
+        $robots .= "User-agent: Claude-Web\n";
+        $robots .= "Allow: /\n";
+        $robots .= "User-agent: PerplexityBot\n";
+        $robots .= "Allow: /\n";
+        $robots .= "\n";
+        $robots .= "Sitemap: {$sitemapUrl}\n";
+
+        return response($robots, 200, ['Content-Type' => 'text/plain; charset=utf-8']);
     }
 }
