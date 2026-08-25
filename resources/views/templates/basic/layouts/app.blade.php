@@ -138,15 +138,19 @@
     <div class="overlay"></div>
 
     <div class="preloader" aria-label="@lang('Loading')" role="status">
-        <div class="whm-preloader-card">
-            <span class="whm-preloader-mark">
-                <i data-lucide="server"></i>
-            </span>
-            <div>
-                <strong>{{ gs('site_name') }}</strong>
-                <small>@lang('Preparing hosting workspace')</small>
+        <div class="whm-preloader-wrapper">
+            <div class="whm-preloader-spinner-container">
+                <svg class="whm-preloader-spinner" viewBox="0 0 50 50">
+                    <circle class="whm-spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="2.5"></circle>
+                    <circle class="whm-spinner-circle" cx="25" cy="25" r="20" fill="none" stroke-width="2.5"></circle>
+                </svg>
+                <div class="whm-preloader-favicon-wrap">
+                    <img src="{{ siteFavicon() }}" alt="{{ gs('site_name') }}" class="whm-preloader-favicon" onerror="this.src='{{ siteLogo() }}'">
+                </div>
             </div>
-            <span class="whm-preloader-line"></span>
+            <div class="whm-preloader-caption">
+                <span>{{ gs('site_name') }}</span>
+            </div>
         </div>
     </div>
 

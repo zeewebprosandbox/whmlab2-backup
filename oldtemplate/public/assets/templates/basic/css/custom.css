@@ -865,13 +865,15 @@ body {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  display: grid;
-  place-items: center;
-  background: rgba(248, 250, 252, 0.94);
-  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.18s ease, visibility 0.18s ease;
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .preloader.is-hiding {
@@ -880,90 +882,112 @@ body {
   pointer-events: none;
 }
 
-.whm-preloader-card {
-  width: min(86vw, 310px);
-  border: 1px solid var(--whm-slate-200);
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  align-items: center;
-  gap: 13px;
-  overflow: hidden;
-  padding: 16px;
-  position: relative;
-}
-
-.whm-preloader-mark {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: var(--whm-brand);
-  color: #ffffff;
-  display: inline-flex;
+.whm-preloader-wrapper {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  animation: whmPreloaderPulse 0.9s ease-in-out infinite;
+  gap: 12px;
 }
 
-.whm-preloader-mark svg {
-  width: 21px;
-  height: 21px;
+.whm-preloader-spinner-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.whm-preloader-card strong,
-.whm-preloader-card small {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.whm-preloader-card strong {
-  color: var(--whm-slate-900);
-  font-size: 15px;
-  line-height: 1.2;
-}
-
-.whm-preloader-card small {
-  color: var(--whm-slate-500);
-  font-size: 12px;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-.whm-preloader-line {
+.whm-preloader-spinner {
+  width: 60px;
+  height: 60px;
   position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 3px;
+  inset: 0;
+  animation: whmPreloaderSpin 1.3s linear infinite;
+}
+
+.whm-spinner-track {
+  stroke: #e2e8f0;
+}
+
+.whm-spinner-circle {
+  stroke: #4f46e5;
+  stroke-linecap: round;
+  stroke-dasharray: 85, 150;
+  stroke-dashoffset: 0;
+  animation: whmPreloaderDash 1.3s ease-in-out infinite;
+}
+
+.whm-preloader-favicon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  z-index: 2;
+  animation: whmFaviconPulse 2s ease-in-out infinite;
+}
+
+.whm-preloader-favicon {
   width: 100%;
-  background: linear-gradient(90deg, transparent, var(--whm-brand), transparent);
-  animation: whmPreloaderLine 0.85s ease-in-out infinite;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
-@keyframes whmPreloaderPulse {
+.whm-preloader-caption {
+  font-family: var(--font-family-base, 'Barlow Condensed', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  animation: whmCaptionFade 2s ease-in-out infinite;
+}
 
-  0%,
+@keyframes whmPreloaderSpin {
   100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.18);
-  }
-
-  50% {
-    transform: scale(1.04);
-    box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.08);
+    transform: rotate(360deg);
   }
 }
 
-@keyframes whmPreloaderLine {
+@keyframes whmPreloaderDash {
   0% {
-    transform: translateX(-100%);
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
   }
-
+  50% {
+    stroke-dasharray: 85, 150;
+    stroke-dashoffset: -35;
+  }
   100% {
-    transform: translateX(100%);
+    stroke-dasharray: 85, 150;
+    stroke-dashoffset: -120;
+  }
+}
+
+@keyframes whmFaviconPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.12);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.22);
+  }
+}
+
+@keyframes whmCaptionFade {
+  0%, 100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
