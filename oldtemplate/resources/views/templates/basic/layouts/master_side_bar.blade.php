@@ -26,9 +26,9 @@
             </div>
         </header>
 
-        <div class="service-category whm-page-body whm-client-page-body py-3">
-            <div class="container-fluid px-1" style="max-width: 100%; margin: 0 auto;">
-                <div class="row g-3">
+        <div class="service-category whm-page-body whm-client-page-body py-4">
+            <div class="container-fluid px-3 px-xl-4" style="max-width: 1440px; margin: 0 auto;">
+                <div class="row gy-4">
                     @yield('content')
                 </div>
             </div>

@@ -9737,11 +9737,11 @@ body:has(.whm-client-main) {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
 }
 
-/* 5. Page Body & Container Proportions across all pages (2.5px / subtle spacing) */
+/* 5. Page Body & Container Proportions across all pages (Comfortable, balanced spacing) */
 .whm-client-page-body {
   width: 100% !important;
   max-width: 100% !important;
-  padding: 12px 6px 36px !important;
+  padding: 24px 28px 48px !important;
   box-sizing: border-box !important;
   background: #f8fafc !important;
 }
@@ -9749,10 +9749,10 @@ body:has(.whm-client-main) {
 .whm-client-page-body .container,
 .whm-client-page-body .container-fluid {
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 1440px !important;
   margin: 0 auto !important;
-  padding-left: 2.5px !important;
-  padding-right: 2.5px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   box-sizing: border-box !important;
 }
 
@@ -9763,8 +9763,8 @@ body:has(.whm-client-main) {
 }
 
 .whm-client-page-body .row > * {
-  padding-left: 2.5px !important;
-  padding-right: 2.5px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* 6. Refined Service List Cards & Page Header (Clean, Subtle, No Edge Clipping) */

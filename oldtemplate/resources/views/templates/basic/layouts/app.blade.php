@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -26,22 +26,17 @@
 
     <style>
         :root {
-            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+            --font-sans: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-display: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
-        body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title, p, span, div, a {
-            font-family: var(--font-sans) !important;
+        body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title, p, span, div, a, li, label, table, th, td, h1, h2, h3, h4, h5, h6, .whm-brand strong, .tw-brand-title, .tw-heading-xl, .tw-heading-lg {
+            font-family: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
         }
-        h1, h2, h3, h4, h5, h6, .tw-brand-title, .whm-brand strong, .tw-heading-xl, .tw-heading-lg {
-            font-family: var(--font-display) !important;
-            letter-spacing: -0.025em !important;
-            -webkit-font-smoothing: antialiased !important;
-        }
         code, pre, .font-mono, .ip-address, .domain-name, [data-mono] {
-            font-family: var(--font-mono) !important;
+            font-family: 'JetBrains Mono', monospace !important;
         }
     </style>
 
