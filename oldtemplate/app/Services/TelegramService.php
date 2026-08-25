@@ -175,6 +175,49 @@ class TelegramService
     }
 
     /**
+     * Notify on Service Suspension (Due to overdue payment or admin action)
+     */
+    public static function notifyServiceSuspended($hosting, string $reason = 'Payment overdue'): bool
+    {
+        $time = now()->format('Y-m-d H:i:s T');
+
+        $text = "🚨 <b>SERVICE SUSPENDED</b>\n";
+        $text .= "━━━━━━━━━━━━━━━━━━━━\n";
+        $text .= "• <b>Service ID:</b> #" . $hosting->id . "\n";
+        $text .= "• <b>Product:</b> " . htmlspecialchars(@$hosting->product->name ?? 'Hosting Service') . "\n";
+        $text .= "• <b>Domain:</b> <code>" . htmlspecialchars($hosting->domain ?? 'N/A') . "</code>\n";
+        $text .= "• <b>Customer:</b> @" . htmlspecialchars(@$hosting->user->username ?? 'User') . " (" . htmlspecialchars(@$hosting->user->email ?? 'N/A') . ")\n";
+        $text .= "• <b>Reason:</b> " . htmlspecialchars($reason) . "\n";
+        $text .= "• <b>Next Due Date:</b> " . showDateTime($hosting->next_due_date, 'd/m/Y') . "\n";
+        $text .= "• <b>Time:</b> {$time}\n";
+
+        return self::sendMessage($text);
+    }
+
+    /**
+     * Notify on Service Expiry Reminder (Upcoming due date)
+     */
+    public static function notifyServiceExpiryReminder($hosting, int $daysRemaining): bool
+    {
+        $time = now()->format('Y-m-d H:i:s T');
+        $curSym = gs('cur_sym') ?? '$';
+
+        $urgency = $daysRemaining <= 1 ? '⚠️ <b>FINAL EXPIRY WARNING (TOMORROW)</b>' : "⏰ <b>SERVICE EXPIRY REMINDER ({$daysRemaining} DAYS REMAINING)</b>";
+
+        $text = "{$urgency}\n";
+        $text .= "━━━━━━━━━━━━━━━━━━━━\n";
+        $text .= "• <b>Service ID:</b> #" . $hosting->id . "\n";
+        $text .= "• <b>Product:</b> " . htmlspecialchars(@$hosting->product->name ?? 'Hosting Service') . "\n";
+        $text .= "• <b>Domain:</b> <code>" . htmlspecialchars($hosting->domain ?? 'N/A') . "</code>\n";
+        $text .= "• <b>Customer:</b> @" . htmlspecialchars(@$hosting->user->username ?? 'User') . "\n";
+        $text .= "• <b>Recurring Amount:</b> {$curSym}" . showAmount($hosting->recurring_amount) . "\n";
+        $text .= "• <b>Expiry / Due Date:</b> " . showDateTime($hosting->next_due_date, 'd/m/Y') . "\n";
+        $text .= "• <b>Time:</b> {$time}\n";
+
+        return self::sendMessage($text);
+    }
+
+    /**
      * Send Test Alert
      */
     public static function sendTestAlert(): bool

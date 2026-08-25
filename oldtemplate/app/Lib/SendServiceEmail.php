@@ -176,6 +176,27 @@ class SendServiceEmail{
         ]);
     }
 
+    public static function serviceExpiryReminder($hosting, int $daysRemaining){
+        $user = $hosting->user;
+        $product = $hosting->product;
+        $invoice = \App\Models\Invoice::where('hosting_id', $hosting->id)->where('status', 2)->latest()->first();
+
+        $invoiceLink = $invoice ? route('user.invoice.view', $invoice->id) : route('user.invoice.list');
+
+        notify($user, 'INVOICE_PAYMENT_REMINDER', [
+            'invoice_number' => $invoice ? $invoice->id : 'Renew-' . $hosting->id,
+            'invoice_created' => showDateTime($hosting->reg_date, 'd/m/Y'),
+            'invoice_due_date' => showDateTime($hosting->next_due_date, 'd/m/Y'),
+            'amount' => showAmount($hosting->recurring_amount, currencyFormat: false),
+            'currency_symbol' => gs('cur_sym'),
+            'service_name' => $product->name,
+            'service_domain' => $hosting->domain,
+            'days_left' => $daysRemaining,
+            'due_date' => showDateTime($hosting->next_due_date, 'd/m/Y'),
+            'invoice_link' => $invoiceLink,
+        ]);
+    }
+
     public static function invoiceRefund($invoice, $refundAmount, $trx){
         notify($invoice->user, 'INVOICE_REFUND_NOTIFICATION', [
             'invoice_id' => $invoice->id,

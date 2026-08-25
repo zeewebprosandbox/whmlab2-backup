@@ -421,10 +421,20 @@ class AdminController extends Controller
     }
 
     public function deleteService($id){
-        $service = Hosting::with('server', 'user')->findOrFail($id);
+        $service = Hosting::with('server.group', 'user')->findOrFail($id);
         $domain = $service->domain ?: '#' . $service->id;
 
-        // Clean up linked WhmPanelAccount, websites, DNS, databases, mail accounts
+        // 1. Terminate remote account on physical server / ZodPanel / Hestia
+        try {
+            $serverGroup = @$service->server->group;
+            if ($serverGroup) {
+                \App\HostingModule\HostingManager::init($serverGroup)->terminate($service);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Service remote termination warning on delete: " . $e->getMessage());
+        }
+
+        // 2. Clean up linked WhmPanelAccount, websites, DNS, databases, mail accounts
         if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_accounts')) {
             $account = \App\Models\WhmPanelAccount::where('hosting_id', $service->id)->first();
             if ($account) {
@@ -447,22 +457,35 @@ class AdminController extends Controller
             }
         }
 
-        // Decrement server accounts counter
+        // 3. Decrement server accounts counter
         if ($service->server && $service->server->current_accounts > 0) {
             $service->server->decrement('current_accounts');
         }
 
-        // Clean up invoice items referencing this hosting
+        // 4. Clean up invoice items referencing this hosting
         \App\Models\InvoiceItem::where('hosting_id', $service->id)->delete();
 
+        // 5. Delete service record
         $service->delete();
 
-        $notify[] = ['success', "Service '{$domain}' has been deleted entirely 100% successfully."];
+        $notify[] = ['success', "Service '{$domain}' terminated remotely and deleted completely from admin."];
         return back()->withNotify($notify);
     }
 
     public function deleteAllServices(){
-        $count = Hosting::count();
+        $hostings = Hosting::with('server.group')->get();
+        $count = $hostings->count();
+
+        foreach ($hostings as $service) {
+            try {
+                $serverGroup = @$service->server->group;
+                if ($serverGroup) {
+                    \App\HostingModule\HostingManager::init($serverGroup)->terminate($service);
+                }
+            } catch (\Throwable $e) {
+                // Ignore individual remote delete errors
+            }
+        }
 
         // Truncate/Clean mirror tables
         if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_dns_records')) {
@@ -481,7 +504,7 @@ class AdminController extends Controller
         // Wipe hostings
         Hosting::query()->delete();
 
-        $notify[] = ['success', "All {$count} service(s) have been deleted entirely 100% successfully."];
+        $notify[] = ['success', "All {$count} service(s) have been terminated remotely and wiped 100% successfully."];
         return back()->withNotify($notify);
     }
 

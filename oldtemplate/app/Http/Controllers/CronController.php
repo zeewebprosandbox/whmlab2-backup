@@ -34,15 +34,17 @@ class CronController extends Controller{
         $general->save();
 
         $this->invoiceGenerate(); 
+        $this->checkServiceExpiriesAndReminders();
         $this->unpaidInvoiceReminder();
         $this->firstOverdueReminder();
         $this->secondOverdueReminder();
         $this->thirdOverdueReminder();
+        $this->autoSuspendOverdueServices();
         $this->addLateFee();
         $this->removeShoppingCarts();
         $this->syncDefaultDnsZones();
 
-        $notify[] = ['success', 'Manually cron run successfully'];
+        $notify[] = ['success', 'Automated billing, renewal reminders, and suspension cron ran successfully'];
         return back()->withNotify($notify);
     }
 
@@ -485,6 +487,86 @@ class CronController extends Controller{
         }
 
         return $count;
+    }
+
+    /**
+     * Check package expiry dates and send structured notifications 7, 3, 1, and 0 days before due date
+     */
+    public function checkServiceExpiriesAndReminders()
+    {
+        $hostings = Hosting::active()->where('billing_cycle', '!=', 0)->with('user', 'product')->get();
+
+        foreach ($hostings as $hosting) {
+            if (!$hosting->next_due_date || !$hosting->user) {
+                continue;
+            }
+
+            $dueDate = Carbon::parse($hosting->next_due_date)->startOfDay();
+            $today = Carbon::now()->startOfDay();
+            $daysLeft = (int) $today->diffInDays($dueDate, false);
+
+            if (in_array($daysLeft, [7, 3, 1, 0])) {
+                $remindKey = "expiry_remind_{$daysLeft}d_" . $dueDate->format('Ymd');
+                $notes = (string) $hosting->admin_notes;
+
+                if (!str_contains($notes, $remindKey)) {
+                    SendServiceEmail::serviceExpiryReminder($hosting, $daysLeft);
+                    \App\Services\TelegramService::notifyServiceExpiryReminder($hosting, $daysLeft);
+
+                    $hosting->admin_notes = trim($notes . "\n[" . now()->format('Y-m-d H:i') . "] " . $remindKey);
+                    $hosting->save();
+                }
+            }
+        }
+    }
+
+    /**
+     * Automatically suspend overdue services on ZodPanel/Hestia and notify customer & channel
+     */
+    public function autoSuspendOverdueServices()
+    {
+        $overdueHostings = Hosting::active()
+            ->where('billing_cycle', '!=', 0)
+            ->where('next_due_date', '<', Carbon::now()->subDays(1)->startOfDay())
+            ->with('server.group', 'user', 'product')
+            ->get();
+
+        foreach ($overdueHostings as $hosting) {
+            $hasUnpaidInvoice = Invoice::where('hosting_id', $hosting->id)->where('status', 2)->exists();
+            if (!$hasUnpaidInvoice) {
+                continue;
+            }
+
+            // 1. Suspend on remote panel
+            $serverGroup = @$hosting->server->group;
+            if ($serverGroup) {
+                try {
+                    $req = new \Illuminate\Http\Request([
+                        'suspend_reason' => 'Payment overdue past grace period',
+                    ]);
+                    \App\HostingModule\HostingManager::init($serverGroup)->suspend([
+                        'hosting' => $hosting,
+                        'request' => $req,
+                    ]);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error("Automated cron suspension failed for hosting #{$hosting->id}: " . $e->getMessage());
+                }
+            }
+
+            // 2. Update service status
+            $hosting->status = 3; // 3 means Suspended
+            $hosting->suspend_reason = 'Payment overdue past grace period (Automated Cron)';
+            $hosting->suspend_date = now();
+            $hosting->save();
+
+            // 3. Send Apple Mail suspension email
+            SendServiceEmail::serviceSuspend($hosting, (object) [
+                'suspend_reason' => 'Payment overdue past grace period. Please settle your invoice to instantly restore your service.',
+            ]);
+
+            // 4. Dispatch Telegram Alert
+            \App\Services\TelegramService::notifyServiceSuspended($hosting, 'Payment overdue past grace period (Automated Cron)');
+        }
     }
 
 }

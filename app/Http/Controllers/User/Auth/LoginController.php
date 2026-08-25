@@ -105,6 +105,12 @@ class LoginController extends Controller
 
     public function authenticated(Request $request, $user)
     {
+        if ($user->status == 0) {
+            $this->guard()->logout();
+            $notify[] = ['error', 'Your account has been deactivated or banned. Please contact support for assistance.'];
+            return to_route('user.login')->withNotify($notify);
+        }
+
         $user->tv = $user->ts == Status::VERIFIED ? Status::UNVERIFIED : Status::VERIFIED;
         $user->save();
         $ip = getRealIP();

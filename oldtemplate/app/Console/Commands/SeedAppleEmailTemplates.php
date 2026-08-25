@@ -244,6 +244,85 @@ class SeedAppleEmailTemplates extends Command
     <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Renewal Date:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">{{expiry_date}}</td></tr>
 </table>'
             ],
+
+            'SERVICE_SUSPEND' => [
+                'subject' => 'Service Suspended — {{service_name}}',
+                'email_body' => '<h2 style="font-size: 20px; font-weight: 600; color: #ff3b30; margin: 0 0 12px 0;">Service Suspension Notice</h2>
+<p style="margin: 0 0 20px 0; color: #424245;">Your service <strong>{{service_name}}</strong> has been suspended due to: <em>{{service_suspension_reason}}</em>.</p>
+
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #fff5f5; border: 1px solid #ffccd0; border-radius: 10px; margin-bottom: 24px; padding: 16px 20px;">
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Service:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">{{service_name}}</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Status:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 700; color: #ff3b30; text-align: right;">Suspended</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Due Date:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">{{service_next_due_date}}</td></tr>
+</table>
+
+<p style="font-size: 13px; color: #424245; margin: 0 0 24px 0;">To immediately unsuspend and restore your service, please settle your outstanding invoice.</p>
+
+<div style="text-align: center; margin: 28px 0 10px 0;">
+    <a href="{{invoice_link}}" style="background: #000000; color: #ffffff; padding: 12px 28px; border-radius: 980px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">Pay Invoice & Restore Service</a>
+</div>'
+            ],
+
+            'SERVICE_UNSUSPEND' => [
+                'subject' => 'Service Restored & Active — {{service_name}}',
+                'email_body' => '<h2 style="font-size: 20px; font-weight: 600; color: #34c759; margin: 0 0 12px 0;">Service Successfully Restored</h2>
+<p style="margin: 0 0 20px 0; color: #424245;">Your service <strong>{{service_name}}</strong> has been reactivated and full access is now restored.</p>
+
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #fbfbfd; border: 1px solid #e5e5ea; border-radius: 10px; margin-bottom: 24px; padding: 16px 20px;">
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Service:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">{{service_name}}</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Status:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 700; color: #34c759; text-align: right;">Active</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Next Due Date:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">{{service_next_due_date}}</td></tr>
+</table>
+
+<div style="text-align: center; margin: 28px 0 10px 0;">
+    <a href="https://zodpanel.zodserver.cloud:8083" style="background: #000000; color: #ffffff; padding: 12px 28px; border-radius: 980px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">Open Control Panel</a>
+</div>'
+            ],
+
+            'FIRST_INVOICE_OVERDUE_NOTICE' => [
+                'subject' => 'Invoice Overdue Notice (1st Warning) — #{{invoice_number}}',
+                'email_body' => '<h2 style="font-size: 20px; font-weight: 600; color: #ff9500; margin: 0 0 12px 0;">Invoice Payment Overdue</h2>
+<p style="margin: 0 0 20px 0; color: #424245;">Invoice <strong>#{{invoice_number}}</strong> was due on <strong>{{invoice_due_date}}</strong> and is now overdue.</p>
+
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #fbfbfd; border: 1px solid #e5e5ea; border-radius: 10px; margin-bottom: 24px; padding: 16px 20px;">
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Invoice #:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">#{{invoice_number}}</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Due Date:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #ff3b30; text-align: right;">{{invoice_due_date}}</td></tr>
+</table>
+
+<div style="text-align: center; margin: 28px 0 10px 0;">
+    <a href="{{invoice_link}}" style="background: #000000; color: #ffffff; padding: 12px 28px; border-radius: 980px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">Pay Overdue Invoice</a>
+</div>'
+            ],
+
+            'SECOND_INVOICE_OVERDUE_NOTICE' => [
+                'subject' => 'Urgent: Invoice Overdue (2nd Notice) — #{{invoice_number}}',
+                'email_body' => '<h2 style="font-size: 20px; font-weight: 600; color: #ff3b30; margin: 0 0 12px 0;">Urgent Overdue Notice</h2>
+<p style="margin: 0 0 20px 0; color: #424245;">Invoice <strong>#{{invoice_number}}</strong> remains unpaid. To prevent automated service suspension, please submit payment promptly.</p>
+
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #fbfbfd; border: 1px solid #e5e5ea; border-radius: 10px; margin-bottom: 24px; padding: 16px 20px;">
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Invoice #:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">#{{invoice_number}}</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Due Date:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #ff3b30; text-align: right;">{{invoice_due_date}}</td></tr>
+</table>
+
+<div style="text-align: center; margin: 28px 0 10px 0;">
+    <a href="{{invoice_link}}" style="background: #ff3b30; color: #ffffff; padding: 12px 28px; border-radius: 980px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">Pay Now to Prevent Suspension</a>
+</div>'
+            ],
+
+            'THIRD_INVOICE_OVERDUE_NOTICE' => [
+                'subject' => 'Final Notice Before Suspension — #{{invoice_number}}',
+                'email_body' => '<h2 style="font-size: 20px; font-weight: 600; color: #ff3b30; margin: 0 0 12px 0;">Final Notice: Immediate Action Required</h2>
+<p style="margin: 0 0 20px 0; color: #424245;">This is your final notice regarding unpaid Invoice <strong>#{{invoice_number}}</strong>. Your service will be automatically suspended shortly unless payment is settled.</p>
+
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #fbfbfd; border: 1px solid #e5e5ea; border-radius: 10px; margin-bottom: 24px; padding: 16px 20px;">
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Invoice #:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #1d1d1f; text-align: right;">#{{invoice_number}}</td></tr>
+    <tr><td style="padding: 6px 0; font-size: 13px; color: #86868b;">Status:</td><td style="padding: 6px 0; font-size: 13px; font-weight: 700; color: #ff3b30; text-align: right;">Pending Suspension</td></tr>
+</table>
+
+<div style="text-align: center; margin: 28px 0 10px 0;">
+    <a href="{{invoice_link}}" style="background: #ff3b30; color: #ffffff; padding: 12px 28px; border-radius: 980px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">Pay Immediately</a>
+</div>'
+            ],
         ];
     }
 }
