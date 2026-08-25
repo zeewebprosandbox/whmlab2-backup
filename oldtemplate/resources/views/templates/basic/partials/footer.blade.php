@@ -8,11 +8,7 @@
     <div class="whm-footer-grid">
         <div class="whm-footer-brand">
             <a href="{{ route('home') }}" class="whm-brand">
-                <span class="whm-brand-mark"><i data-lucide="server"></i></span>
-                <span>
-                    <strong>{{ gs('site_name') }}</strong>
-                    <small>@lang('Hosting & Domains')</small>
-                </span>
+                <img src="{{ siteLogo('dark') }}" alt="{{ gs('site_name') }}" class="whm-brand-img" style="max-height: 38px; max-width: 170px; object-fit: contain;">
             </a>
             <p>{{ __(@$footer->data_values->description) ?: __('Clean hosting billing, domains, invoices, and client services in one workspace.') }}</p>
         </div>

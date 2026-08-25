@@ -4,11 +4,7 @@
 
 <header class="tw-nav">
     <a href="{{ route('home') }}" class="tw-brand">
-        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
-        <span>
-            <strong class="tw-brand-title">{{ gs('site_name') }}</strong>
-            <small class="tw-brand-subtitle">@lang('Hosting & Domains')</small>
-        </span>
+        <img src="{{ siteLogo() }}" alt="{{ gs('site_name') }}" class="tw-brand-img" style="max-height: 38px; max-width: 180px; object-fit: contain;">
     </a>
 
     <nav class="tw-menu">
@@ -70,11 +66,7 @@
 <aside class="whm-app-sidebar" data-whm-sidebar>
     <div class="whm-sidebar-brand">
         <a href="{{ route('home') }}" class="whm-brand">
-            <span class="whm-brand-mark"><i data-lucide="server"></i></span>
-            <span>
-                <strong>{{ gs('site_name') }}</strong>
-                <small>@lang('Billing & Management')</small>
-            </span>
+            <img src="{{ siteLogo('dark') }}" alt="{{ gs('site_name') }}" class="whm-brand-img" style="max-height: 38px; max-width: 170px; object-fit: contain;">
         </a>
     </div>
     <nav class="whm-sidebar-nav">

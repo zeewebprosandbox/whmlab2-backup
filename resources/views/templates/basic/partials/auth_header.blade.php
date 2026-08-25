@@ -26,11 +26,7 @@
 
 <header class="tw-nav whm-client-desktop-nav">
     <a href="{{ route('user.home') }}" class="tw-brand">
-        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
-        <span>
-            <strong class="tw-brand-title">{{ gs('site_name') }}</strong>
-            <small class="tw-brand-subtitle">@lang('Client Area')</small>
-        </span>
+        <img src="{{ siteLogo() }}" alt="{{ gs('site_name') }}" class="tw-brand-img" style="max-height: 36px; max-width: 170px; object-fit: contain;">
     </a>
 
     <nav class="tw-menu">
@@ -52,7 +48,7 @@
         @include($activeTemplate . 'partials.cart_widget')
         <x-language />
         <a href="{{ route('user.profile.setting') }}" class="whm-user-chip">
-            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->fullname ?? $user->username) }}&background=2563eb&color=fff" alt="@lang('User')">
+            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->fullname ?? $user->username) }}&background=4f46e5&color=fff" alt="@lang('User')">
             <span>{{ __($user->firstname ?? $user->username) }}</span>
         </a>
     </div>
@@ -63,8 +59,7 @@
         <i data-lucide="menu"></i>
     </button>
     <a href="{{ route('user.home') }}" class="tw-brand">
-        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
-        <span class="font-black text-ink">{{ gs('site_name') }}</span>
+        <img src="{{ siteLogo() }}" alt="{{ gs('site_name') }}" class="tw-brand-img" style="max-height: 32px; max-width: 150px; object-fit: contain;">
     </a>
     @include($activeTemplate . 'partials.cart_widget')
 </header>
@@ -74,11 +69,7 @@
 <aside class="whm-app-sidebar whm-client-sidebar" data-whm-sidebar style="scrollbar-width: none; -ms-overflow-style: none;">
     <div class="whm-sidebar-brand">
         <a href="{{ route('user.home') }}" class="whm-brand">
-            <span class="whm-brand-mark"><i data-lucide="server"></i></span>
-            <span>
-                <strong>{{ gs('site_name') }}</strong>
-                <small>@lang('Client Area')</small>
-            </span>
+            <img src="{{ siteLogo('dark') }}" alt="{{ gs('site_name') }}" class="whm-brand-img" style="max-height: 36px; max-width: 170px; object-fit: contain;">
         </a>
     </div>
     <nav class="whm-sidebar-nav" style="scrollbar-width: none; -ms-overflow-style: none;">

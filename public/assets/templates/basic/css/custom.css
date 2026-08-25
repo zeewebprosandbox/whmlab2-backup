@@ -9359,6 +9359,32 @@ body:has(.whm-client-main) {
   border-bottom: 1px solid var(--portal-sidebar-border) !important;
 }
 
+/* Brand Logo Image Styling */
+.whm-brand-img,
+.tw-brand-img {
+  display: block !important;
+  max-height: 36px !important;
+  max-width: 170px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.whm-brand-img:hover,
+.tw-brand-img:hover {
+  opacity: 0.9 !important;
+}
+
+.whm-sidebar-brand {
+  padding: 16px 20px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.whm-sidebar-brand .whm-brand-img {
+  max-height: 34px !important;
+}
+
 .whm-client-sidebar .whm-brand {
   display: flex !important;
   align-items: center !important;
