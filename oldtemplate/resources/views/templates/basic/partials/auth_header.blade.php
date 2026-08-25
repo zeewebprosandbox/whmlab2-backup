@@ -71,7 +71,7 @@
 
 <div class="whm-sidebar-overlay" data-whm-overlay></div>
 
-<aside class="whm-app-sidebar whm-client-sidebar" data-whm-sidebar>
+<aside class="whm-app-sidebar whm-client-sidebar" data-whm-sidebar style="scrollbar-width: none; -ms-overflow-style: none;">
     <div class="whm-sidebar-brand">
         <a href="{{ route('user.home') }}" class="whm-brand">
             <span class="whm-brand-mark"><i data-lucide="server"></i></span>
@@ -81,7 +81,7 @@
             </span>
         </a>
     </div>
-    <nav class="whm-sidebar-nav">
+    <nav class="whm-sidebar-nav" style="scrollbar-width: none; -ms-overflow-style: none;">
         <div class="whm-nav-group">
             <p>@lang('Overview')</p>
             <a href="{{ route('user.home') }}" class="whm-nav-item {{ request()->routeIs('user.home') ? 'active' : '' }}">
@@ -150,7 +150,7 @@
         </div>
     </nav>
     <div class="whm-sidebar-user">
-        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->fullname ?? $user->username) }}&background=2563eb&color=fff" alt="@lang('User')">
+        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->fullname ?? $user->username) }}&background=4f46e5&color=fff" alt="@lang('User')">
         <div>
             <strong>{{ __($user->fullname ?? $user->username) }}</strong>
             <span>{{ __($user->email) }}</span>
