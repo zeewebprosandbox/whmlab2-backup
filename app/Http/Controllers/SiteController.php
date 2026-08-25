@@ -152,7 +152,9 @@ class SiteController extends Controller
             'Email Deliverability',
             'Security & SSL',
             'Developer Stacks',
-            'eCommerce & Scale'
+            'eCommerce & Scale',
+            'Database Tuning',
+            'DevOps & Backups'
         ];
 
         return view('Template::blogs', compact('pageTitle', 'sections', 'blogs', 'categories'));
