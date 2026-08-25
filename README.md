@@ -1,158 +1,254 @@
-# WHM/cPanel Billing Platform — Next.js 14 & Laravel 11 Workspace
+# ZodHost & ZodPanel Platform (ZodHostVpS)
 
-A high-performance, modern WHM/cPanel Billing & Server Management Platform featuring an ultra-clean **Next.js 14+ (App Router)** client frontend with a **shadcn/ui** design system, paired with a robust **Laravel** backend and WHMPanel control layer.
+> **Next-Generation Cloud Web Hosting, VPS Management & Billing Automation Suite**  
+> Built for High Performance, Resiliency, Multi-PHP, Node.js Apps, Git Auto-Deploy, Single Sign-On (phpMyAdmin & Roundcube), and Automated Lifecycle Management.
 
----
-
-## 🚀 Key Features & UI Surface
-
-- **Aesthetic Direction**: "Orbital Minimalism" — Dark-mode Linear meets Vercel meets Stripe aesthetic (`#09090b` zinc canvas, `#18181b` card surfaces, subtle `border-zinc-800` structural borders, electric indigo `#6366F1` & cyan `#22D3EE` accents).
-- **Dual Typography**: **Inter** for clean technical reading and **JetBrains Mono** for IPs, server specs, DNS records, and terminal logs.
-- **Server Health Telemetry**: Live CPU load, RAM usage, and NVMe disk gauges with cluster status badges.
-- **cPanel Replacement Console (`/services/[id]`)**:
-  1. **Overview**: Resource usage circular progress gauges & Quick Utilities grid (phpMyAdmin, Mailboxes, SSL, Backups, Subdomains).
-  2. **Files & Databases**: MySQL database management table.
-  3. **Email**: Mailbox list with quota usage bars and "Create Account" modal with password generator.
-  4. **Domains & DNS**: Inline DNS Zone editor table (A, CNAME, MX records).
-  5. **Security**: Let's Encrypt Wildcard AutoSSL status and one-click installer.
-  6. **Advanced**: PHP Version selector (PHP 8.2, 8.1, 8.0) and php.ini settings.
-- **Domain Portfolio (`/domains`)**: Domain table with auto-renew switches, WHOIS privacy toggle, and bulk nameserver toolbar.
-- **Financial Core (`/billing`)**: Credit balance card, spending analytics, filterable invoice list, and clean receipt view.
-- **Support Center (`/support`)**: Support tickets center with priority badges (High/Low) and 6-digit Support PIN verification.
-- **Account & Settings (`/settings`)**: Profile avatar, API key manager table, 2FA setup, and granular notification matrix.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Ubuntu%2024.04%20LTS-orange.svg)](https://ubuntu.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2%20%7C%208.3%20%7C%208.4%20%7C%208.5-purple.svg)](https://php.net)
+[![Node.js](https://img.shields.io/badge/Node.js-18%20%7C%2020%20%7C%2022-green.svg)](https://nodejs.org)
+[![HestiaCP](https://img.shields.io/badge/core-HestiaCP%201.8+-red.svg)](https://hestiacp.com)
 
 ---
 
-## 📦 Directory Structure
+## 📑 Table of Contents
 
-```text
-whmlab2.0/
-├── frontend/                 # Next.js 14+ (App Router) + shadcn/ui Frontend
-│   ├── src/
-│   │   ├── app/              # App Router routes (/dashboard, /services, /domains, /billing, /support, /settings, /login)
-│   │   ├── components/       # shadcn/ui primitives & layout components (sidebar, header)
-│   │   └── lib/              # Utility helpers (cn class merger)
-│   ├── package.json
-│   └── next.config.ts
-├── app/                      # Laravel Controllers, Models, Middleware & Services
-├── config/                   # Laravel Configurations
-├── database/                 # Migrations & Seeders
-├── public/                   # Web Server Document Root
-├── resources/                # Blade Templates & Tailwind CSS Design System Core
-└── routes/                   # Web, User & API Route Definitions
+- [Overview & Architecture](#-overview--architecture)
+- [Key Features](#-key-features)
+- [Repository Structure](#-repository-structure)
+- [Quick Start & Automated Node Installation](#-quick-start--automated-node-installation)
+- [Client Area & Billing Engine (WHMLab)](#-client-area--billing-engine-whmlab)
+- [Single Sign-On (SSO) Engines](#-single-sign-on-sso-engines)
+  - [phpMyAdmin Multi-Database SSO](#phpmyadmin-multi-database-sso)
+  - [Roundcube Webmail SSO (Dovecot Master Auth)](#roundcube-webmail-sso-dovecot-master-auth)
+- [Node.js Engine & Git Push-to-Deploy](#-nodejs-engine--git-push-to-deploy)
+- [Unified Cron Automation](#-unified-cron-automation)
+- [Documentation Index](#-documentation-index)
+- [Security & Hardening](#-security--hardening)
+- [License](#-license)
+
+---
+
+## 🏛 Overview & Architecture
+
+**ZodHostVpS** is a unified, full-stack hosting platform engineered to provide a self-hosted alternative to cPanel/WHM with modern web technologies. It bridges two integrated subsystems:
+
+1. **ZodPanel VPS Node Engine (`/vps`)**:
+   - Hardened Linux hosting server stack running on **Ubuntu 24.04 LTS**.
+   - Dual-engine web server: **Nginx** (Reverse Proxy / SSL Termination / HTTP/2) + **Apache2** / **PHP-FPM** backend.
+   - Multi-PHP manager supporting concurrent PHP versions from **5.6 up to 8.5**.
+   - **Dovecot IMAP/POP3** with Master User authentication & **Exim4** with automatic SPF/DKIM/DMARC deliverability repair.
+   - Isolated **Node.js App Engine** with Systemd process supervisors and automatic Nginx reverse proxying.
+   - **Git Auto-Deploy Webhook Engine** with dedicated SSH deploy key management.
+
+2. **WHMLab Client Area & Billing Suite (`/app`, `/resources`, `/frontend`)**:
+   - Modern Laravel backend & React/Next.js frontend dashboard.
+   - Automated hosting account provisioning, upgrade/downgrade, and termination.
+   - Automated invoice generation, payment gateways, and recurring subscriptions.
+   - Single-entrypoint cron orchestrator (`php artisan zod:automate-cron`) for automated expiration warnings, service suspensions, server resource sync, and email deliverability health checks.
+
+```
++-------------------------------------------------------------------------+
+|                         WHMLab Client Area / Billing                    |
+|                (Laravel API + Next.js Frontend Dashboard)               |
++-------------------------------------------------------------------------+
+                                    │
+                                    │ REST API / SSH Automation
+                                    ▼
++-------------------------------------------------------------------------+
+|                       ZodPanel Host Node (VPS)                          |
+|  ┌──────────────────────┐  ┌─────────────────────┐  ┌────────────────┐  |
+|  | Nginx Reverse Proxy  |  | phpMyAdmin SSO      |  | Roundcube SSO  |  |
+|  | (Port 80/443/HTTP2)  |  | (hestia-sso.php)    |  | (Dovecot Mast) |  |
+|  └──────────┬───────────┘  └─────────────────────┘  └────────────────┘  |
+|             │                                                           |
+|             ├───────────────┬───────────────┬───────────────┐           |
+|             ▼               ▼               ▼               ▼           |
+|       ┌───────────┐   ┌───────────┐   ┌───────────┐   ┌───────────┐     |
+|       | Apache2 / |   | Multi-PHP |   | Node.js   |   | MariaDB   |     |
+|       | FastCGI   |   | 5.6 - 8.5 |   | Apps      |   | Database  |     |
+|       └───────────┘   └───────────┘   └───────────┘   └───────────┘     |
++-------------------------------------------------------------------------+
 ```
 
 ---
 
-## ⚡ Quick Start: Running the Platform
+## ✨ Key Features
 
-### 1. Start Next.js Frontend (Port 3000)
+- **Seamless Single Sign-On (SSO)**:
+  - Open phpMyAdmin for any database or all databases with a single click.
+  - Open Roundcube Webmail instantly using cryptographic HMAC-SHA256 tokens and Dovecot Master User authentication.
+- **Node.js Application Manager**:
+  - Deploy Next.js, Express, Nest.js, Remix, and Nuxt apps alongside PHP sites.
+  - Automatic port allocation, Systemd service generation, environment variable management, and Nginx proxy routing.
+- **Git Push-to-Deploy**:
+  - Deploy private or public repositories with webhook listeners and automated build pipelines (`composer install`, `npm run build`, migrations).
+- **Automated Mail Deliverability**:
+  - Automatic 2048-bit DKIM key generation, SPF record alignment, DMARC policy enforcement, and Exim4 mail server tuning.
+- **Zero-Friction Node Setup**:
+  - Single-script automated setup (`vps/install_vps_node.sh`) that provisions a complete production node in minutes.
 
-```bash
-# Navigate to the Next.js frontend directory
-cd frontend
+---
 
-# Install UI dependencies (if not already installed)
-npm install
+## 📂 Repository Structure
 
-# Run Next.js in Development Mode
-npm run dev
 ```
-
-Open your browser at **`http://localhost:3000`** to view the clean Next.js + shadcn/ui frontend.
-
-#### Building Frontend for Production
-
-```bash
-# Inside the frontend directory
-cd frontend
-
-# Run optimized production build
-npm run build
-
-# Start production server
-npm start
+.
+├── vps/                               # VPS Node Engine & Server Files
+│   ├── install_vps_node.sh            # Automated 1-Click VPS Node Installer
+│   ├── usr_local_hestia_bin/          # Custom CLI binaries (v-zodpanel-*)
+│   ├── web/                           # Custom ZodPanel Web GUI modules & templates
+│   ├── roundcube_plugins/             # Roundcube Webmail SSO plugin (zodpanel_sso)
+│   ├── phpmyadmin/                    # phpMyAdmin multi-database SSO engine (hestia-sso.php)
+│   ├── etc_whmpanel/                  # Configuration & Master SSO environment files
+│   ├── etc_nginx_custom/              # Nginx templates (phpmyadmin.inc, cloudflare.inc)
+│   └── dovecot_configs/               # Dovecot master user authentication configs
+│
+├── app/                               # Laravel WHMLab Backend Core
+│   ├── Console/Commands/              # Automation commands (AutomateCronCommand, etc.)
+│   ├── Http/Controllers/              # Billing, provisioning, and API controllers
+│   ├── Models/                        # Eloquent models (User, Service, Server, Invoice)
+│   └── Services/                      # Server provisioning & remote synchronization
+│
+├── frontend/                          # Next.js Modern Client Area & Dashboard
+│   ├── src/app/                       # App Router pages (Services, Billing, Domains, etc.)
+│   └── src/components/                # Reusable UI components
+│
+├── resources/                         # Blade templates and legacy client views
+├── routes/                            # Web, Admin, and API routes
+├── scratch/                           # Deployment, migration, and testing utilities
+│
+├── README.md                          # Master Project Guide
+├── VPS_INSTALLATION_GUIDE.md          # Step-by-step VPS Node Deployment Guide
+├── SSO_AUTHENTICATION_GUIDE.md        # Technical Guide for phpMyAdmin & Webmail SSO
+├── NODEJS_AND_GIT_ENGINE_GUIDE.md     # Node.js process and Git deployment documentation
+├── AUTOMATION_AND_CRON_GUIDE.md       # Background cron jobs & automation documentation
+├── DNS_DOMAIN_RECORDS_GUIDE.md        # DNS Records and Zone Management Guide
+└── DEVELOPER_FRIENDLY_BLUEPRINT.md    # Developer Blueprint & Architecture Reference
 ```
 
 ---
 
-### 2. Start Laravel Backend & WHMPanel (Port 8000)
+## 🚀 Quick Start & Automated Node Installation
+
+### 1. Provision a New VPS Node
+
+On a fresh Ubuntu 24.04 LTS instance:
 
 ```bash
-# From the project root
-composer install
+# 1. Clone repository
+git clone https://github.com/zeewebprosandbox/ZodHostVpS.git /opt/zodhost-vps
+cd /opt/zodhost-vps/vps
+
+# 2. Make installer executable and run
+chmod +x install_vps_node.sh
+./install_vps_node.sh
+```
+
+### 2. Configure Hostname & SSL
+
+```bash
+# Set FQDN
+v-change-sys-hostname zodpanel.zodserver.cloud
+
+# Issue Let's Encrypt SSL for the control panel
+v-add-letsencrypt-host
+```
+
+---
+
+## 💼 Client Area & Billing Engine (WHMLab)
+
+### Local / Production WHMLab Setup
+
+```bash
+# 1. Install PHP dependencies
+composer install --no-dev --optimize-autoloader
+
+# 2. Configure Environment
 cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
 
-# Start Laravel development server
-php artisan serve
+# 3. Run database migrations
+php artisan migrate --force
+
+# 4. Install & Build Frontend
+npm install
+npm run build
 ```
-
-The backend API and admin control panel will be available at **`http://127.0.0.1:8000`** (or `/admin`).
 
 ---
 
-## 🗺️ Next.js App Router Map
+## 🔑 Single Sign-On (SSO) Engines
 
-| Route | Description | Component Surface |
-| :--- | :--- | :--- |
-| `/dashboard` | Main Client Console | Telemetry cluster meters, active instances, balance snapshot, support PIN |
-| `/services` | Hosting Services | Grid of running cPanel, WordPress & VPS instances |
-| `/services/[id]` | cPanel Replacement | 6-tab console (Overview, Files & DB, Email, DNS Zone Editor, SSL, Advanced) |
-| `/domains` | Domain Portfolio | Domains table, auto-renew switches, bulk nameserver toolbar |
-| `/billing` | Financial Core | Credit balance, deposit funds, itemized invoice list & receipt view |
-| `/support` | Support Center | Ticket threads, priority dot badges, create ticket trigger |
-| `/settings` | Account & Security | Profile details, API tokens table, 2FA QR code modal, notification matrix |
-| `/login` | Auth Layer | Split-screen layout with animated mesh background & SSL trust footer |
+### phpMyAdmin Multi-Database SSO
+- **Handler**: `/open/phpmyadmin/index.php`
+- **Target**: `/usr/share/phpmyadmin/hestia-sso.php`
+- Authenticates panel users across all owned databases without entering database passwords.
+
+### Roundcube Webmail SSO (Dovecot Master Auth)
+- **Plugin**: `/var/lib/roundcube/plugins/zodpanel_sso/zodpanel_sso.php`
+- **Mechanism**: Dovecot master authentication (`mailbox@domain.com*masteruser`) with HMAC-SHA256 timestamped signatures.
+- Automatically creates Roundcube sessions and redirects users straight into their inbox.
 
 ---
 
-## ⚙️ Control Panel Subdomain Routing (Optional)
+## ⚡ Node.js Engine & Git Push-to-Deploy
 
-To serve WHMPanel from a dedicated subdomain such as `panel.example.com`:
-
-```env
-APP_URL=https://example.com
-WHMPANEL_DOMAIN=panel.example.com
-SESSION_DOMAIN=.example.com
-```
-
-Clear cached configuration:
+### Deploying a Node.js App via CLI
 
 ```bash
-php artisan optimize:clear
-php artisan config:cache
-php artisan route:cache
+v-zodpanel-node-app zodhost zodhost.com create 3000 /home/zodhost/web/zodhost.com/public_html "npm run start" 20
+```
+
+### Configuring Git Auto-Deploy
+
+```bash
+v-zodpanel-git-deploy zodhost zodhost.com \
+    "git@github.com:myorg/app.git" \
+    "main" \
+    "npm install && npm run build && v-zodpanel-node-app zodhost zodhost.com restart"
 ```
 
 ---
 
-## 🔒 Private GitHub Authentication & Domain DNS Setup
+## ⏰ Unified Cron Automation
 
-### Keeping GitHub Repositories 100% Private
+Consolidate all background hosting workers into a single cron job:
 
-Your ZodPanel repositories (`whmlab2-backup` and `zodpanel-hestia-custom-backup`) can remain **100% PRIVATE**. When adding a new VPS via 1-Click Auto-Merge, WHMLab authenticates with GitHub using a **GitHub Personal Access Token (PAT)**.
+```bash
+* * * * * cd /path/to/whmlab && php artisan schedule:run >> /dev/null 2>&1
+```
 
-1. **Add Token to `.env`**:
-   ```env
-   ZODPANEL_GITHUB_TOKEN=ghp_abcdefghijklmnopqrstuvwxyz0123456789
-   ZODPANEL_BACKUP_REPO=https://github.com/zeewebprosandbox/zodpanel-hestia-custom-backup
-   WHMLAB_BACKUP_REPO=https://github.com/zeewebprosandbox/whmlab2-backup
-   ```
-2. **Automated Node Deployment**:
-   During 1-Click VPS Auto-Merge, WHMLab uses `https://{TOKEN}@github.com/...` to clone and update the latest ZodPanel release directly onto the node without exposing public access.
+Or trigger manual execution:
 
----
-
-## 🌐 Full Domain DNS Records & Registrar Setup
-
-For full technical specifications on all DNS records (A, NS, CNAME, MX, SPF, DKIM, DMARC, SRV) and step-by-step registrar glue record guides for Cloudflare, Namecheap, GoDaddy, NameSilo, etc., see:
-
-👉 **[Complete Domain DNS Records & Registrar Guide](DNS_DOMAIN_RECORDS_GUIDE.md)**
+```bash
+php artisan zod:automate-cron
+```
 
 ---
 
-## 🛡️ License & Credits
+## 📚 Documentation Index
 
-Built for high-performance server administration & hosting billing. Built with Next.js 14, shadcn/ui, Tailwind CSS, Lucide Icons, and Laravel.
+| Guide | Description |
+| :--- | :--- |
+| [VPS Installation Guide](VPS_INSTALLATION_GUIDE.md) | Full guide for provisioning and hardening Ubuntu 24.04 VPS nodes |
+| [SSO Authentication Guide](SSO_AUTHENTICATION_GUIDE.md) | Technical architecture of phpMyAdmin and Roundcube Webmail SSO |
+| [Node.js & Git Engine Guide](NODEJS_AND_GIT_ENGINE_GUIDE.md) | Node.js lifecycle manager and Git auto-deploy webhooks |
+| [Automation & Cron Guide](AUTOMATION_AND_CRON_GUIDE.md) | WHMLab background worker and cron automation reference |
+| [DNS & Domain Guide](DNS_DOMAIN_RECORDS_GUIDE.md) | Complete DNS zones and deliverability reference |
+| [Developer Blueprint](DEVELOPER_FRIENDLY_BLUEPRINT.md) | Architectural specification and development guidelines |
+
+---
+
+## 🔒 Security & Hardening
+
+- **Firewall**: Managed via `ufw` and `fail2ban` with jail rules for SSH, Web, Mail, and Control Panel brute-force attempts.
+- **Isolated User System**: Each web application and Node.js process runs under its isolated POSIX user account.
+- **Session Tokens**: All internal API and SSO endpoints enforce time-bound HMAC signatures and CSRF tokens.
+
+---
+
+## 📄 License
+
+This software is released under the **MIT License**.
