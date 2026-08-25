@@ -84,7 +84,12 @@ class ServiceController extends Controller{
             }
         }
 
-        $nodeHost = $server?->ip_address ?: (parse_url($server?->hostname ?: '', PHP_URL_HOST) ?: '169.58.176.53');
+        $rawHost = $server?->hostname ?: '';
+        $parsedHost = parse_url($rawHost, PHP_URL_HOST) ?: $rawHost;
+        $nodeHost = !empty($parsedHost) && !filter_var($parsedHost, FILTER_VALIDATE_IP) 
+            ? $parsedHost 
+            : 'zodpanel.zodserver.cloud';
+
         $ssoLinks = [
             'panel' => route('user.login.hosting', $service->id),
             'phpmyadmin' => "https://{$nodeHost}:8083/open/phpmyadmin/",

@@ -1,207 +1,221 @@
 /* Copy Animation */
-::selection{
+::selection {
   background-color: #3390FF;
   color: #fff;
 }
 
-.base-color{
+.base-color {
   color: hsl(var(--main)) !important;
 }
 
 .copyInput {
-	display: inline-block;
-	line-height: 50px;
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 40px;
-	text-align: center;
-	font-size: 14px;
-	cursor: pointer;
-	-webkit-transition: all .3s;
-	-o-transition: all .3s;
-	transition: all .3s;
-  }
-  
-  .copied::after {
-	position: absolute;
-	top: 8px;
-	right: 12%;
-	width: 100px;
-	display: block;
-	content: "COPIED";
-	font-size: 1em;
-	padding: 5px 5px;
-	color: #fff;
-	background-color: #FF7000;
-	border-radius: 3px;
-	opacity: 0;
-	will-change: opacity, transform;
-	animation: showcopied 1.5s ease;
-  }
-  
-  @keyframes showcopied {
-	0% {
-		opacity: 0;
-		transform: translateX(100%);
-	}
-	50% {
-		opacity: 0.7;
-		transform: translateX(40%);
-	}
-	70% {
-		opacity: 1;
-		transform: translateX(0);
-	}
-	100% {
-		opacity: 0;
-	}
+  display: inline-block;
+  line-height: 50px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
+}
+
+.copied::after {
+  position: absolute;
+  top: 8px;
+  right: 12%;
+  width: 100px;
+  display: block;
+  content: "COPIED";
+  font-size: 1em;
+  padding: 5px 5px;
+  color: #fff;
+  background-color: #FF7000;
+  border-radius: 3px;
+  opacity: 0;
+  will-change: opacity, transform;
+  animation: showcopied 1.5s ease;
+}
+
+@keyframes showcopied {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
   }
 
+  50% {
+    opacity: 0.7;
+    transform: translateX(40%);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
 
 
 
+
+.cookies-card {
+  width: 520px;
+  padding: 30px;
+  color: #1E2337;
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 999999;
+  transition: all .5s;
+  background: #d1d1d1;
+  border-radius: 5px;
+}
+
+.cookies-card.hide {
+  bottom: -500px !important;
+}
+
+.radius--10px {
+  border-radius: 10px;
+}
+
+.cookies-card__icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background-color: #6e6f70;
+  color: #fff;
+  font-size: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cookies-card__content {
+  margin-bottom: 0;
+}
+
+.cookies-btn {
+  color: #363636;
+  text-decoration: none;
+  padding: 10px 35px;
+  margin: 3px 5px;
+  display: inline-block;
+  border-radius: 999px;
+}
+
+.cookies-btn:hover {
+  color: #363636;
+}
+
+
+@media (max-width: 767px) {
   .cookies-card {
-	width: 520px;
-	padding: 30px;
-	color: #1E2337;
-	position:  fixed;
-	bottom: 15px;  
-	left: 15px;
-	z-index: 999999;
-	transition: all .5s;
-	background: #d1d1d1;
-    border-radius: 5px;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    font-size: 14px;
+    padding: 15px;
   }
-  
-  .cookies-card.hide{
-	bottom: -500px !important;
-  }
-  .radius--10px {
-	border-radius: 10px;
-  }
-  
-  .cookies-card__icon {
-	width: 55px;
-	height: 55px;
-	border-radius: 50%;
-	background-color: #6e6f70;
-    color: #fff;
-	font-size: 32px;
-	display: inline-flex;
-	justify-content: center;
-	align-items: center;
-  }
-  
-  .cookies-card__content {
-	margin-bottom: 0;
-  }
-  
-  .cookies-btn {
-	color: #363636;
-	text-decoration: none;
-	padding: 10px 35px;
-	margin: 3px 5px;
-	display: inline-block;
-	border-radius:  999px;
-  }
-  
-  .cookies-btn:hover {
-	color: #363636;
-  }
-
-  
-  @media (max-width: 767px) {
-	  .cookies-card {
-		  width:  100%;
-		  left: 0;
-		  bottom:  0;
-		  font-size:  14px;
-		  padding:  15px;
-	  }
-  }
+}
 
 
 
 
 .hover-input-popup {
-        position: relative;
-    }
-    .input-popup {
-        display: none;
-    }
-    .hover-input-popup .input-popup {
-        display: block;
-        position: absolute;
-        bottom: 130%;
-        left: 50%;
-        width: 280px;
-        background-color: #1a1a1a;
-        color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        -webkit-border-radius: 5px;
-        -moz-border-radius: 5px;
-        -ms-border-radius: 5px;
-        -o-border-radius: 5px;
-        -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-        transform: translateX(-50%);
-        -webkit-transition: all 0.3s;
-        -o-transition: all 0.3s;
-        transition: all 0.3s;
-    }
-    .input-popup::after {
-        position: absolute;
-        content: '';
-        bottom: -19px;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 10px 10px 10px 10px;
-        border-style: solid;
-        border-color: transparent transparent #1a1a1a transparent;
-        -webkit-transform: rotate(180deg);
-        -ms-transform: rotate(180deg);
-        transform: rotate(180deg);
-    }
-    .input-popup p {
-        padding-left: 20px;
-        position: relative;
-    }
-    .input-popup p::before {
-        position: absolute;
-        content: '';
-        font-family: 'Line Awesome Free';
-        font-weight: 900;
-        left: 0;
-        top: 4px;
-        line-height: 1;
-        font-size: 18px;
-    }
-    .input-popup p.error {
-        text-decoration: line-through;
-    }
-    .input-popup p.error::before {
-        content: "\f057";
-        color: #ea5455;
-    }
-    .input-popup p.success::before {
-        content: "\f058";
-        color: #28c76f;
-    }
+  position: relative;
+}
 
-
-
- .show-filter{
+.input-popup {
   display: none;
 }
-@media(max-width:767px){
-  .responsive-filter-card{
-      display: none;
-      transition: none;
+
+.hover-input-popup .input-popup {
+  display: block;
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  width: 280px;
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+.input-popup::after {
+  position: absolute;
+  content: '';
+  bottom: -19px;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 10px 10px 10px 10px;
+  border-style: solid;
+  border-color: transparent transparent #1a1a1a transparent;
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.input-popup p {
+  padding-left: 20px;
+  position: relative;
+}
+
+.input-popup p::before {
+  position: absolute;
+  content: '';
+  font-family: 'Line Awesome Free';
+  font-weight: 900;
+  left: 0;
+  top: 4px;
+  line-height: 1;
+  font-size: 18px;
+}
+
+.input-popup p.error {
+  text-decoration: line-through;
+}
+
+.input-popup p.error::before {
+  content: "\f057";
+  color: #ea5455;
+}
+
+.input-popup p.success::before {
+  content: "\f058";
+  color: #28c76f;
+}
+
+
+
+.show-filter {
+  display: none;
+}
+
+@media(max-width:767px) {
+  .responsive-filter-card {
+    display: none;
+    transition: none;
   }
-  .show-filter{
-      display: block;
+
+  .show-filter {
+    display: block;
   }
 }
 
@@ -432,7 +446,7 @@ p {
   overflow: hidden;
 }
 
-.sidebar > span {
+.sidebar>span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -930,11 +944,13 @@ body {
 }
 
 @keyframes whmPreloaderPulse {
+
   0%,
   100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.18);
   }
+
   50% {
     transform: scale(1.04);
     box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.08);
@@ -945,12 +961,14 @@ body {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .whm-preloader-mark,
   .whm-preloader-line {
     animation: none;
@@ -1118,7 +1136,7 @@ body:has(.whm-app-sidebar) {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.whm-nav-item + .whm-nav-item {
+.whm-nav-item+.whm-nav-item {
   margin-top: 2px;
 }
 
@@ -1348,17 +1366,17 @@ body:has(.whm-app-sidebar) {
   padding: 24px 0 56px;
 }
 
-.whm-main-content > .service-category,
+.whm-main-content>.service-category,
 .whm-main-content .section-full,
-.whm-main-content > .col-12 {
+.whm-main-content>.col-12 {
   max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.whm-main-content .service-category > .container,
-.whm-main-content .section-full > .container,
-.whm-main-content .breadcrumb-bg > .container {
+.whm-main-content .service-category>.container,
+.whm-main-content .section-full>.container,
+.whm-main-content .breadcrumb-bg>.container {
   max-width: 1400px;
 }
 
@@ -1649,8 +1667,8 @@ table tbody tr:hover {
   justify-content: center;
 }
 
-.whm-desktop-menu > a,
-.whm-menu-dropdown > button {
+.whm-desktop-menu>a,
+.whm-menu-dropdown>button {
   min-height: 40px;
   border: 0;
   border-radius: 999px;
@@ -1664,9 +1682,9 @@ table tbody tr:hover {
   padding: 0 14px;
 }
 
-.whm-desktop-menu > a:hover,
-.whm-desktop-menu > a.active,
-.whm-menu-dropdown:hover > button {
+.whm-desktop-menu>a:hover,
+.whm-desktop-menu>a.active,
+.whm-menu-dropdown:hover>button {
   background: var(--whm-slate-100);
   color: var(--whm-slate-900);
 }
@@ -1794,7 +1812,7 @@ table tbody tr:hover {
   text-align: center;
 }
 
-.whm-social-login > span {
+.whm-social-login>span {
   color: var(--whm-slate-500);
   display: block;
   font-size: 12px;
@@ -1885,6 +1903,7 @@ table tbody tr:hover {
 }
 
 @media (max-width: 640px) {
+
   .responsive-table thead,
   table thead {
     display: none;
@@ -1960,7 +1979,7 @@ table tbody tr:hover {
   left: -80px;
 }
 
-.whm-auth-brand-panel > * {
+.whm-auth-brand-panel>* {
   position: relative;
   z-index: 1;
 }
@@ -2131,7 +2150,7 @@ table tbody tr:hover {
   justify-content: center;
 }
 
-.whm-story-copy > p {
+.whm-story-copy>p {
   color: var(--whm-brand);
   font-size: 12px;
   font-weight: 850;
@@ -2335,7 +2354,7 @@ table tbody tr:hover {
   margin-top: 4px;
 }
 
-.whm-hero-panel__header > svg {
+.whm-hero-panel__header>svg {
   width: 42px;
   height: 42px;
   color: var(--whm-brand);
@@ -2517,6 +2536,7 @@ table tbody tr:hover {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2665,7 +2685,7 @@ table tbody tr:hover {
 
 .whm-domain-card,
 .whm-workflow-card,
-.whm-feature-grid > div {
+.whm-feature-grid>div {
   border: 1px solid var(--whm-slate-200);
   border-radius: 22px;
   background: #ffffff;
@@ -2772,6 +2792,7 @@ table tbody tr:hover {
 }
 
 @media (max-width: 1199px) {
+
   .whm-home-hero,
   .whm-split-section {
     grid-template-columns: 1fr;
@@ -2823,7 +2844,7 @@ table tbody tr:hover {
   white-space: nowrap !important;
 }
 
-.form-group:not(.custom--checkbox) > label:not([role="button"]) {
+.form-group:not(.custom--checkbox)>label:not([role="button"]) {
   position: absolute !important;
   width: 1px !important;
   height: 1px !important;
@@ -2836,9 +2857,9 @@ table tbody tr:hover {
   position: relative;
 }
 
-.form-group:not(.custom--checkbox) > label.whm-field-label-hidden + .form-control,
-.form-group:not(.custom--checkbox) > label.whm-field-label-hidden + .form--control,
-.form-group:not(.custom--checkbox) > label.whm-field-label-hidden + select,
+.form-group:not(.custom--checkbox)>label.whm-field-label-hidden+.form-control,
+.form-group:not(.custom--checkbox)>label.whm-field-label-hidden+.form--control,
+.form-group:not(.custom--checkbox)>label.whm-field-label-hidden+select,
 .whm-field-modern .form-control,
 .whm-field-modern .form--control,
 .whm-field-modern .form-select {
@@ -2978,16 +2999,16 @@ textarea.form-control:focus {
   border-radius: 11px;
 }
 
-.whm-desktop-menu > a,
-.whm-menu-dropdown > button {
+.whm-desktop-menu>a,
+.whm-menu-dropdown>button {
   color: #1f2937;
   min-height: 38px;
   padding: 0 13px;
 }
 
-.whm-desktop-menu > a:hover,
-.whm-desktop-menu > a.active,
-.whm-menu-dropdown:hover > button {
+.whm-desktop-menu>a:hover,
+.whm-desktop-menu>a.active,
+.whm-menu-dropdown:hover>button {
   background: rgba(241, 245, 249, 0.86);
   color: var(--whm-brand);
 }
@@ -3112,6 +3133,7 @@ textarea.form-control:focus {
 }
 
 @media (max-width: 575px) {
+
   .form-control,
   .form--control,
   .form-select {
@@ -3172,16 +3194,16 @@ textarea.form-control:focus {
   padding-bottom: 36px;
 }
 
-.whm-client-page-body > .pt-60,
-.whm-client-page-body > .pb-60,
+.whm-client-page-body>.pt-60,
+.whm-client-page-body>.pb-60,
 .whm-client-page-body .pt-60.pb-60 {
   padding-top: 20px !important;
   padding-bottom: 24px !important;
 }
 
 .whm-client-page-body .container,
-.whm-client-main .breadcrumb-bg > .container,
-.whm-client-main .service-category > .container {
+.whm-client-main .breadcrumb-bg>.container,
+.whm-client-main .service-category>.container {
   max-width: 1220px;
 }
 
@@ -3333,6 +3355,7 @@ textarea.form-control:focus {
 }
 
 @media (max-width: 767px) {
+
   .whm-home-hero,
   .whm-home-section {
     padding-left: 16px;
@@ -3761,7 +3784,7 @@ body {
   box-shadow: none !important;
 }
 
-.whm-desktop-nav > .whm-brand,
+.whm-desktop-nav>.whm-brand,
 .whm-desktop-actions {
   flex: 0 0 auto;
 }
@@ -3797,8 +3820,8 @@ body {
   min-width: 0;
 }
 
-.whm-desktop-menu > a,
-.whm-menu-dropdown > button {
+.whm-desktop-menu>a,
+.whm-menu-dropdown>button {
   min-height: 36px !important;
   border-radius: 9px !important;
   color: #334155 !important;
@@ -3807,10 +3830,10 @@ body {
   padding: 0 11px !important;
 }
 
-.whm-desktop-menu > a:hover,
-.whm-desktop-menu > a.active,
-.whm-menu-dropdown:hover > button,
-.whm-menu-dropdown:focus-within > button {
+.whm-desktop-menu>a:hover,
+.whm-desktop-menu>a.active,
+.whm-menu-dropdown:hover>button,
+.whm-menu-dropdown:focus-within>button {
   background: #eff6ff !important;
   color: #2563eb !important;
 }
@@ -4043,7 +4066,7 @@ body {
 .whm-domain-card,
 .whm-workflow-card,
 .whm-category-panel__intro,
-.whm-feature-grid > div,
+.whm-feature-grid>div,
 .whm-plan-card {
   border-radius: var(--whm-radius-lg) !important;
   border: 1px solid var(--whm-line) !important;
@@ -4112,7 +4135,7 @@ body {
   justify-content: center;
 }
 
-.whm-image-story-copy > p {
+.whm-image-story-copy>p {
   color: #2563eb !important;
   font-size: 12px;
   font-weight: 850;
@@ -4296,7 +4319,7 @@ body {
   gap: 14px !important;
 }
 
-.whm-feature-grid > div {
+.whm-feature-grid>div {
   padding: 20px !important;
 }
 
@@ -4340,8 +4363,9 @@ body {
 }
 
 @media (max-width: 1199px) {
-  .whm-desktop-menu > a,
-  .whm-menu-dropdown > button {
+
+  .whm-desktop-menu>a,
+  .whm-menu-dropdown>button {
     padding: 0 8px !important;
   }
 
@@ -4391,6 +4415,7 @@ body {
 }
 
 @media (max-width: 767px) {
+
   .whm-home-hero,
   .whm-home-section,
   .whm-story-section,
@@ -4459,7 +4484,7 @@ body {
   .whm-workflow-card,
   .whm-category-panel__intro,
   .whm-plan-card,
-  .whm-feature-grid > div {
+  .whm-feature-grid>div {
     border-radius: 12px !important;
   }
 
@@ -4608,7 +4633,7 @@ body {
   text-align: center;
 }
 
-.whm-social-login > span {
+.whm-social-login>span {
   display: block;
   color: var(--whm-slate-500);
   font-size: 12px;
@@ -4760,7 +4785,7 @@ body {
 .whm-plan-card,
 .whm-domain-card,
 .whm-workflow-card,
-.whm-feature-grid > div {
+.whm-feature-grid>div {
   border: 1px solid var(--whm-slate-200) !important;
   border-radius: 16px !important;
   background: #ffffff !important;
@@ -4798,8 +4823,8 @@ body {
   overflow: hidden;
 }
 
-.table > :not(caption) > * > *,
-table > :not(caption) > * > * {
+.table> :not(caption)>*>*,
+table> :not(caption)>*>* {
   border-color: var(--whm-slate-200) !important;
 }
 
@@ -4869,26 +4894,26 @@ table tbody tr {
     padding-top: 0 !important;
   }
 
-  .whm-client-main > .whm-topbar {
+  .whm-client-main>.whm-topbar {
     width: 100%;
     padding-left: 28px !important;
     padding-right: 28px !important;
   }
 
-  .whm-client-main > .whm-breadcrumb,
-  .whm-client-main > .whm-page-body,
-  .whm-client-main > .service-category,
-  .whm-client-main > .footer {
+  .whm-client-main>.whm-breadcrumb,
+  .whm-client-main>.whm-page-body,
+  .whm-client-main>.service-category,
+  .whm-client-main>.footer {
     width: 100% !important;
     max-width: none !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
 
-  .whm-client-main .whm-breadcrumb > .container,
-  .whm-client-main .service-category > .container,
-  .whm-client-main .whm-page-body > .container,
-  .whm-client-main .footer > .container,
+  .whm-client-main .whm-breadcrumb>.container,
+  .whm-client-main .service-category>.container,
+  .whm-client-main .whm-page-body>.container,
+  .whm-client-main .footer>.container,
   .whm-client-main .whm-footer {
     width: 100% !important;
     max-width: 1220px !important;
@@ -4979,7 +5004,7 @@ body {
   box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
 }
 
-.whm-desktop-menu > a,
+.whm-desktop-menu>a,
 .whm-desktop-menu button,
 .whm-login-btn,
 .whm-nav-item {
@@ -4988,8 +5013,8 @@ body {
   font-weight: 750;
 }
 
-.whm-desktop-menu > a:hover,
-.whm-desktop-menu > a.active,
+.whm-desktop-menu>a:hover,
+.whm-desktop-menu>a.active,
 .whm-desktop-menu button:hover,
 .whm-nav-item:hover,
 .whm-nav-item.active {
@@ -5004,7 +5029,7 @@ body {
 .whm-story-stage,
 .whm-domain-card,
 .whm-workflow-card,
-.whm-feature-grid > div,
+.whm-feature-grid>div,
 .whm-plan-card,
 .whm-store-plan-card,
 .custom--card,
@@ -5126,7 +5151,7 @@ body {
 }
 
 .whm-section-heading p,
-.whm-story-copy > p,
+.whm-story-copy>p,
 .whm-domain-card p,
 .whm-plan-card__top span {
   color: var(--pro-blue) !important;
@@ -5196,7 +5221,7 @@ body {
 
 .whm-plan-card:hover,
 .whm-store-plan-card:hover,
-.whm-feature-grid > div:hover {
+.whm-feature-grid>div:hover {
   border-color: rgba(37, 99, 235, 0.34) !important;
   box-shadow: var(--pro-shadow);
   transform: translateY(-4px);
@@ -5235,7 +5260,7 @@ body {
 .whm-story-stage,
 .whm-domain-card,
 .whm-workflow-card,
-.whm-feature-grid > div {
+.whm-feature-grid>div {
   padding: clamp(22px, 3vw, 34px) !important;
 }
 
@@ -5342,6 +5367,7 @@ table tbody td {
 }
 
 @media (max-width: 1199px) {
+
   .whm-home-hero,
   .whm-home-section,
   .whm-story-section,
@@ -5365,7 +5391,7 @@ table tbody td {
   .whm-story-stage,
   .whm-domain-card,
   .whm-workflow-card,
-  .whm-feature-grid > div,
+  .whm-feature-grid>div,
   .whm-plan-card {
     border-radius: 8px !important;
   }
@@ -5757,7 +5783,7 @@ body:has(.whm-auth-shell) {
   border-top: 0 !important;
 }
 
-.custom-border-top-dark .card-body > .justify-content-between:first-child,
+.custom-border-top-dark .card-body>.justify-content-between:first-child,
 .whm-client-page-body .card-header {
   align-items: center;
   border-bottom: 1px solid var(--client-border);
@@ -5765,7 +5791,7 @@ body:has(.whm-auth-shell) {
   padding-bottom: 14px;
 }
 
-.custom-border-top-dark .card-body > .justify-content-between:first-child > div,
+.custom-border-top-dark .card-body>.justify-content-between:first-child>div,
 .whm-client-page-body .card-header h5,
 .whm-client-page-body .card-header h6 {
   color: var(--client-ink);
@@ -5912,6 +5938,7 @@ body:has(.whm-auth-shell) {
 }
 
 @media (max-width: 991px) {
+
   .whm-client-sidebar,
   .whm-app-sidebar.whm-client-sidebar {
     width: min(86vw, 320px) !important;
@@ -5995,7 +6022,7 @@ body:has(.whm-auth-shell) {
   gap: 18px;
 }
 
-.whm-auth-simple > .whm-brand {
+.whm-auth-simple>.whm-brand {
   justify-self: center;
   display: inline-flex;
   align-items: center;
@@ -6003,7 +6030,7 @@ body:has(.whm-auth-shell) {
   color: var(--studio-ink);
 }
 
-.whm-auth-simple > .whm-brand .whm-brand-mark {
+.whm-auth-simple>.whm-brand .whm-brand-mark {
   width: 42px;
   height: 42px;
   border-radius: 8px;
@@ -6012,13 +6039,13 @@ body:has(.whm-auth-shell) {
   box-shadow: none;
 }
 
-.whm-auth-simple > .whm-brand strong {
+.whm-auth-simple>.whm-brand strong {
   color: var(--studio-ink);
   font-size: 17px;
   letter-spacing: 0;
 }
 
-.whm-auth-simple > .whm-brand small {
+.whm-auth-simple>.whm-brand small {
   color: var(--studio-muted);
 }
 
@@ -6114,13 +6141,32 @@ body:has(.whm-auth-shell) {
 }
 
 /* ── Modern Tech Typography Weights & Spacing ($70K+ Caliber) ── */
-body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title, p, span, div, a {
+body,
+button,
+input,
+select,
+textarea,
+.nav-link,
+.btn,
+.card,
+.menu-title,
+p,
+span,
+div,
+a {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
 }
 
-h1, h2, h3, h4, h5, h6, .tw-brand-title, .whm-brand strong {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.tw-brand-title,
+.whm-brand strong {
   font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
   letter-spacing: -0.025em !important;
 }
@@ -6184,6 +6230,7 @@ body:has(.whm-client-main) {
 }
 
 @media (min-width: 992px) {
+
   .whm-client-sidebar,
   .whm-app-sidebar.whm-client-sidebar {
     width: 220px !important;
@@ -6193,6 +6240,7 @@ body:has(.whm-client-main) {
     bottom: 0 !important;
     z-index: 1020 !important;
   }
+
   .whm-client-main {
     margin-left: 220px !important;
     width: calc(100% - 220px) !important;
@@ -6516,12 +6564,12 @@ body:has(.whm-auth-shell) {
   gap: 20px !important;
 }
 
-.whm-auth-simple > .whm-brand {
+.whm-auth-simple>.whm-brand {
   justify-self: center;
   padding: 0;
 }
 
-.whm-auth-simple > .whm-brand .whm-brand-mark {
+.whm-auth-simple>.whm-brand .whm-brand-mark {
   width: 38px;
   height: 38px;
   background: var(--studio-ink) !important;
@@ -6558,7 +6606,7 @@ body:has(.whm-auth-shell) {
   margin: 0 0 18px !important;
 }
 
-.whm-social-login > span,
+.whm-social-login>span,
 .whm-login-or {
   display: none !important;
 }
@@ -6726,8 +6774,8 @@ body:has(.whm-client-main) {
   padding: 22px 0 48px !important;
 }
 
-.whm-client-page-body > .pt-60,
-.whm-client-page-body > .pb-60,
+.whm-client-page-body>.pt-60,
+.whm-client-page-body>.pb-60,
 .whm-client-page-body .pt-60.pb-60,
 .whm-client-page-body .section-full {
   padding-top: 0 !important;
@@ -6738,9 +6786,9 @@ body:has(.whm-client-main) {
   max-width: 1160px !important;
 }
 
-.whm-client-page-body .row.justify-content-center > .col-lg-9,
-.whm-client-page-body .row.justify-content-center > .col-lg-10,
-.whm-client-page-body .row.justify-content-center > .col-lg-12 {
+.whm-client-page-body .row.justify-content-center>.col-lg-9,
+.whm-client-page-body .row.justify-content-center>.col-lg-10,
+.whm-client-page-body .row.justify-content-center>.col-lg-12 {
   width: 100%;
   max-width: 100%;
 }
@@ -6840,7 +6888,7 @@ body:has(.whm-client-main) {
   letter-spacing: 0.02em;
 }
 
-.custom-border-top-dark .card-body > .justify-content-between:first-child {
+.custom-border-top-dark .card-body>.justify-content-between:first-child {
   margin: 0 0 12px !important;
   padding-bottom: 12px;
 }
@@ -7050,7 +7098,7 @@ body:has(.zod-home-hero) {
 
 .zod-hero-kicker,
 .zod-section-head span,
-.zod-domain-main > span {
+.zod-domain-main>span {
   width: fit-content;
   display: inline-flex;
   align-items: center;
@@ -7158,7 +7206,7 @@ body:has(.zod-home-hero) {
   pointer-events: none;
 }
 
-.zod-hero-console > * {
+.zod-hero-console>* {
   position: relative;
   z-index: 1;
 }
@@ -7204,13 +7252,13 @@ body:has(.zod-home-hero) {
 }
 
 .zod-console-card,
-.zod-console-list > div,
+.zod-console-list>div,
 .zod-proof-card,
 .zod-launch-grid article,
 .zod-plan-tile,
 .zod-lane-intro,
 .zod-domain-console,
-.zod-tld-board > div {
+.zod-tld-board>div {
   border: 1px solid rgba(16, 20, 24, 0.12);
   border-radius: 8px;
   background: #ffffff;
@@ -7244,10 +7292,21 @@ body:has(.zod-home-hero) {
   line-height: 1.1;
 }
 
-.zod-tone-blue svg { color: #93c5fd; }
-.zod-tone-teal svg { color: #5eead4; }
-.zod-tone-gold svg { color: #fcd34d; }
-.zod-tone-green svg { color: #86efac; }
+.zod-tone-blue svg {
+  color: #93c5fd;
+}
+
+.zod-tone-teal svg {
+  color: #5eead4;
+}
+
+.zod-tone-gold svg {
+  color: #fcd34d;
+}
+
+.zod-tone-green svg {
+  color: #86efac;
+}
 
 .zod-console-flow {
   position: relative;
@@ -7292,7 +7351,7 @@ body:has(.zod-home-hero) {
   gap: 10px;
 }
 
-.zod-console-list > div {
+.zod-console-list>div {
   display: grid;
   grid-template-columns: 0.72fr 1fr auto;
   gap: 12px;
@@ -7432,7 +7491,7 @@ body:has(.zod-home-hero) {
 }
 
 .zod-lane-intro a,
-.zod-plan-tile > a {
+.zod-plan-tile>a {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -7514,7 +7573,7 @@ body:has(.zod-home-hero) {
   padding: 20px;
 }
 
-.zod-launch-grid article > div {
+.zod-launch-grid article>div {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -7580,7 +7639,7 @@ body:has(.zod-home-hero) {
   gap: 10px;
 }
 
-.zod-tld-board > div {
+.zod-tld-board>div {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -7633,6 +7692,7 @@ body:has(.zod-home-hero) {
 }
 
 @media (max-width: 767px) {
+
   .zod-home-hero,
   .zod-home-section {
     width: min(100% - 24px, 1240px);
@@ -7660,7 +7720,7 @@ body:has(.zod-home-hero) {
     flex-direction: column;
   }
 
-  .zod-console-list > div {
+  .zod-console-list>div {
     grid-template-columns: 1fr;
   }
 }
@@ -7709,8 +7769,8 @@ body {
 
 .whm-brand strong,
 .whm-mobile-brand,
-.whm-desktop-menu > a,
-.whm-menu-dropdown > button,
+.whm-desktop-menu>a,
+.whm-menu-dropdown>button,
 .whm-user-chip {
   color: var(--root-ink) !important;
 }
@@ -7720,8 +7780,8 @@ body {
   color: var(--root-muted) !important;
 }
 
-.whm-desktop-menu > a,
-.whm-menu-dropdown > button,
+.whm-desktop-menu>a,
+.whm-menu-dropdown>button,
 .whm-login-btn,
 .whm-user-chip,
 .whm-cart-link,
@@ -7734,9 +7794,9 @@ body {
   border-radius: 8px !important;
 }
 
-.whm-desktop-menu > a:hover,
-.whm-desktop-menu > a.active,
-.whm-menu-dropdown:hover > button,
+.whm-desktop-menu>a:hover,
+.whm-desktop-menu>a.active,
+.whm-menu-dropdown:hover>button,
 .whm-user-chip:hover,
 .whm-cart-link:hover {
   background: #eef2f6 !important;
@@ -7846,7 +7906,7 @@ body {
 .zod-billing-strip button,
 .zod-hero-kicker,
 .zod-section-head span,
-.zod-domain-main > span {
+.zod-domain-main>span {
   border-radius: 8px !important;
 }
 
@@ -7974,13 +8034,13 @@ body {
   gap: 16px;
 }
 
-.domain-row > span {
+.domain-row>span {
   color: var(--root-ink);
   font-size: 18px;
   font-weight: 900;
 }
 
-.whm-domain-result-row > div {
+.whm-domain-result-row>div {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -8245,6 +8305,7 @@ table thead th {
 }
 
 @media (max-width: 767px) {
+
   .zod-home-hero,
   .zod-home-section,
   .footer.whm-footer {
@@ -8314,7 +8375,7 @@ body:has(.whm-auth-shell) {
   grid-template-columns: 1fr !important;
   place-items: center !important;
   padding: clamp(18px, 4vw, 44px) !important;
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(246,247,249,0.94)), var(--client-bg) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 247, 249, 0.94)), var(--client-bg) !important;
 }
 
 .whm-auth-simple {
@@ -8323,7 +8384,7 @@ body:has(.whm-auth-shell) {
   gap: 18px;
 }
 
-.whm-auth-simple > .whm-brand {
+.whm-auth-simple>.whm-brand {
   justify-self: center;
   padding: 8px 10px;
   border: 1px solid var(--client-border);
@@ -8542,8 +8603,8 @@ body:has(.whm-auth-shell) {
 }
 
 .whm-client-page-body .container,
-.whm-client-main .breadcrumb-bg > .container,
-.whm-client-main .service-category > .container {
+.whm-client-main .breadcrumb-bg>.container,
+.whm-client-main .service-category>.container {
   width: min(100%, 1240px) !important;
   max-width: 1240px !important;
 }
@@ -8885,6 +8946,7 @@ label,
 }
 
 @media (max-width: 575px) {
+
   .whm-auth-card,
   .whm-auth-card-wide,
   .tw-client-hero,
@@ -9654,6 +9716,7 @@ body:has(.whm-client-main) {
 
 /* 2. Desktop Width & Layout Alignment (Prevents Card Edge Clipping) */
 @media (min-width: 992px) {
+
   .whm-client-sidebar,
   .whm-app-sidebar.whm-client-sidebar {
     position: fixed !important;
@@ -9757,12 +9820,12 @@ body:has(.whm-client-main) {
 }
 
 .whm-client-page-body .row {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  width: 100% !important;
+  margin-left: 2% !important;
+  margin-right: 2% !important;
+  width: 95%;
 }
 
-.whm-client-page-body .row > * {
+.whm-client-page-body .row>* {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
@@ -9918,7 +9981,3 @@ body:has(.whm-client-main) {
   border-color: #6366f1 !important;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
 }
-
-
-
-

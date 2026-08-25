@@ -1248,11 +1248,13 @@ class Whmpanel implements HostingManagerInterface
 
     public function loginServer($server)
     {
-        $host = $server->hostname ?: (($server->protocol ?: 'https://') . ($server->ip_address ?: '169.58.176.53') . ':' . ($server->port ?: 8083));
-        $host = rtrim($host, '/');
-        if (!str_contains($host, 'zodpanel.zodserver.cloud') && !str_contains($host, ':8083')) {
-            $host = 'https://zodpanel.zodserver.cloud:8083';
-        }
+        $rawHost = $server->hostname ?: '';
+        $parsedHost = parse_url($rawHost, PHP_URL_HOST) ?: $rawHost;
+        $domainHost = !empty($parsedHost) && !filter_var($parsedHost, FILTER_VALIDATE_IP) 
+            ? $parsedHost 
+            : 'zodpanel.zodserver.cloud';
+        $host = 'https://' . $domainHost . ':8083';
+
         $token = md5('adminZODPANEL_SECRET');
         $ssoUrl = $host . '/login/sso.php?' . http_build_query([
             'user' => 'admin',
@@ -1270,11 +1272,12 @@ class Whmpanel implements HostingManagerInterface
     public function loginAccount($hosting)
     {
         $server = $hosting->server;
-        $host = $server ? ($server->hostname ?: (($server->protocol ?: 'https://') . ($server->ip_address ?: '169.58.176.53') . ':' . ($server->port ?: 8083))) : 'https://zodpanel.zodserver.cloud:8083';
-        $host = rtrim($host, '/');
-        if (!str_contains($host, 'zodpanel.zodserver.cloud') && !str_contains($host, ':8083')) {
-            $host = 'https://zodpanel.zodserver.cloud:8083';
-        }
+        $rawHost = $server?->hostname ?: '';
+        $parsedHost = parse_url($rawHost, PHP_URL_HOST) ?: $rawHost;
+        $domainHost = !empty($parsedHost) && !filter_var($parsedHost, FILTER_VALIDATE_IP) 
+            ? $parsedHost 
+            : 'zodpanel.zodserver.cloud';
+        $host = 'https://' . $domainHost . ':8083';
 
         $user = $hosting->username ?: 'zodhost';
         $token = md5($user . 'ZODPANEL_SECRET');
