@@ -9319,3 +9319,311 @@ label,
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ==========================================================================
+   ULTRA-CLEAN, SUBTLE & TASTEFUL CLIENT PORTAL THEME
+   ========================================================================== */
+
+:root {
+  --portal-bg: #f8fafc;
+  --portal-card-bg: #ffffff;
+  --portal-border: #e2e8f0;
+  --portal-border-subtle: #f1f5f9;
+  --portal-sidebar-bg: #0b0f19;
+  --portal-sidebar-border: rgba(255, 255, 255, 0.07);
+  --portal-sidebar-item: #94a3b8;
+  --portal-sidebar-item-hover: #ffffff;
+  --portal-sidebar-item-hover-bg: rgba(255, 255, 255, 0.05);
+  --portal-sidebar-item-active-bg: rgba(99, 102, 241, 0.15);
+  --portal-sidebar-item-active-text: #818cf8;
+}
+
+body:has(.whm-client-main) {
+  background-color: var(--portal-bg) !important;
+  color: #0f172a !important;
+}
+
+/* 1. Sleek Modern Sidebar */
+.whm-client-sidebar,
+.whm-app-sidebar.whm-client-sidebar {
+  width: 250px !important;
+  background: var(--portal-sidebar-bg) !important;
+  border-right: 1px solid var(--portal-sidebar-border) !important;
+  box-shadow: none !important;
+}
+
+.whm-client-sidebar .whm-sidebar-brand {
+  min-height: 64px !important;
+  padding: 16px 20px !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--portal-sidebar-border) !important;
+}
+
+.whm-client-sidebar .whm-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  text-decoration: none !important;
+}
+
+.whm-client-sidebar .whm-brand-mark {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 9px !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+}
+
+.whm-client-sidebar .whm-brand-mark svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.whm-client-sidebar .whm-brand strong {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  display: block !important;
+}
+
+.whm-client-sidebar .whm-brand small {
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+.whm-client-sidebar .whm-sidebar-nav {
+  padding: 16px 12px !important;
+}
+
+.whm-client-sidebar .whm-nav-group {
+  margin-bottom: 16px !important;
+}
+
+.whm-client-sidebar .whm-nav-group p {
+  color: #475569 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  padding: 0 10px !important;
+  margin-bottom: 6px !important;
+}
+
+.whm-client-sidebar .whm-nav-item {
+  min-height: 36px !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  color: var(--portal-sidebar-item) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  transition: all 0.15s ease !important;
+  text-decoration: none !important;
+}
+
+.whm-client-sidebar .whm-nav-item svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: #64748b !important;
+  transition: color 0.15s ease !important;
+}
+
+.whm-client-sidebar .whm-nav-item:hover {
+  background: var(--portal-sidebar-item-hover-bg) !important;
+  color: var(--portal-sidebar-item-hover) !important;
+}
+
+.whm-client-sidebar .whm-nav-item:hover svg {
+  color: #cbd5e1 !important;
+}
+
+.whm-client-sidebar .whm-nav-item.active {
+  background: var(--portal-sidebar-item-active-bg) !important;
+  color: var(--portal-sidebar-item-active-text) !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.whm-client-sidebar .whm-nav-item.active svg {
+  color: #818cf8 !important;
+}
+
+.whm-client-sidebar .whm-nav-subitem {
+  padding-left: 28px !important;
+  font-size: 12px !important;
+}
+
+.whm-client-sidebar .whm-nav-subitem b {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  border-radius: 10px !important;
+  margin-left: auto !important;
+  font-weight: 600 !important;
+}
+
+/* User Card at bottom of sidebar */
+.whm-client-sidebar .whm-sidebar-user {
+  margin: 12px !important;
+  padding: 10px 12px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--portal-sidebar-border) !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.whm-client-sidebar .whm-sidebar-user img {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.whm-client-sidebar .whm-sidebar-user strong {
+  color: #f1f5f9 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  display: block !important;
+  line-height: 1.2 !important;
+}
+
+.whm-client-sidebar .whm-sidebar-user span {
+  color: #64748b !important;
+  font-size: 11px !important;
+  display: block !important;
+  line-height: 1.2 !important;
+}
+
+.whm-client-sidebar .whm-sidebar-user a {
+  color: #64748b !important;
+  margin-left: auto !important;
+  padding: 4px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.whm-client-sidebar .whm-sidebar-user a:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* 2. Sleek Top Header Bar */
+.whm-client-main .whm-topbar {
+  height: 64px !important;
+  padding: 0 28px !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--portal-border) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.whm-client-main .whm-topbar h1 {
+  color: #0f172a !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+}
+
+.whm-topbar-kicker {
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  margin: 0 0 2px 0 !important;
+}
+
+.whm-topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.whm-topbar-search {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  background: #f1f5f9 !important;
+  border: 1px solid transparent !important;
+  border-radius: 9999px !important;
+  padding: 0 12px !important;
+  transition: all 0.15s ease !important;
+}
+
+.whm-topbar-search:focus-within {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+.whm-topbar-search svg {
+  width: 14px !important;
+  height: 14px !important;
+  color: #94a3b8 !important;
+}
+
+.whm-topbar-search input {
+  width: 220px !important;
+  height: 34px !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding-left: 8px !important;
+  font-size: 12px !important;
+  color: #1e293b !important;
+}
+
+.whm-avatar-link img {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 9999px !important;
+  border: 2px solid #e2e8f0 !important;
+  transition: border-color 0.15s ease !important;
+}
+
+.whm-avatar-link:hover img {
+  border-color: #6366f1 !important;
+}
+
+.whm-cart-link {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--portal-border) !important;
+  background: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #475569 !important;
+  transition: all 0.15s ease !important;
+}
+
+.whm-cart-link:hover {
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Page body padding */
+.whm-client-page-body {
+  padding: 24px 0 48px 0 !important;
+  background-color: var(--portal-bg) !important;
+}
+
