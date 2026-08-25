@@ -9879,5 +9879,46 @@ body:has(.whm-client-main) {
   margin: 2px 0 0 0 !important;
 }
 
+/* 7. Global Search in Topbar */
+.whm-global-search {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.whm-global-search svg,
+.whm-global-search [data-lucide="search"] {
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 14px !important;
+  height: 14px !important;
+  color: #94a3b8 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+.whm-global-search input {
+  height: 36px !important;
+  width: 230px !important;
+  padding: 0 14px 0 34px !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+  color: #0f172a !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.15s ease !important;
+}
+
+.whm-global-search input:focus {
+  background: #ffffff !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+}
+
+
 
 

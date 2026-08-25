@@ -1,34 +1,38 @@
 @extends($activeTemplate.'layouts.master_side_bar')
 
 @section('content')
-<div class="col-12">
-    <div class="whm-service-page-head">
-        <div>
-            <span>@lang('Service groups')</span>
-            <h3>@lang('My Services')</h3>
-            <p>@lang('See hosting, VPS, mail, RDP, and other services grouped by the panel or server type that powers them.')</p>
+<div class="col-12 space-y-5">
+    <!-- Header Card -->
+    <div class="p-5 sm:p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+        <div class="space-y-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">@lang('Service Groups')</span>
+            <h1 class="text-xl font-bold tracking-tight text-slate-900 font-display">@lang('My Services')</h1>
+            <p class="text-xs text-slate-500 max-w-xl">@lang('Manage your hosting instances, Cloud VPS, mail, and server nodes.')</p>
         </div>
-        <a href="{{ route('service.category') }}?all" class="btn btn--base btn--sm">
-            <i data-lucide="plus-circle"></i> @lang('Order New Service')
+        <a href="{{ route('service.category') }}?all" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all flex items-center gap-1.5 flex-shrink-0">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>@lang('Order New Service')</span>
         </a>
     </div>
 
-    <div class="whm-service-filter-grid mb-4">
-        <a href="{{ route('user.service.list') }}" class="whm-service-filter {{ !$selectedServiceGroup ? 'active' : '' }}">
-            <i data-lucide="layers-3"></i>
-            <span>@lang('All services')</span>
-            <strong>{{ $services->total() }}</strong>
+    <!-- Filter Pills -->
+    <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('user.service.list') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 {{ !$selectedServiceGroup ? 'bg-slate-900 text-white shadow-xs' : 'bg-white border border-slate-200/80 text-slate-600 hover:text-slate-900 hover:border-slate-300' }}">
+            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+            <span>@lang('All Services')</span>
+            <span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono {{ !$selectedServiceGroup ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600' }}">{{ $services->total() }}</span>
         </a>
         @foreach($serviceGroups as $group)
-            <a href="{{ route('user.service.list', ['service' => $group['key']]) }}" class="whm-service-filter {{ $selectedServiceGroup === $group['key'] ? 'active' : '' }}">
-                <i data-lucide="{{ $group['key'] === 'vps' ? 'server-cog' : ($group['key'] === 'mail' ? 'mail' : 'box') }}"></i>
+            <a href="{{ route('user.service.list', ['service' => $group['key']]) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 {{ $selectedServiceGroup === $group['key'] ? 'bg-slate-900 text-white shadow-xs' : 'bg-white border border-slate-200/80 text-slate-600 hover:text-slate-900 hover:border-slate-300' }}">
+                <i data-lucide="{{ $group['key'] === 'vps' ? 'server' : ($group['key'] === 'mail' ? 'mail' : 'hard-drive') }}" class="w-3.5 h-3.5"></i>
                 <span>{{ __($group['label']) }}</span>
-                <strong>{{ $group['count'] }}</strong>
+                <span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono {{ $selectedServiceGroup === $group['key'] ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600' }}">{{ $group['count'] }}</span>
             </a>
         @endforeach
     </div>
 
-    <div class="whm-service-list">
+    <!-- Service Cards List -->
+    <div class="space-y-3">
         @forelse($services as $service)
             @php
                 $server = $service->server;
@@ -37,55 +41,76 @@
                 $allRoles = \App\Models\Server::serviceRoles();
                 $role = $server ? $server->serviceRoleLabel() : ($allRoles[$fallbackRoleKey] ?? ucfirst($fallbackRoleKey));
             @endphp
-            <div class="whm-service-card">
-                <div class="whm-service-card__main">
-                    <div class="whm-service-icon">
-                        <i data-lucide="{{ str_contains(strtolower($role), 'vps') ? 'server-cog' : (str_contains(strtolower($role), 'mail') ? 'mail' : 'hard-drive') }}"></i>
+            <div class="p-4 sm:p-5 bg-white border border-slate-200/80 hover:border-slate-300 rounded-2xl transition-all shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <!-- Main Info -->
+                <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100/60 flex items-center justify-center text-indigo-600 flex-shrink-0">
+                        <i data-lucide="{{ str_contains(strtolower($role), 'vps') ? 'server' : (str_contains(strtolower($role), 'mail') ? 'mail' : 'globe') }}" class="w-5 h-5"></i>
                     </div>
-                    <div>
-                        <h5>{{ __(@$service->product->name ?: @$service->product->serviceCategory->name) }}</h5>
-                        <p>{{ __(@$service->domain ?: @$service->product->serviceCategory->name) }}</p>
-                        <div class="whm-service-meta">
-                            <span>{{ __($role) }}</span>
-                            @if($serverGroup)
-                                <span>{{ __($serverGroup->getType) }} / {{ __($serverGroup->name) }}</span>
+                    <div class="space-y-1 min-w-0">
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h4 class="text-sm font-bold text-slate-900 tracking-tight">
+                                {{ __(@$service->product->name ?: @$service->product->serviceCategory->name) }}
+                            </h4>
+                            @if($service->status == 1)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[10px] font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 orb-pulse"></span>
+                                    @lang('Active')
+                                </span>
+                            @elseif($service->status == 2)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60 text-[10px] font-bold">
+                                    @lang('Pending')
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold">
+                                    {{ @App\Models\Hosting::status()[$service->status] ?? 'Unknown' }}
+                                </span>
                             @endif
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-slate-500 font-mono flex-wrap">
+                            <a href="{{ route('user.service.details', $service->id) }}" class="font-bold text-slate-700 hover:text-indigo-600 transition-colors">
+                                {{ __(@$service->domain ?: 'Unassigned domain') }}
+                            </a>
                             @if($server)
-                                <span>{{ __($server->name) }}</span>
+                                <span class="text-slate-300">•</span>
+                                <span class="text-slate-400">{{ $server->ip_address ?? $server->name }}</span>
                             @endif
                         </div>
                     </div>
                 </div>
 
-                <div class="whm-service-card__billing">
-                    <span>@lang('Recurring')</span>
-                    <strong>{{ showAmount($service->recurring_amount) }}</strong>
-                    <small>{{ @billingCycle($service->billing_cycle, true)['showText'] }}</small>
-                </div>
+                <!-- Billing & Action Group -->
+                <div class="flex items-center justify-between lg:justify-end gap-6 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                    <div class="text-right">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">@lang('Recurring')</span>
+                        <div class="text-sm font-bold font-mono text-slate-900">{{ showAmount($service->recurring_amount) }}</div>
+                        <span class="text-[11px] text-slate-500">{{ @billingCycle($service->billing_cycle, true)['showText'] }}</span>
+                    </div>
 
-                <div class="whm-service-card__status">
-                    @php echo $service->showStatus; @endphp
-                    <small>
-                        @if($service->billing_cycle != 0)
-                            @lang('Renews') {{ showDateTime($service->next_due_date, 'd/m/Y') }}
-                        @else
-                            @lang('One-time service')
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('user.service.details', $service->id) }}" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all flex items-center gap-1.5">
+                            <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                            <span>@lang('Manage')</span>
+                        </a>
+                        @if($service->status == 1)
+                            <a href="{{ route('user.login.hosting', $service->id) }}" target="_blank" rel="noopener" class="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 rounded-xl transition-all shadow-2xs" title="@lang('Control Panel')">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500"></i>
+                            </a>
                         @endif
-                    </small>
+                    </div>
                 </div>
-
-                <a href="{{ route('user.service.details', $service->id) }}" class="btn btn--base btn--sm">
-                    <i data-lucide="monitor-cog"></i> @lang('Manage')
-                </a>
             </div>
         @empty
-            <div class="card custom--card">
-                <div class="card-body text-center p-5">
-                    <i data-lucide="box" class="mb-3 text--secondary"></i>
-                    <h5>@lang('No services found')</h5>
-                    <p class="text-muted">@lang('Order a hosting, VPS, mail, or server plan to see it grouped here.')</p>
-                    <a href="{{ route('service.category') }}?all" class="btn btn--base btn--sm">@lang('Browse Services')</a>
+            <div class="p-8 bg-white border border-slate-200/80 rounded-2xl text-center space-y-3 shadow-xs">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100/60 flex items-center justify-center text-indigo-600 mx-auto">
+                    <i data-lucide="box" class="w-6 h-6"></i>
                 </div>
+                <h4 class="text-sm font-bold text-slate-900">@lang('No services found')</h4>
+                <p class="text-xs text-slate-500 max-w-sm mx-auto">@lang('Order a cloud hosting, VPS, mail, or server plan to manage it here.')</p>
+                <a href="{{ route('service.category') }}?all" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>@lang('Browse Services')</span>
+                </a>
             </div>
         @endforelse
     </div>
@@ -97,186 +122,3 @@
     @endif
 </div>
 @endsection
-
-@push('style')
-<style>
-    .whm-service-page-head {
-        align-items: center;
-        display: flex;
-        gap: 16px;
-        justify-content: space-between;
-        margin-bottom: 24px;
-    }
-
-    .whm-service-page-head span,
-    .whm-service-filter span,
-    .whm-service-card__billing span {
-        color: var(--accent-cyan-light);
-        display: block;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-    }
-
-    .whm-service-page-head h3 {
-        color: #ffffff;
-        font-family: var(--font-display);
-        font-weight: 800;
-        margin: 4px 0;
-    }
-
-    .whm-service-page-head p {
-        color: var(--text-secondary);
-        margin: 0;
-        font-size: 13px;
-    }
-
-    .whm-service-filter-grid {
-        display: grid;
-        gap: 14px;
-        grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
-    }
-
-    .whm-service-filter,
-    .whm-service-card {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-primary);
-        border-radius: var(--radius-md);
-        color: var(--text-primary);
-        transition: all var(--transition-normal);
-    }
-
-    .whm-service-filter {
-        padding: 18px;
-        text-decoration: none !important;
-    }
-
-    .whm-service-filter:hover,
-    .whm-service-filter.active,
-    .whm-service-card:hover {
-        background: var(--bg-tertiary);
-        border-color: var(--border-hover);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.2);
-        color: #ffffff;
-        transform: translateY(-2px);
-    }
-
-    .whm-service-filter i {
-        color: var(--accent-cyan-light);
-        height: 22px;
-        margin-bottom: 12px;
-        width: 22px;
-    }
-
-    .whm-service-filter strong {
-        display: block;
-        font-family: var(--font-mono);
-        font-size: 24px;
-        font-weight: 800;
-        color: #ffffff;
-        margin-top: 4px;
-    }
-
-    .whm-service-list {
-        display: grid;
-        gap: 14px;
-    }
-
-    .whm-service-card {
-        align-items: center;
-        display: grid;
-        gap: 20px;
-        grid-template-columns: minmax(0, 1.7fr) minmax(130px, .5fr) minmax(130px, .55fr) auto;
-        padding: 20px 24px;
-    }
-
-    .whm-service-card__main {
-        align-items: center;
-        display: flex;
-        gap: 16px;
-        min-width: 0;
-    }
-
-    .whm-service-icon {
-        align-items: center;
-        background: rgba(99, 102, 241, 0.15);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: var(--radius-sm);
-        color: var(--accent-cyan-light);
-        display: flex;
-        flex: 0 0 auto;
-        height: 48px;
-        justify-content: center;
-        width: 48px;
-    }
-
-    .whm-service-card h5 {
-        color: #ffffff;
-        font-family: var(--font-display);
-        font-weight: 800;
-        font-size: 16px;
-        margin-bottom: 4px;
-    }
-
-    .whm-service-card p {
-        color: var(--text-secondary);
-        font-size: 13px;
-        font-family: var(--font-mono);
-        margin: 0;
-    }
-
-    .whm-service-card small {
-        color: var(--text-tertiary);
-        font-size: 11px;
-    }
-
-    .whm-service-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 8px;
-    }
-
-    .whm-service-meta span {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        color: var(--accent-cyan-light);
-        font-size: 11px;
-        font-weight: 700;
-        padding: 3px 8px;
-    }
-
-    .whm-service-card__billing strong {
-        color: #ffffff;
-        display: block;
-        font-family: var(--font-mono);
-        font-size: 18px;
-        font-weight: 800;
-    }
-
-    .whm-service-card__status {
-        display: grid;
-        gap: 6px;
-    }
-
-    @media (max-width: 991px) {
-        .whm-service-page-head,
-        .whm-service-card {
-            display: block;
-        }
-
-        .whm-service-page-head .btn,
-        .whm-service-card .btn {
-            margin-top: 14px;
-            width: 100%;
-        }
-
-        .whm-service-card__billing,
-        .whm-service-card__status {
-            margin-top: 14px;
-        }
-    }
-</style>
-@endpush

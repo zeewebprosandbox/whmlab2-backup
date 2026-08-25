@@ -14,9 +14,9 @@
                 <h1>{{ __($pageTitle) }}</h1>
             </div>
             <div class="whm-topbar-actions">
-                <form action="{{ route('register.domain') }}" method="get" class="whm-topbar-search relative flex items-center">
-                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none"></i>
-                    <input type="text" name="domain" placeholder="@lang('Search domains')" class="pl-8.5 pr-3 py-1.5 bg-slate-100/80 border border-slate-200/80 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all w-52 sm:w-64">
+                <form action="{{ route('register.domain') }}" method="get" class="whm-global-search">
+                    <i data-lucide="search"></i>
+                    <input type="text" name="domain" placeholder="@lang('Search domains...')">
                 </form>
                 @include($activeTemplate . 'partials.cart_widget')
                 <x-language />
