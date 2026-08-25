@@ -46,78 +46,64 @@
 @endphp
 
 @section('content')
-    <section class="zod-home-hero">
-        <div class="zod-hero-copy">
+    <section class="zod-home-hero zod-hero-focused">
+        <div class="zod-hero-bg-grid"></div>
+        <div class="zod-hero-bg-glow"></div>
+
+        <div class="zod-hero-content">
             <div class="zod-hero-kicker">
+                <span class="zod-kicker-dot"></span>
                 <i data-lucide="shield-check"></i>
-                @lang('Production-ready hosting workspace')
+                <span>@lang('High-Performance Cloud & Web Infrastructure')</span>
             </div>
-            <h1>@lang('Hosting made clear, fast, and ready to sell.')</h1>
-            <p>@lang('Bring hosting, VPS, domains, billing, SSL visibility, and support into one polished customer workspace built for clean purchasing and confident service management.')</p>
+
+            <h1 class="zod-hero-title">@lang('Hosting made clear, fast, and ready to scale.')</h1>
+
+            <p class="zod-hero-desc">@lang('Deploy NVMe web hosting, high-performance cloud VPS, business email clusters, and instant DNS domains from one unified workspace built for speed and reliability.')</p>
+
             <div class="zod-hero-actions">
                 @if($firstCategory)
                     <a href="{{ route('service.category', $firstCategory->slug) }}" class="zod-btn zod-btn-primary">
-                        <i data-lucide="rocket"></i> @lang('Browse Services')
+                        <i data-lucide="rocket"></i>
+                        <span>@lang('Browse Services')</span>
                     </a>
                 @endif
                 <a href="{{ route('register.domain') }}" class="zod-btn zod-btn-ghost">
-                    <i data-lucide="scan-search"></i> @lang('Search Domain')
+                    <i data-lucide="scan-search"></i>
+                    <span>@lang('Register Domain')</span>
                 </a>
             </div>
-            <div class="zod-hero-metrics" aria-label="@lang('ZodHost platform highlights')">
-                @foreach($heroMetrics as $metric)
-                    <div>
-                        <strong>{{ $metric['value'] }}</strong>
-                        <span>{{ $metric['label'] }}</span>
-                    </div>
-                @endforeach
+
+            <!-- Features Trust Strip -->
+            <div class="zod-hero-trust-strip">
+                <div class="zod-trust-item">
+                    <i data-lucide="zap" class="text-amber-500"></i>
+                    <span>@lang('NVMe Fast Storage')</span>
+                </div>
+                <div class="zod-trust-item">
+                    <i data-lucide="shield" class="text-indigo-600"></i>
+                    <span>@lang('Free SSL Certificates')</span>
+                </div>
+                <div class="zod-trust-item">
+                    <i data-lucide="globe" class="text-cyan-500"></i>
+                    <span>@lang('Instant DNS Provisioning')</span>
+                </div>
+                <div class="zod-trust-item">
+                    <i data-lucide="clock" class="text-emerald-500"></i>
+                    <span>@lang('99.9% Uptime SLA')</span>
+                </div>
             </div>
+
             @if($heroPills->count())
                 <div class="zod-hero-pills" aria-label="@lang('Available service categories')">
                     @foreach($heroPills as $pill)
-                        <span><i data-lucide="{{ $pill['icon'] }}"></i>{{ $pill['name'] }}</span>
+                        <a href="{{ route('service.category') }}?all" class="zod-hero-pill-link">
+                            <i data-lucide="{{ $pill['icon'] }}"></i>
+                            <span>{{ $pill['name'] }}</span>
+                        </a>
                     @endforeach
                 </div>
             @endif
-        </div>
-
-        <div class="zod-hero-console" aria-label="@lang('ZodHost operations console preview')">
-            <div class="zod-console-top">
-                <span></span><span></span><span></span>
-                <strong>@lang('Live Service Desk')</strong>
-            </div>
-            <div class="zod-console-command">
-                <div>
-                    <span>@lang('Command center')</span>
-                    <strong>@lang('New hosting order')</strong>
-                </div>
-                <b>@lang('In progress')</b>
-            </div>
-            <div class="zod-console-grid">
-                @foreach($opsCards as $card)
-                    <article class="zod-console-card zod-tone-{{ $card['tone'] }}">
-                        <i data-lucide="{{ $card['icon'] }}"></i>
-                        <span>{{ $card['label'] }}</span>
-                        <strong>{{ $card['value'] }}</strong>
-                    </article>
-                @endforeach
-            </div>
-            <div class="zod-console-flow">
-                <div class="zod-flow-line"></div>
-                <div class="zod-flow-node active"><i data-lucide="shopping-cart"></i></div>
-                <div class="zod-flow-node"><i data-lucide="server-cog"></i></div>
-                <div class="zod-flow-node"><i data-lucide="shield-check"></i></div>
-                <div class="zod-flow-node"><i data-lucide="smile"></i></div>
-            </div>
-            <div class="zod-console-list">
-                <div><span>@lang('Checkout')</span><strong>@lang('Service, domain, invoice attached')</strong><b>@lang('Clean')</b></div>
-                <div><span>@lang('Panel')</span><strong>@lang('WHMPanel / ZodPanel access ready')</strong><b>@lang('Synced')</b></div>
-                <div><span>@lang('Support')</span><strong>@lang('Tickets linked to active products')</strong><b>@lang('Live')</b></div>
-            </div>
-            <div class="zod-console-footer">
-                <span><i data-lucide="lock-keyhole"></i>@lang('Secure client area')</span>
-                <span><i data-lucide="refresh-cw"></i>@lang('Renewals visible')</span>
-            </div>
         </div>
     </section>
 
