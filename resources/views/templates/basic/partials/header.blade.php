@@ -55,8 +55,7 @@
         <i data-lucide="menu"></i>
     </button>
     <a href="{{ route('home') }}" class="tw-brand">
-        <span class="tw-brand-mark"><i data-lucide="server"></i></span>
-        <span class="font-black text-ink">{{ gs('site_name') }}</span>
+        <img src="{{ siteLogo() }}" alt="{{ gs('site_name') }}" class="tw-brand-img" style="max-height: 32px; max-width: 150px; object-fit: contain;">
     </a>
     @include($activeTemplate . 'partials.cart_widget')
 </header>

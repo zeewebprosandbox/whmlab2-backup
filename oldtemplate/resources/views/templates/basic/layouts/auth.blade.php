@@ -13,15 +13,7 @@
         <!-- Top Header / Logo -->
         <div class="relative z-10">
             <a href="{{ route('home') }}" class="inline-flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 p-[1px] shadow-glow-accent">
-                    <div class="w-full h-full bg-[#0A0A0B] rounded-[7px] flex items-center justify-center text-indigo-400 group-hover:text-cyan-400 transition-colors">
-                        <i data-lucide="server" class="w-5 h-5"></i>
-                    </div>
-                </div>
-                <div>
-                    <span class="block text-lg font-bold tracking-tight text-white leading-none">{{ gs('site_name') }}</span>
-                    <span class="block text-[11px] font-semibold tracking-wider text-neutral-400 uppercase mt-1">@lang('Cloud Workspace')</span>
-                </div>
+                <img src="{{ siteLogo('dark') }}" alt="{{ gs('site_name') }}" class="whm-brand-img" style="max-height: 38px; max-width: 180px; object-fit: contain;">
             </a>
         </div>
 
