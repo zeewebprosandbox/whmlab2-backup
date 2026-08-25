@@ -20,6 +20,7 @@ return [
         '/usr/local/hestia/bin/v-zodpanel-run-domain-command',
         '/usr/local/hestia/bin/v-add-user-pma-temp-user',
         '/usr/local/hestia/bin/v-run-cli-cmd',
+        '/usr/local/hestia/bin/v-zodpanel-repair-mail-deliverability',
         '/usr/local/hestia/web/css/zodpanel-modules.css',
         '/usr/local/hestia/web/inc/zodpanel_modules.php',
         '/usr/local/hestia/web/api/whmlab/index.php',

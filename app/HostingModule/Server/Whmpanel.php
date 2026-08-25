@@ -765,6 +765,63 @@ class Whmpanel implements HostingManagerInterface
         ];
     }
 
+    public function mailDeliverabilityDiagnostics($data): array
+    {
+        $hosting = $data['hosting'] ?? null;
+        $domain = $data['domain'] ?? $hosting?->domain;
+
+        if (!$hosting || !$domain) {
+            return [
+                'success' => false,
+                'message' => 'A ZodPanel service and domain are required',
+            ];
+        }
+
+        if ($this->usesBridge($hosting->server) && $hosting->username) {
+            return $this->bridgeRequest(
+                $hosting->server,
+                'get',
+                'users/' . $hosting->username . '/mail/' . $domain . '/delivery/diagnostics'
+            );
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Mail deliverability diagnostics require a ZodPanel bridge server',
+        ];
+    }
+
+    public function repairMailDeliverability($data): array
+    {
+        $hosting = $data['hosting'] ?? null;
+        $domain = $data['domain'] ?? $hosting?->domain;
+
+        if (!$hosting || !$domain) {
+            return [
+                'success' => false,
+                'message' => 'A ZodPanel service and domain are required',
+            ];
+        }
+
+        if ($this->usesBridge($hosting->server) && $hosting->username) {
+            return $this->bridgeRequest(
+                $hosting->server,
+                'post',
+                'users/' . $hosting->username . '/mail/' . $domain . '/delivery/repair',
+                [
+                    'repair_dns' => true,
+                    'force_dkim' => true,
+                ],
+                30
+            );
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Mail deliverability repair requires a ZodPanel bridge server',
+        ];
+    }
+
     public function createDatabase($data): array
     {
         $hosting = $data['hosting'] ?? null;
@@ -1793,12 +1850,12 @@ class Whmpanel implements HostingManagerInterface
         return $server && $server->hostname && ($server->api_token || $server->security_token || $server->password);
     }
 
-    private function bridgeRequest($server, string $method, string $endpoint, array $payload = [], int $timeout = 3): array
+    private function bridgeRequest($server, string $method, string $endpoint, array $payload = [], int $timeout = 15): array
     {
         $token = $server->api_token ?: $server->security_token ?: $server->password;
         $port = $server->port ?: 8083;
         $protocol = $server->protocol ?: 'https://';
-        $host = $server->ip_address ?: (parse_url($server->hostname, PHP_URL_HOST) ?: $server->host);
+        $host = parse_url($server->hostname, PHP_URL_HOST) ?: ($server->hostname ?: $server->ip_address);
         $url = rtrim("{$protocol}{$host}:{$port}", '/') . '/api/whmlab/index.php';
 
         try {

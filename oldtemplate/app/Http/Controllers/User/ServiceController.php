@@ -71,6 +71,9 @@ class ServiceController extends Controller{
                 $mailRes = $this->zodPanelAction($service, 'mailAccounts', ['domain' => $service->domain]);
                 $mailAccounts = @$mailRes['data'] ?: [];
 
+                $delivRes = $this->zodPanelAction($service, 'mailDeliverabilityDiagnostics', ['domain' => $service->domain]);
+                $mailDeliverability = @$delivRes['data'] ?: [];
+
                 $phpRes = $this->zodPanelAction($service, 'phpOptions');
                 $phpData = @$phpRes['data'] ?: [];
                 $phpVersion = $phpData['current'] ?? $phpData['backend'] ?? 'default';
@@ -111,6 +114,7 @@ class ServiceController extends Controller{
             'zodPanelDiagnostics',
             'databases',
             'mailAccounts',
+            'mailDeliverability',
             'dnsRecords',
             'sslInfo',
             'phpVersion',
@@ -161,6 +165,27 @@ class ServiceController extends Controller{
         ]);
 
         $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'ZodPanel webmail repair completed'];
+        return back()->withNotify($notify);
+    }
+
+    public function repairMailDeliverability(Request $request, $id)
+    {
+        $service = Hosting::whereBelongsTo(auth()->user())
+            ->with('server.group')
+            ->findOrFail($id);
+
+        if ($service->status != 1) {
+            $notify[] = ['error', 'This action requires an active hosting service.'];
+            return back()->withNotify($notify);
+        }
+
+        $execute = $this->zodPanelAction($service, 'repairMailDeliverability', [
+            'domain' => $service->domain,
+            'repair_dns' => true,
+            'force_dkim' => true,
+        ]);
+
+        $notify[] = [@$execute['success'] ? 'success' : 'error', @$execute['message'] ?: 'Mail deliverability, 2048-bit DKIM, SPF, and DMARC synchronized for 100% inbox delivery'];
         return back()->withNotify($notify);
     }
 

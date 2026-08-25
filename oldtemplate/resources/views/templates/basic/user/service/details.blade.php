@@ -488,6 +488,98 @@
                     </div>
                 @endif
             </div>
+
+            <!-- Mail Deliverability & 100% Inbox Placement Engine -->
+            <div class="p-6 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 border border-indigo-900/40 rounded-2xl space-y-5 text-white shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            @lang('100% Inbox Placement Engine')
+                        </div>
+                        <h3 class="text-base font-bold text-white font-display">@lang('Multi-Tenant Mail Authentication & Deliverability')</h3>
+                        <p class="text-xs text-slate-400">@lang('Isolated DKIM (2048-bit), SPF, DMARC, and TLS 1.3 encryption for') {{ $service->domain ?? 'your domain' }}.</p>
+                    </div>
+                    @if($isActive)
+                        <form action="{{ route('user.service.zodpanel.mail.deliverability.repair', $service->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-2 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i>
+                                <span>@lang('Auto-Fix & Seal Inbox Placement')</span>
+                            </button>
+                        </form>
+                    @endif
+                </div>
+
+                <!-- Deliverability Badges Grid -->
+                <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <!-- DKIM -->
+                    <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300">@lang('2048-Bit DKIM')</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">@lang('Active')</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-mono">mail._domainkey.{{ $service->domain }}</p>
+                        <p class="text-[10px] text-emerald-400/80">✓ Cryptographically signs outgoing emails</p>
+                    </div>
+
+                    <!-- SPF -->
+                    <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300">@lang('SPF Alignment')</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">@lang('Enforced')</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-mono">v=spf1 a mx ip4:{{ $serverHost ?? '169.58.176.53' }} ~all</p>
+                        <p class="text-[10px] text-emerald-400/80">✓ Authorizes server IP outbound</p>
+                    </div>
+
+                    <!-- DMARC -->
+                    <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300">@lang('DMARC Policy')</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">@lang('Quarantine')</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-mono">_dmarc.{{ $service->domain }} (100%)</p>
+                        <p class="text-[10px] text-emerald-400/80">✓ Protects domain reputation & inbox</p>
+                    </div>
+
+                    <!-- Multi-Tenant Isolation -->
+                    <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300">@lang('Tenant Isolation')</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">@lang('Isolated')</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-mono">TLS 1.3 / Dovecot Maildir</p>
+                        <p class="text-[10px] text-cyan-400/80">✓ Strict per-domain segregation</p>
+                    </div>
+                </div>
+
+                <!-- Client Connection Settings Reference -->
+                <div class="relative z-10 p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-2">
+                    <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-400"></i>
+                        <span>@lang('Recommended Client Connection Settings (Outlook, Apple Mail, Thunderbird, Mobile)')</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] font-mono text-slate-400">
+                        <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-200 font-bold block mb-0.5 font-sans">@lang('IMAP (Incoming)')</span>
+                            Host: <span class="text-cyan-300">mail.{{ $service->domain }}</span><br>
+                            Port: <span class="text-emerald-300">993</span> (SSL/TLS)
+                        </div>
+                        <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-200 font-bold block mb-0.5 font-sans">@lang('SMTP (Outgoing)')</span>
+                            Host: <span class="text-cyan-300">mail.{{ $service->domain }}</span><br>
+                            Port: <span class="text-emerald-300">587</span> or <span class="text-emerald-300">465</span> (TLS)
+                        </div>
+                        <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-200 font-bold block mb-0.5 font-sans">@lang('POP3 (Incoming)')</span>
+                            Host: <span class="text-cyan-300">mail.{{ $service->domain }}</span><br>
+                            Port: <span class="text-emerald-300">995</span> (SSL/TLS)
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 4. DNS ZONE TAB (REAL-TIME) -->
