@@ -14,19 +14,17 @@
                 <h1>{{ __($pageTitle) }}</h1>
             </div>
             <div class="whm-topbar-actions">
-                <form action="{{ route('register.domain') }}" method="get" class="whm-topbar-search">
+                <form action="{{ route('register.domain') }}" method="get" class="whm-global-search">
                     <i data-lucide="search"></i>
-                    <input type="text" name="domain" placeholder="@lang('Search domains')">
+                    <input type="text" name="domain" placeholder="@lang('Search domains...')">
                 </form>
                 @include($activeTemplate . 'partials.cart_widget')
                 <x-language />
                 <a href="{{ route('user.profile.setting') }}" class="whm-avatar-link">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->fullname ?? $user->username) }}&background=2563eb&color=fff" alt="@lang('User')">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->fullname ?? $user->username) }}&background=4f46e5&color=fff" alt="@lang('User')">
                 </a>
             </div>
         </header>
-
-        @include($activeTemplate.'partials.breadcrumb')
 
         <div class="whm-client-page-body">
             @yield('content')
