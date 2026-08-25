@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Roboto+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -26,27 +26,102 @@
 
     <style>
         :root {
-            --font-heading: Boing, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            --font-body: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-sidebar: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-family-base: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
-        body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title, p, span, div, a, li, label, table, th, td, .text-muted, .text-slate-500, .text-slate-600 {
-            font-family: var(--font-body) !important;
+
+        /* 1. Global Barlow Condensed Uniform Font */
+        *, html, body, button, input, select, textarea, .nav-link, .btn, .card, .menu-title, p, span, div, a, li, label, table, th, td, h1, h2, h3, h4, h5, h6, .whm-brand strong, .tw-brand-title, .tw-heading-xl, .tw-heading-lg, .whm-client-sidebar, .whm-app-sidebar, .whm-sidebar-nav, .whm-nav-item, .whm-nav-subitem, .whm-nav-group p {
+            font-family: var(--font-family-base) !important;
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
         }
-        h1, h2, h3, h4, h5, h6, .whm-topbar h1, .whm-service-page-head h3, .font-display, .tw-brand-title, .tw-heading-xl, .tw-heading-lg {
-            font-family: var(--font-heading) !important;
-            letter-spacing: -0.015em !important;
-            -webkit-font-smoothing: antialiased !important;
+
+        /* 2. Balanced 50% Reduced Font Weights (Light, Clean, Subtle Aesthetic) */
+        h1, h2, h3, h4, h5, h6, .font-display, .font-bold, .font-extrabold {
+            font-weight: 500 !important;
+            letter-spacing: 0.01em !important;
         }
-        .whm-client-sidebar, .whm-app-sidebar, .whm-sidebar-nav, .whm-sidebar-brand, .whm-nav-item, .whm-nav-subitem, .whm-nav-group p, .whm-brand, .whm-sidebar-user, .whm-sidebar-user strong, .whm-sidebar-user span {
-            font-family: var(--font-sidebar) !important;
-            -webkit-font-smoothing: antialiased !important;
+
+        .whm-topbar h1,
+        .whm-service-page-head h3,
+        .font-semibold {
+            font-weight: 500 !important;
         }
+
+        body, p, span, div, a, li, label, td, input, select, textarea {
+            font-weight: 400 !important;
+            letter-spacing: 0.015em !important;
+        }
+
+        .whm-nav-item,
+        .whm-nav-subitem {
+            font-weight: 400 !important;
+            letter-spacing: 0.02em !important;
+        }
+
+        .whm-nav-group p {
+            font-weight: 500 !important;
+            letter-spacing: 0.08em !important;
+        }
+
         code, pre, .font-mono, .ip-address, .domain-name, [data-mono] {
             font-family: var(--font-mono) !important;
+            font-weight: 400 !important;
+        }
+
+        /* 3. Improved Button Heights & Proportions Across All Pages */
+        .btn,
+        button:not([data-bs-dismiss]):not(.modal-close),
+        a.btn,
+        .whm-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.02em !important;
+            transition: all 0.15s ease !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        /* Primary/Regular Buttons */
+        .btn-primary,
+        .btn--base,
+        .btn-base,
+        a.bg-indigo-600,
+        button.bg-indigo-600,
+        a.bg-slate-900,
+        button.bg-slate-900 {
+            height: 34px !important;
+            min-height: 34px !important;
+            padding: 0 14px !important;
+            font-size: 13px !important;
+            line-height: 34px !important;
+        }
+
+        /* Small Action Buttons (Manage, Control Panel, View, Pay Now, Statements) */
+        .btn-sm,
+        .btn--sm,
+        a.px-2\.5,
+        a.px-3,
+        button.px-2\.5,
+        button.px-3 {
+            height: 28px !important;
+            min-height: 28px !important;
+            padding: 0 10px !important;
+            font-size: 11.5px !important;
+            line-height: 28px !important;
+            border-radius: 6px !important;
+        }
+
+        .btn svg,
+        .btn i,
+        a.btn svg,
+        button svg {
+            width: 13px !important;
+            height: 13px !important;
         }
     </style>
 
