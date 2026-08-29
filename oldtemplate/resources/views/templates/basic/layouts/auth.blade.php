@@ -1,74 +1,39 @@
 @extends($activeTemplate . 'layouts.app')
 
 @section('app')
-<div class="min-h-screen bg-[#0A0A0B] text-[#F5F5F7] flex flex-col lg:flex-row overflow-hidden relative font-sans">
-    
-    <!-- Left 55%: Immersive Mesh Gradient & Branding -->
-    <div class="lg:w-[55%] relative flex flex-col justify-between p-8 lg:p-16 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5 bg-[#0D0D10]">
-        <!-- Mesh Animation Blobs -->
-        <div class="mesh-blob-1 -top-20 -left-20 pointer-events-none"></div>
-        <div class="mesh-blob-2 bottom-10 right-10 pointer-events-none"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none"></div>
+<div class="min-h-screen bg-white text-neutral-900 flex flex-col justify-between relative selection:bg-neutral-900 selection:text-white">
+    <!-- Subtle top ambient light -->
+    <div class="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-neutral-100/60 to-transparent pointer-events-none"></div>
 
-        <!-- Top Header / Logo -->
-        <div class="relative z-10">
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-3 group">
-                <img src="{{ siteLogo('dark') }}" alt="{{ gs('site_name') }}" class="whm-brand-img" style="max-height: 38px; max-width: 180px; object-fit: contain;">
-            </a>
-        </div>
+    <!-- Header / Branding Navigation -->
+    <header class="relative z-10 w-full max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-3 transition-opacity hover:opacity-85">
+            <img src="{{ siteLogo() }}" alt="{{ gs('site_name') }}" class="whm-brand-img" style="max-height: 40px; max-width: 190px; object-fit: contain;">
+        </a>
 
-        <!-- Center Hero Copy -->
-        <div class="relative z-10 my-12 max-w-xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-6">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 orb-pulse"></span>
-                @lang('Orbital Platform v2.0')
-            </div>
-            <h1 class="text-3xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15] mb-4">
-                @lang('High performance hosting, simplified.')
-            </h1>
-            <p class="text-neutral-400 text-base leading-relaxed">
-                @lang('Manage NVMe cloud servers, domains, SSL certificates, and automated billing through a high-speed unified console.')
-            </p>
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-xs font-medium text-neutral-500 hover:text-neutral-900 transition-colors">
+            <i class="las la-arrow-left text-sm"></i>
+            <span>@lang('Back to home')</span>
+        </a>
+    </header>
 
-            <!-- Feature Pills -->
-            <div class="grid grid-cols-2 gap-4 mt-8">
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                    <div class="w-8 h-8 rounded-md bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-semibold text-white">99.99% Uptime</div>
-                        <div class="text-[11px] text-neutral-400">Automated failover</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                    <div class="w-8 h-8 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-                        <i data-lucide="zap" class="w-4 h-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-semibold text-white">NVMe Speed</div>
-                        <div class="text-[11px] text-neutral-400">Sub-10ms latency</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer / Trust Signals -->
-        <div class="relative z-10 flex items-center justify-between pt-6 border-t border-white/5 text-xs text-neutral-500">
-            <div>&copy; {{ date('Y') }} {{ gs('site_name') }}. All rights reserved.</div>
-            <div class="flex items-center gap-2 text-neutral-400">
-                <i data-lucide="lock" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>256-bit SSL Encrypted</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right 45%: Clean Form Panel -->
-    <div class="lg:w-[45%] flex flex-col justify-center items-center p-6 lg:p-16 bg-[#141416] relative z-10">
-        <div class="w-full max-w-md">
+    <!-- Main Auth Center Wrapper -->
+    <main class="relative z-10 flex-1 flex flex-col justify-center items-center px-6 py-8 sm:py-12">
+        <div class="w-full max-w-[480px]">
             @yield('auth')
         </div>
-    </div>
+    </main>
 
+    <!-- Clean Footer -->
+    <footer class="relative z-10 w-full max-w-6xl mx-auto px-6 py-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
+        <div>&copy; {{ date('Y') }} {{ gs('site_name') }}. @lang('All rights reserved.')</div>
+        <div class="flex items-center gap-6">
+            <div class="inline-flex items-center gap-1.5 text-neutral-500">
+                <i class="las la-shield-alt text-sm text-emerald-600"></i>
+                <span>@lang('256-bit SSL Encrypted')</span>
+            </div>
+            <a href="{{ route('ticket.index') }}" class="hover:text-neutral-900 transition-colors">@lang('Support')</a>
+        </div>
+    </footer>
 </div>
 @endsection

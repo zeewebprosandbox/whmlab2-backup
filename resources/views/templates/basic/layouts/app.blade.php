@@ -17,8 +17,9 @@
 
     <link href="{{ asset('assets/global/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/global/css/all.min.css') }}" rel="stylesheet" />
-
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css" integrity="sha512-vebUliqxrVkBy3gucMhClgkss5VUzwTXVgzuo5C04nADVxlJUo6QQQ5D53EOVC3UpQ797MLbwebSUSk3UoyblQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}" />
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}" />
@@ -35,6 +36,23 @@
             font-family: var(--font-family-base) !important;
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
+        }
+
+        /* Icon Font Preservation (Guarantees LineAwesome & FontAwesome render crisp line icons) */
+        i, [class^="la-"], [class*=" la-"], [class^="las"], [class*=" las"], [class^="lar"], [class*=" lar"], [class^="lab"], [class*=" lab"], [class^="fa-"], [class*=" fa-"], [class^="fas"], [class*=" fas"], [class^="far"], [class*=" far"], [class^="fab"], [class*=" fab"], .la, .las, .lar, .lab, .fa, .fas, .far, .fab {
+            font-family: "Line Awesome Free", "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+            font-style: normal !important;
+            font-weight: 900 !important;
+            display: inline-block;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .lar, [class*=" lar"] {
+            font-weight: 400 !important;
+        }
+        .lab, [class*=" lab"], .fab, [class*=" fab"] {
+            font-family: "Line Awesome Brands", "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+            font-weight: 400 !important;
         }
 
         /* 2. Balanced 50% Reduced Font Weights (Light, Clean, Subtle Aesthetic) */

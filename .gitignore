@@ -35,6 +35,6 @@ oldtemplate/.env.*
 oldtemplate/bootstrap/cache/*.php
 oldtemplate/storage/framework/cache/*
 oldtemplate/storage/framework/sessions/*
-oldtemplate/storage/framework/views/*
 oldtemplate/storage/logs/*
+/scratch
 

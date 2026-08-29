@@ -534,8 +534,9 @@ class ManageUsersController extends Controller
     public function services($id){
         $user = User::findOrFail($id);
         $pageTitle = $user->username .' - Services';
-        $services = Hosting::where('user_id', $user->id)->orderBy('id', 'DESC')->with('product.serviceCategory', 'user')->paginate(getPaginate());
-        return view('admin.services', compact('pageTitle', 'services'));
+        $services = Hosting::where('user_id', $user->id)->orderBy('id', 'DESC')->with('product.serviceCategory', 'user', 'server')->paginate(getPaginate());
+        $allServers = \App\Models\Server::orderBy('name', 'ASC')->get();
+        return view('admin.services', compact('pageTitle', 'services', 'allServers', 'user'));
     }
 
     public function invoices($id){

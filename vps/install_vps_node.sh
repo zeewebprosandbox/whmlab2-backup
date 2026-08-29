@@ -138,8 +138,27 @@ if [ -f "$SCRIPT_DIR/etc_nginx_custom/phpmyadmin.inc" ]; then
     cp -f "$SCRIPT_DIR/etc_nginx_custom/phpmyadmin.inc" /etc/nginx/conf.d/phpmyadmin.inc
 fi
 
-# 8. Restart & Verify Services
-log "8/8 Restarting and validating web services..."
+# 8. Deploy File Manager Configuration
+log "8/9 Deploying ZodPanel direct File Manager configuration..."
+if [ -f "$SCRIPT_DIR/fm/configuration.php" ]; then
+    mkdir -p /usr/local/hestia/web/fm
+    cp -f "$SCRIPT_DIR/fm/configuration.php" /usr/local/hestia/web/fm/configuration.php
+    chmod 644 /usr/local/hestia/web/fm/configuration.php
+fi
+
+# 9. Setup Watchdog, Error Enforcer, and Restart Services
+log "9/9 Setting up watchdog daemon, error enforcer, and validating web services..."
+if [ -f "/usr/local/hestia/bin/v-zodpanel-watchdog" ]; then
+    chmod 755 /usr/local/hestia/bin/v-zodpanel-watchdog
+    echo "* * * * * root /usr/local/hestia/bin/v-zodpanel-watchdog >/dev/null 2>&1" > /etc/cron.d/zodpanel-watchdog
+    chmod 644 /etc/cron.d/zodpanel-watchdog
+fi
+
+if [ -f "/usr/local/hestia/bin/v-zodpanel-enforce-debug-errors" ]; then
+    chmod 755 /usr/local/hestia/bin/v-zodpanel-enforce-debug-errors
+    /usr/local/hestia/bin/v-zodpanel-enforce-debug-errors || true
+fi
+
 systemctl restart hestia || true
 systemctl restart nginx || true
 systemctl restart apache2 || true

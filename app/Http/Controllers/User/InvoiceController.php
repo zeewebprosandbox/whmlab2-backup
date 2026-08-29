@@ -29,8 +29,16 @@ class InvoiceController extends Controller{
         $carts = ShoppingCart::whereBelongsTo($user)->get();
         $billingSetting = BillingSetting::first();
 
-        if(!$carts->count()){
-            $notify[] = ['error', 'Your cart is empty'];
+        if ($request->isMethod('get')) {
+            if (!$carts || !$carts->count()) {
+                $notify[] = ['info', 'Your shopping cart is currently empty.'];
+                return to_route('services')->withNotify($notify);
+            }
+            return to_route('shopping.cart');
+        }
+
+        if(!$carts || !$carts->count()){
+            $notify[] = ['error', 'Your shopping cart is empty. Please add an item before checkout.'];
             return to_route('shopping.cart')->withNotify($notify);
         }
 
@@ -38,9 +46,13 @@ class InvoiceController extends Controller{
             $this->validatePaymentRequest($request);
         }
 
-        $totalPrice = $carts->sum('total');
-        $totalDiscount = $carts->sum('discount');
-        $afterDiscount = $carts->sum('after_discount');
+        $totalPrice = (float) $carts->sum('total');
+        $totalDiscount = (float) $carts->sum('discount');
+        $afterDiscount = (float) $carts->sum('after_discount');
+
+        if ($afterDiscount <= 0 && $totalPrice > 0) {
+            $afterDiscount = max(0, $totalPrice - $totalDiscount);
+        }
 
         if($request->payment == 'wallet'){
             $walletPayable = $this->walletPayableAmount($afterDiscount);
@@ -51,7 +63,7 @@ class InvoiceController extends Controller{
             }
 
             if($walletPayable > $user->balance){
-                $notify[] = ['error', 'Your balance is not enough for this checkout. Please choose another payment method.'];
+                $notify[] = ['error', 'Your wallet balance is insufficient for this checkout. Please select a payment gateway or top up your balance.'];
                 return to_route('shopping.cart')->withNotify($notify);
             }
         }
@@ -110,7 +122,9 @@ class InvoiceController extends Controller{
                 $hosting->product_id = $cart->product_id;
                 $hosting->domain_setup_id = $cart->domain_setup_id; 
                 $hosting->domain = $cart->domain ?? $cart->hostname;
-                $hosting->server_id = $product->server_id;
+
+                $assignedServer = $product?->server ?: \App\Models\Server::bestForProduct($product) ?: \App\Models\Server::where('status', 1)->first() ?: \App\Models\Server::first();
+                $hosting->server_id = $assignedServer?->id ?: $product?->server_id;
                 $hosting->first_payment_amount = $cart->after_discount;
                 $hosting->recurring_amount = $cart->price;
                 $hosting->discount = $cart->discount;
@@ -120,14 +134,24 @@ class InvoiceController extends Controller{
                 $hosting->next_invoice_date = $nextInvoiceDate;
                 $hosting->stock_control = $product->stock_control;
                 $hosting->user_id = $user->id;
-                $hosting->password = $cart->password;
+                $hosting->password = $cart->password ?: \Illuminate\Support\Str::password(16);
+                $domainPart = preg_replace('/[^a-z0-9]/i', '', explode('.', $hosting->domain ?: 'srv')[0]);
+                $hosting->username = $hosting->username ?: (substr($domainPart, 0, 8) . rand(10, 99));
+                $hosting->status = 1; // 1 means Active
                 $hosting->reg_date = Carbon::now();
-                $hosting->ns1 = $cart->ns1;
-                $hosting->ns2 = $cart->ns2;
+                $hosting->ns1 = $cart->ns1 ?: @$assignedServer?->ns1 ?: 'ns1.zodserver.cloud';
+                $hosting->ns2 = $cart->ns2 ?: @$assignedServer?->ns2 ?: 'ns2.zodserver.cloud';
                 $hosting->save();
                 
                 $this->hostingConfigs($hosting->id, $cart->config_options);
                 $this->invoiceItemForHosting($invoice, $hosting, $product);
+
+                try {
+                    $whmpanel = new \App\HostingModule\Server\Whmpanel();
+                    $whmpanel->create($hosting);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Immediate hosting provisioning on checkout warning: " . $e->getMessage());
+                }
             }
             else{
                 /**
@@ -186,7 +210,8 @@ class InvoiceController extends Controller{
             return $this->processInvoicePayment($request, $invoice, $user);
         }
 
-        return redirect()->route('user.invoice.view', $invoice->id);
+        $notify[] = ['success', 'Your order has been placed and your hosting service is active!'];
+        return redirect()->route('user.service.list')->withNotify($notify);
     } 
 
     private function validatePaymentRequest(Request $request){
@@ -420,8 +445,8 @@ class InvoiceController extends Controller{
             $afterPayment = new AfterPayment();
             $afterPayment->pay($invoice);
 
-            $notify[] = ['success', 'Your payment was successful'];
-            return redirect()->route('user.invoice.view', $invoice->id)->withNotify($notify); 
+            $notify[] = ['success', 'Payment completed successfully! Your service is ready.'];
+            return redirect()->route('user.service.list')->withNotify($notify); 
         }
 
         $this->validatePaymentRequest($request);

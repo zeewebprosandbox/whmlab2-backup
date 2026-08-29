@@ -43,8 +43,10 @@ class CronController extends Controller{
         $this->addLateFee();
         $this->removeShoppingCarts();
         $this->syncDefaultDnsZones();
+        $this->syncAllServerAccounts();
+        $this->autoProvisionPendingOrders();
 
-        $notify[] = ['success', 'Automated billing, renewal reminders, and suspension cron ran successfully'];
+        $notify[] = ['success', 'Automated billing, renewal reminders, server sync, DNS zones, and AutoSSL cron ran successfully'];
         return back()->withNotify($notify);
     }
 
@@ -54,8 +56,22 @@ class CronController extends Controller{
         $general->last_cron = now();
         $general->save();
 
-        $crons = CronJob::with('schedule');
+        // 1. Run all master automation workflows directly
+        $this->invoiceGenerate(); 
+        $this->checkServiceExpiriesAndReminders();
+        $this->unpaidInvoiceReminder();
+        $this->firstOverdueReminder();
+        $this->secondOverdueReminder();
+        $this->thirdOverdueReminder();
+        $this->autoSuspendOverdueServices();
+        $this->addLateFee();
+        $this->removeShoppingCarts();
+        $this->syncDefaultDnsZones();
+        $this->syncAllServerAccounts();
+        $this->autoProvisionPendingOrders();
 
+        // 2. Run any custom scheduled database cron jobs
+        $crons = CronJob::with('schedule');
         if (request()->alias) {
             $crons->where('alias', request()->alias);
         } else {
@@ -82,17 +98,19 @@ class CronController extends Controller{
                 }
             }
             $cron->last_run = now();
-            $cron->next_run = now()->addSeconds($cron->schedule->interval);
+            if ($cron->schedule) {
+                $cron->next_run = now()->addSeconds($cron->schedule->interval);
+            }
             $cron->save();
 
             $cronLog->end_at = $cron->last_run;
-
             $startTime         = Carbon::parse($cronLog->start_at);
             $endTime           = Carbon::parse($cronLog->end_at);
             $diffInSeconds     = $startTime->diffInSeconds($endTime);
             $cronLog->duration = $diffInSeconds;
             $cronLog->save();
         }
+
         if (request()->target == 'all') {
             $notify[] = ['success', 'Cron executed successfully'];
             return back()->withNotify($notify);
@@ -101,6 +119,52 @@ class CronController extends Controller{
             $notify[] = ['success', keyToTitle(request()->alias) . ' executed successfully'];
             return back()->withNotify($notify);
         }
+
+        return response("OK - ZodHost automated cron executed successfully at " . now(), 200)->header('Content-Type', 'text/plain');
+    }
+
+    public function syncAllServerAccounts()
+    {
+        try {
+            return \App\Http\Controllers\Admin\ServerController::syncAllServerAccounts();
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    public function autoProvisionPendingOrders()
+    {
+        $pendingHostings = Hosting::where('status', 0)->with('user', 'product.serverGroup.servers', 'server.group')->get();
+        $whmpanel = new \App\HostingModule\Server\Whmpanel();
+        $count = 0;
+
+        foreach ($pendingHostings as $h) {
+            try {
+                if (!$h->server_id) {
+                    $product = $h->product;
+                    if ($product) {
+                        $selectedServer = \App\Models\Server::bestForProduct($product);
+                        if ($selectedServer) {
+                            $h->server_id = $selectedServer->id;
+                            $h->setRelation('server', $selectedServer);
+                            $h->save();
+                        }
+                    }
+                }
+
+                $res = $whmpanel->create($h);
+                if (!empty($res['success'])) {
+                    $h->status = 1;
+                    $h->save();
+                    $whmpanel->enforceDefaultDnsZone($h);
+                    $count++;
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error("Auto-provision error for hosting #{$h->id}: " . $e->getMessage());
+            }
+        }
+
+        return $count;
     }
 
     public function invoiceGenerate(){

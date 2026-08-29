@@ -443,20 +443,33 @@ class ZodPanelNodeBootstrapper
         // 3. Enforce TLS 1.2 and TLS 1.3 modern cryptographic protocols
         $this->run('sed -i "s/ssl_protocols .*/ssl_protocols TLSv1.2 TLSv1.3;/" /usr/local/hestia/nginx/conf/hestia-nginx.conf 2>/dev/null || true', false);
 
-        // 4. Configure phpMyAdmin All-in-One SSO
+        // 4. Configure phpMyAdmin All-in-One SSO (Single-Server Engine)
         $this->line("Configuring phpMyAdmin Single Sign-On (SSO) with All-in-One database access...");
-        $this->run('rm -f /usr/share/phpmyadmin/hestia-sso.php && /usr/local/hestia/bin/v-add-sys-pma-sso 2>/dev/null || true', false);
-        $ssoConf = '<?php' . PHP_EOL . 'if (!isset($cfg[\'Servers\'][$i])) { $cfg[\'Servers\'][$i] = []; }' . PHP_EOL . '$cfg[\'Servers\'][$i][\'auth_type\'] = \'signon\';' . PHP_EOL . '$cfg[\'Servers\'][$i][\'SignonSession\'] = \'SignonSession\';' . PHP_EOL . '$cfg[\'Servers\'][$i][\'SignonURL\'] = \'hestia-sso.php\';' . PHP_EOL . '$cfg[\'Servers\'][$i][\'LogoutURL\'] = \'hestia-sso.php?logout\';' . PHP_EOL;
-        $this->run("cat << 'EOF' > /etc/phpmyadmin/conf.d/00-hestia-sso.php\n" . $ssoConf . "EOF\n", false);
-        $this->run('sed -i "s/fastcgi_pass  unix:\/run\/php\/www.sock;/fastcgi_param HTTPS on;\n\t\tfastcgi_param HTTP_X_FORWARDED_PROTO https;\n\t\tfastcgi_pass  unix:\/run\/php\/www.sock;/" /etc/nginx/conf.d/phpmyadmin.inc 2>/dev/null || true', false);
+        $this->run('rm -f /etc/phpmyadmin/conf.d/00-hestia-sso.php /etc/phpmyadmin/conf.d/02-tempdir.php 2>/dev/null || true', false);
+        $this->run('chown -R root:hestiamail /etc/phpmyadmin/hestia-sso.inc.php /usr/share/phpmyadmin/hestia-sso.php 2>/dev/null || true', false);
+        $this->run('chmod 644 /usr/share/phpmyadmin/hestia-sso.php /usr/local/hestia/web/open/phpmyadmin/index.php 2>/dev/null || true', false);
+
+        // 5. Configure Proactive Self-Healing Watchdog Daemon
+        $this->line("Configuring Proactive Self-Healing Watchdog Daemon...");
+        $watchdogCron = "* * * * * root /usr/local/hestia/bin/v-zodpanel-watchdog >/dev/null 2>&1\n";
+        $this->run("echo " . escapeshellarg($watchdogCron) . " > /etc/cron.d/zodpanel-watchdog && chmod 644 /etc/cron.d/zodpanel-watchdog 2>/dev/null || true", false);
+        // 6. Enforce global real error and stack trace display (disable 500 error page masking)
+        $this->line("Enforcing global real error display and stack trace passthrough across all PHP versions and web servers...");
+        $this->run('/usr/local/hestia/bin/v-zodpanel-enforce-debug-errors 2>/dev/null || true', false);
+
+        // 7. Run initial multi-tenant synchronization
+        $this->line("Executing global account & service reconciliation on node...");
+        $this->run('/usr/local/hestia/bin/v-zodpanel-sync-all-accounts 2>/dev/null || true', false);
 
         // Enable and start hestia, nginx, apache2 services
         $this->run('systemctl unmask hestia 2>/dev/null || true', false);
         $this->run('systemctl enable hestia 2>/dev/null || true', false);
         $this->run('systemctl restart hestia 2>/dev/null || service hestia restart 2>/dev/null || true', false);
         $this->run('systemctl restart nginx 2>/dev/null || service nginx restart 2>/dev/null || true', false);
-        $this->run('systemctl restart apache2 2>/dev/null || service apache2 restart 2>/dev/null || true', false);
+        $this->run('systemctl restart php*-fpm exim4 dovecot 2>/dev/null || true', false);
 
+        // Run watchdog once to verify all services
+        $this->run('/usr/local/hestia/bin/v-zodpanel-watchdog 2>/dev/null || true', false);
 
         // Verify port 8083 status
         $portCheck = trim($this->run('ss -tulpn 2>/dev/null | grep ":8083" || netstat -tulpn 2>/dev/null | grep ":8083" || true', false));

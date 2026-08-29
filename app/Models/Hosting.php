@@ -21,6 +21,49 @@ class Hosting extends Model
         'last_cron'=>'datetime'
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function ($hosting) {
+            // Clean up WhmPanel accounts and websites to prevent foreign key errors
+            if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_accounts')) {
+                $accounts = \App\Models\WhmPanelAccount::where('hosting_id', $hosting->id)->get();
+                foreach ($accounts as $acc) {
+                    if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_websites')) {
+                        $websites = \App\Models\WhmPanelWebsite::where('account_id', $acc->id)->get();
+                        foreach ($websites as $w) {
+                            if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_dns_records')) {
+                                \App\Models\WhmPanelDnsRecord::where('website_id', $w->id)->delete();
+                            }
+                            $w->delete();
+                        }
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_databases')) {
+                        \App\Models\WhmPanelDatabase::where('account_id', $acc->id)->delete();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasTable('whm_panel_mail_accounts')) {
+                        \App\Models\WhmPanelMailAccount::where('account_id', $acc->id)->delete();
+                    }
+                    $acc->delete();
+                }
+            }
+
+            // Clean up configs, cancel requests, and invoice relations
+            \App\Models\HostingConfig::where('hosting_id', $hosting->id)->delete();
+            \App\Models\CancelRequest::where('hosting_id', $hosting->id)->delete();
+            \App\Models\InvoiceItem::where('hosting_id', $hosting->id)->delete();
+            \App\Models\Invoice::where('hosting_id', $hosting->id)->update(['hosting_id' => null]);
+        });
+    }
+
+    public function deleteWithRelations(): bool
+    {
+        if ($this->server && $this->server->current_accounts > 0) {
+            $this->server->decrement('current_accounts');
+        }
+
+        return (bool) $this->delete();
+    }
+
     public function scopeActive($query){
         return $query->where('status', 1);
     }

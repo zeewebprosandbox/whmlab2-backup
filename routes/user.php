@@ -80,7 +80,7 @@ Route::middleware('auth')->name('user.')->group(function () {
 
             //Invoice
             Route::controller('InvoiceController')->prefix('invoice')->name('invoice.')->group(function(){
-                Route::post('/create','create')->name('create');
+                Route::match(['get', 'post'], '/create','create')->name('create');
                 Route::get('/view/{id}', 'viewInvoice')->name('view');
                 Route::post('/payment', 'payment')->name('payment')->middleware('kyc');
                 Route::get('/list', 'list')->name('list');

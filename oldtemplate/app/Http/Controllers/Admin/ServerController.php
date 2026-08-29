@@ -650,6 +650,10 @@ class ServerController extends Controller{
 
     public function serverAccounts($id){
         $server = Server::with('group')->findOrFail($id);
+        
+        // Auto-discover and sync any accounts directly on the VPS node
+        self::syncServerAccountsFromNode($server);
+
         $pageTitle = "Hosted Accounts: {$server->name}";
         $accounts = \App\Models\Hosting::where('server_id', $server->id)
             ->with('user', 'product.serviceCategory')
@@ -659,12 +663,134 @@ class ServerController extends Controller{
         return view('admin.server.accounts', compact('pageTitle', 'server', 'accounts', 'allServers'));
     }
 
-    public function syncServerAccounts($id){
-        $server = Server::findOrFail($id);
-        $accounts = \App\Models\Hosting::where('server_id', $server->id)->with('user', 'product')->get();
+    public static function syncServerAccountsFromNode(Server $server)
+    {
         $whmpanel = new \App\HostingModule\Server\Whmpanel();
+        $defaultProduct = \App\Models\Product::where('product_type', 1)->first() ?: \App\Models\Product::first();
+        $defaultUser = \App\Models\User::first();
         $synced = 0;
 
+        // 1. If SSH is configured on server, discover real VPS accounts
+        if ($server->ip_address && $server->password && class_exists(\phpseclib3\Net\SSH2::class)) {
+            try {
+                $ssh = new \phpseclib3\Net\SSH2($server->ip_address, (int) ($server->ssh_port ?: 22), 5);
+                if ($ssh->login($server->username ?: 'root', $server->password)) {
+                    $vpsUsers = explode("\n", trim($ssh->exec("ls -1 /usr/local/hestia/data/users/ 2>/dev/null")));
+                    foreach ($vpsUsers as $u) {
+                        $u = trim($u);
+                        if (!$u || $u === 'admin') continue;
+
+                        $userConf = $ssh->exec("cat /usr/local/hestia/data/users/{$u}/user.conf 2>/dev/null");
+                        $webConf = $ssh->exec("cat /usr/local/hestia/data/users/{$u}/web.conf 2>/dev/null");
+
+                        $contact = '';
+                        if (preg_match("/CONTACT=\x27([^\x27]+)\x27/", $userConf, $m)) {
+                            $contact = $m[1];
+                        }
+                        $package = 'basic_shared';
+                        if (preg_match("/PACKAGE=\x27([^\x27]+)\x27/", $userConf, $m)) {
+                            $package = $m[1];
+                        }
+
+                        $packageProduct = null;
+                        if ($package) {
+                            $pkgClean = str_replace(['_shared', '_'], [' ', ' '], strtolower($package));
+                            $packageProduct = \App\Models\Product::where('name', 'like', "%{$pkgClean}%")->first();
+                        }
+                        $assignedProduct = $packageProduct ?: ($defaultProduct ?: \App\Models\Product::first());
+
+                        $domains = [];
+                        foreach (explode("\n", $webConf) as $line) {
+                            if (preg_match("/DOMAIN=\x27([^\x27]+)\x27/", $line, $m)) {
+                                $domains[] = $m[1];
+                            }
+                        }
+
+                        // Filter to ONLY root domains (exclude subdomains like kids.99code.xyz, nav.copyexpertsignals.online)
+                        $rootDomains = [];
+                        foreach ($domains as $d) {
+                            $d = trim($d);
+                            if (!$d) continue;
+
+                            $isSub = false;
+                            foreach ($domains as $parent) {
+                                $parent = trim($parent);
+                                if ($parent && $d !== $parent && str_ends_with($d, '.' . $parent)) {
+                                    $isSub = true;
+                                    break;
+                                }
+                            }
+                            if (!$isSub) {
+                                $rootDomains[] = $d;
+                            }
+                        }
+
+                        if (empty($rootDomains)) {
+                            $rootDomains = [$u . '.com'];
+                        }
+
+                        $user = null;
+                        if ($contact) {
+                            $user = \App\Models\User::where('email', $contact)->first();
+                        }
+                        if (!$user) {
+                            $user = \App\Models\User::where('username', $u)->first() ?: $defaultUser;
+                        }
+
+                        foreach ($rootDomains as $domainName) {
+                            $domainName = trim($domainName);
+                            if (!$domainName) continue;
+
+                            $hosting = \App\Models\Hosting::where('server_id', $server->id)
+                                ->where(function($q) use ($u, $domainName) {
+                                    $q->where('domain', $domainName)->orWhere(function($sub) use ($u, $domainName) {
+                                        $sub->where('username', $u)->where('domain', $domainName);
+                                    });
+                                })->first();
+
+                            if (!$hosting) {
+                                $hosting = new \App\Models\Hosting();
+                                $hosting->user_id = $user ? $user->id : 1;
+                                $hosting->product_id = $assignedProduct ? $assignedProduct->id : 1;
+                                $hosting->server_id = $server->id;
+                                $hosting->domain = $domainName;
+                                $hosting->username = $u;
+                                $hosting->password = 'ZodHost_' . rand(1000, 9999) . '!Sec';
+                                $hosting->package_name = $package;
+                                $hosting->dedicated_ip = $server->ip_address;
+                                $hosting->ip = $server->ip_address;
+                                $hosting->ns1 = $server->ns1 ?: 'ns1.zodserver.cloud';
+                                $hosting->ns2 = $server->ns2 ?: 'ns2.zodserver.cloud';
+                                $hosting->ns1_ip = $server->ns1_ip ?: $server->ip_address;
+                                $hosting->ns2_ip = $server->ns2_ip ?: $server->ip_address;
+                                $hosting->status = 1;
+                                $hosting->billing_cycle = 1;
+                                $hosting->reg_date = now();
+                                $hosting->next_due_date = now()->addMonth();
+                                $hosting->next_invoice_date = now()->addMonth()->subDays(7);
+                                $hosting->save();
+                            } else {
+                                $hosting->server_id = $server->id;
+                                $hosting->username = $u;
+                                $hosting->domain = $domainName;
+                                $hosting->package_name = $package;
+                                $hosting->dedicated_ip = $server->ip_address;
+                                $hosting->ip = $server->ip_address;
+                                $hosting->status = 1;
+                                $hosting->save();
+                            }
+
+                            try {
+                                $whmpanel->enforceDefaultDnsZone($hosting);
+                            } catch (\Throwable $e) {}
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 2. Ensure all existing database accounts have verified credentials & DNS
+        $accounts = \App\Models\Hosting::where('server_id', $server->id)->with('user', 'product')->get();
         foreach ($accounts as $h) {
             if (!$h->username) {
                 $h->username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', explode('.', $h->domain)[0]));
@@ -676,8 +802,6 @@ class ServerController extends Controller{
             $h->ip = $server->ip_address;
             $h->ns1 = $server->ns1 ?: 'ns1.zodserver.cloud';
             $h->ns2 = $server->ns2 ?: 'ns2.zodserver.cloud';
-            $h->ns1_ip = $server->ns1_ip ?: $server->ip_address;
-            $h->ns2_ip = $server->ns2_ip ?: $server->ip_address;
             $h->save();
 
             try {
@@ -689,7 +813,24 @@ class ServerController extends Controller{
         $server->current_accounts = $accounts->where('status', 1)->count();
         $server->save();
 
-        $notify[] = ['success', "Successfully synchronized credentials and DNS zones for all {$synced} accounts on {$server->name}."];
+        return $synced;
+    }
+
+    public static function syncAllServerAccounts()
+    {
+        $servers = Server::where('status', 1)->get();
+        $total = 0;
+        foreach ($servers as $server) {
+            $total += self::syncServerAccountsFromNode($server);
+        }
+        return $total;
+    }
+
+    public function syncServerAccounts($id){
+        $server = Server::findOrFail($id);
+        $synced = self::syncServerAccountsFromNode($server);
+
+        $notify[] = ['success', "Successfully synchronized credentials, accounts, and DNS zones for all {$synced} accounts on {$server->name}."];
         return back()->withNotify($notify);
     }
 

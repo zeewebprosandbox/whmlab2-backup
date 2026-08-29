@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# info: Synchronize and enforce all ZodPanel global rules across all existing accounts
+#
+# This script enforces:
+# 1. MariaDB multi-tenant phpMyAdmin SSO accounts and database permissions
+# 2. DKIM 2048-bit keys, SPF, DMARC, and DNS deliverability rules
+# 3. Webmail SSO credentials and Roundcube integration
+# 4. Automated Let's Encrypt SSL & HSTS for all web and mail domains
+# 5. File Manager domain bindings and UI themes
+
+HESTIA_BIN="/usr/local/hestia/bin"
+
+echo "============================================================"
+echo "   ZodPanel Global Multi-Tenant Rule Enforcement & Sync     "
+echo "============================================================"
+
+# Step 1: Get list of all users
+users=$($HESTIA_BIN/v-list-users plain | cut -f 1)
+
+echo "[1/4] Provisioning MariaDB phpMyAdmin SSO for all users..."
+for u in $users; do
+    echo " -> Provisioning PMA SSO for user: $u"
+    $HESTIA_BIN/v-add-user-pma-temp-user "$u" >/dev/null 2>&1
+done
+
+echo "[2/4] Enforcing Mail Deliverability (DKIM, SPF, DMARC, DNS)..."
+if [ -x "$HESTIA_BIN/v-zodpanel-repair-mail-deliverability" ]; then
+    $HESTIA_BIN/v-zodpanel-repair-mail-deliverability >/dev/null 2>&1
+fi
+
+echo "[3/4] Ensuring Webmail SSO & Dovecot master authentication..."
+if [ -x "$HESTIA_BIN/v-configure-webmail-sso" ]; then
+    $HESTIA_BIN/v-configure-webmail-sso >/dev/null 2>&1
+fi
+
+echo "[4/4] Ensuring SSL automation for all web & mail domains..."
+for u in $users; do
+    # Web domains
+    web_domains=$($HESTIA_BIN/v-list-web-domains "$u" plain 2>/dev/null | cut -f 1)
+    for d in $web_domains; do
+        if [ -x "$HESTIA_BIN/v-configure-zodpanel-ssl-automation" ]; then
+            $HESTIA_BIN/v-configure-zodpanel-ssl-automation "$u" "$d" >/dev/null 2>&1
+        fi
+    done
+done
+
+echo "✓ All global rules synchronized across all tenant accounts!"

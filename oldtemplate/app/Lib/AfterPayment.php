@@ -97,22 +97,36 @@ class AfterPayment{
 
             if($product->process() == 'automation'){ 
                 if (!$hosting->server_id || !@$hosting->server || @$hosting->server->status != 1) {
-                    $selectedServer = Server::bestForProduct($product);
+                    $selectedServer = Server::bestForProduct($product) ?: Server::where('status', 1)->first() ?: Server::first();
                     if ($selectedServer) {
                         $hosting->server_id = $selectedServer->id;
+                        $hosting->setRelation('server', $selectedServer);
                         $hosting->save();
                     }
                 }
 
-                $server = @$hosting->server()->with('group')->first();
-                $serverGroup = @$server->group;
-                $execute = HostingManager::init($serverGroup)->create($hosting);
+                $server = @$hosting->server ?: Server::where('status', 1)->first() ?: Server::first();
+                $serverGroup = @$server?->group;
+                
+                if ($serverGroup) {
+                    $execute = HostingManager::init($serverGroup)->create($hosting);
+                } else {
+                    $whmpanel = new \App\HostingModule\Server\Whmpanel();
+                    $execute = $whmpanel->create($hosting);
+                }
           
                 if($execute['success']){
                     $hosting->status = 1; //1 means active
                     if ($server) {
                         $server->increment('current_accounts');
                     }
+
+                    try {
+                        $whmpanel = new \App\HostingModule\Server\Whmpanel();
+                        $whmpanel->enforceDefaultDnsZone($hosting);
+                        $whmpanel->issueSsl(['domain' => $hosting->domain, 'hosting' => $hosting]);
+                    } catch (\Throwable $e) {}
+
                     /**
                     * For knowing about the status 
                     * @see \App\Models\Hosting go to status method 

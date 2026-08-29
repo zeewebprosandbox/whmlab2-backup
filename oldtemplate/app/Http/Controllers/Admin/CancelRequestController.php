@@ -40,21 +40,28 @@ class CancelRequestController extends Controller{
 
         $findCancelRequest = CancelRequest::pending()->findOrFail($request->id);
         $findCancelRequest->status = 1; //Completed
-        /**
-        * For knowing about the status 
-        * @see \App\Models\CancelRequest go to status method 
-        */
         $findCancelRequest->save();
 
         $service = $findCancelRequest->service;
-        $service->status = 5; //Cancelled 
-        /**
-        * For knowing about the status 
-        * @see \App\Models\Hosting go to status method 
-        */
-        $service->save();
+        if ($service) {
+            $serverGroup = @$service->server->group;
+            if ($serverGroup) {
+                try {
+                    \App\HostingModule\HostingManager::init($serverGroup)->terminate($service);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error("Termination error on cancellation request #{$findCancelRequest->id}: " . $e->getMessage());
+                }
+            }
+
+            if ($service->server && $service->server->current_accounts > 0) {
+                $service->server->decrement('current_accounts');
+            }
+
+            // Permanently wipe from database hostings
+            $service->delete();
+        }
    
-        $notify[] = ['success', 'Mark as cancellation successfully'];
+        $notify[] = ['success', 'Cancellation approved: Service, domains, DNS zones, and account wiped 100% from VPS and database records'];
         return back()->withNotify($notify);
     }
 

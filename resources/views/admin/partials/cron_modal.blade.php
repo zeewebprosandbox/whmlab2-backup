@@ -127,11 +127,17 @@
             @php
                 $lastCron = Carbon\Carbon::parse(gs('last_cron'))->diffInSeconds();
             @endphp
-            @if ($lastCron >= 900)
-                setTimeout(() => {
-                    $('#cronModal').modal('show');
-                }, 1000);
+            @if ($lastCron >= 86400)
+                if (!sessionStorage.getItem('cron_modal_dismissed')) {
+                    setTimeout(() => {
+                        $('#cronModal').modal('show');
+                    }, 1000);
+                }
             @endif
+
+            $(document).on('click', '[data-bs-dismiss="modal"]', function() {
+                sessionStorage.setItem('cron_modal_dismissed', '1');
+            });
 
         })(jQuery)
     </script>

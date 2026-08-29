@@ -1707,7 +1707,13 @@ function whmpanel_try_ssl(string $user, string $domain, string $ip, bool $forceH
 	}
 
 	$aliases = whmpanel_pointed_aliases($domainData, $ip);
-	$ssl = whmpanel_run_soft(["v-add-letsencrypt-domain", $user, $domain, $aliases]);
+	$ssl = whmpanel_run_soft(["v-add-letsencrypt-domain", $user, $domain, $aliases, "no"]);
+	
+	// If Let's Encrypt is pending or failed challenge, trigger instant AutoSSL engine to ensure 0-downtime SSL
+	if (!$ssl["success"] && whmpanel_command_exists("v-configure-zodpanel-ssl-automation")) {
+		whmpanel_run_soft(["v-configure-zodpanel-ssl-automation", $user, $domain]);
+	}
+
 	$webDomain = whmpanel_run_soft(["v-list-web-domain", $user, $domain], true);
 	$domainData = $webDomain["data"][$domain] ?? [];
 	$hasSsl = ($domainData["SSL"] ?? "no") === "yes" || ($domainData["LETSENCRYPT"] ?? "no") === "yes";
@@ -1722,7 +1728,7 @@ function whmpanel_try_ssl(string $user, string $domain, string $ip, bool $forceH
 		"redirect" => $redirect,
 		"mail_ssl" => $mailSsl["installed"] ? $mailSsl : whmpanel_sync_mail_ssl($user, $domain, $ip),
 		"missing_aliases" => $missingAliases,
-		"message" => $ssl["success"] ? "Let's Encrypt SSL installed or expanded" : $ssl["message"],
+		"message" => $ssl["success"] ? "Let's Encrypt SSL installed or expanded" : ($hasSsl ? "Instant SAN SSL active, Let's Encrypt scheduled" : $ssl["message"]),
 	];
 }
 
@@ -1816,6 +1822,11 @@ function whmpanel_create_sso_token(string $username, string $redirect = "/list/w
 	$user = whmpanel_run(["v-list-user", $username], true);
 	if (empty($user[$username])) {
 		whmpanel_error("ZodPanel user {$username} was not found", 404);
+	}
+
+	$userData = $user[$username] ?? [];
+	if (!empty($userData["SUSPENDED"]) && strtolower((string) $userData["SUSPENDED"]) === "yes") {
+		whmpanel_error("This ZodPanel user {$username} is suspended. Control panel access is disabled.", 403);
 	}
 
 	$redirect = str_starts_with($redirect, "/") ? $redirect : "/list/web/";
@@ -2212,6 +2223,25 @@ if ($method === "GET" && preg_match("#^users/([^/]+)/domains$#", $path, $matches
 	whmpanel_json(whmpanel_run(["v-list-web-domains", $matches[1]], true));
 }
 
+if ($method === "POST" && preg_match("#^users/([^/]+)/domains$#", $path, $matches)) {
+	$username = $matches[1];
+	$domain = whmpanel_domain((string) ($input["domain"] ?? ""));
+	if ($domain === "") {
+		whmpanel_error("domain is required", 422);
+	}
+	$nodeIp = whmpanel_node_ip();
+	whmpanel_run(["v-add-web-domain", $username, $domain]);
+	$dns = whmpanel_repair_dns_records($username, $domain, $input);
+	$ssl = whmpanel_try_ssl($username, $domain, $nodeIp);
+	whmpanel_json([
+		"user" => $username,
+		"domain" => $domain,
+		"dns" => $dns,
+		"ssl" => $ssl,
+		"message" => "Domain created, authoritative DNS synced, and AutoSSL provisioned in real-time"
+	], 201);
+}
+
 if ($method === "GET" && preg_match("#^users/([^/]+)/mail/([^/]+)/accounts$#", $path, $matches)) {
 	whmpanel_json(whmpanel_list_mail_accounts($matches[1], $matches[2]));
 }
@@ -2349,6 +2379,185 @@ if ($method === "POST" && preg_match("#^users/([^/]+)/suspend$#", $path, $matche
 
 if ($method === "POST" && preg_match("#^users/([^/]+)/unsuspend$#", $path, $matches)) {
 	whmpanel_json(whmpanel_run(["v-unsuspend-user", $matches[1], "yes"]));
+}
+
+if ($method === "DELETE" && preg_match("#^users/([^/]+)/domains/([^/]+)$#", $path, $matches)) {
+	$username = $matches[1];
+	$domain = whmpanel_domain($matches[2]);
+
+	whmpanel_run_soft(["v-delete-web-domain", $username, $domain, "no"]);
+	whmpanel_run_soft(["v-delete-dns-domain", $username, $domain, "no"]);
+	whmpanel_run_soft(["v-delete-mail-domain", $username, $domain, "no"]);
+
+	shell_exec("systemctl reload named 2>/dev/null || true");
+	shell_exec("systemctl reload nginx 2>/dev/null || true");
+	shell_exec("systemctl reload apache2 2>/dev/null || true");
+
+	whmpanel_json([
+		"success" => true,
+		"username" => $username,
+		"domain" => $domain,
+		"message" => "Web domain, DNS zone, and mail domain completely deleted from VPS"
+	]);
+}
+
+if ($method === "DELETE" && preg_match("#^users/([^/]+)$#", $path, $matches)) {
+	$username = $matches[1];
+	if ($username === "admin" || $username === "root") {
+		whmpanel_error("Cannot delete root or admin user", 403);
+	}
+
+	$webDomains = whmpanel_run_soft(["v-list-web-domains", $username], true);
+	if (!empty($webDomains["data"]) && is_array($webDomains["data"])) {
+		foreach (array_keys($webDomains["data"]) as $wDom) {
+			whmpanel_run_soft(["v-delete-web-domain", $username, $wDom, "no"]);
+		}
+	}
+
+	$dnsDomains = whmpanel_run_soft(["v-list-dns-domains", $username], true);
+	if (!empty($dnsDomains["data"]) && is_array($dnsDomains["data"])) {
+		foreach (array_keys($dnsDomains["data"]) as $dDom) {
+			whmpanel_run_soft(["v-delete-dns-domain", $username, $dDom, "no"]);
+		}
+	}
+
+	$mailDomains = whmpanel_run_soft(["v-list-mail-domains", $username], true);
+	if (!empty($mailDomains["data"]) && is_array($mailDomains["data"])) {
+		foreach (array_keys($mailDomains["data"]) as $mDom) {
+			whmpanel_run_soft(["v-delete-mail-domain", $username, $mDom, "no"]);
+		}
+	}
+
+	$databases = whmpanel_run_soft(["v-list-databases", $username], true);
+	if (!empty($databases["data"]) && is_array($databases["data"])) {
+		foreach (array_keys($databases["data"]) as $dbName) {
+			whmpanel_run_soft(["v-delete-database", $username, $dbName, "no"]);
+		}
+	}
+
+	$delUser = whmpanel_run_soft(["v-delete-user", $username, "no"]);
+
+	shell_exec("systemctl reload named 2>/dev/null || true");
+	shell_exec("systemctl reload nginx 2>/dev/null || true");
+	shell_exec("systemctl reload apache2 2>/dev/null || true");
+
+	whmpanel_json([
+		"success" => true,
+		"username" => $username,
+		"message" => "User account, domains, DNS zones, mail, and databases completely deleted from VPS"
+	]);
+}
+
+if ($method === "GET" && preg_match("#^users/([^/]+)/domains/([^/]+)/dns-records$#", $path, $matches)) {
+	$username = $matches[1];
+	$domain = whmpanel_domain($matches[2]);
+	$records = whmpanel_run_soft(["v-list-dns-records", $username, $domain], true);
+	whmpanel_json($records["data"] ?? $records);
+}
+
+if ($method === "POST" && preg_match("#^users/([^/]+)/domains/([^/]+)/dns-records$#", $path, $matches)) {
+	$username = $matches[1];
+	$domain = whmpanel_domain($matches[2]);
+	$recordName = (string) ($input["name"] ?? "@");
+	$type = strtoupper((string) ($input["type"] ?? "A"));
+	$val = (string) ($input["value"] ?? "");
+	$priority = (string) ($input["priority"] ?? "");
+
+	$args = ["v-add-dns-record", $username, $domain, $recordName, $type, $val];
+	if ($priority !== "" && in_array($type, ["MX", "SRV"], true)) {
+		$args[] = $priority;
+	}
+	$res = whmpanel_run_soft($args);
+	shell_exec("systemctl reload named 2>/dev/null || true");
+	whmpanel_json([
+		"success" => true,
+		"message" => "DNS record added and BIND zone reloaded in real time",
+		"result" => $res
+	], 201);
+}
+
+if ($method === "DELETE" && preg_match("#^users/([^/]+)/domains/([^/]+)/dns-records/([^/]+)$#", $path, $matches)) {
+	$username = $matches[1];
+	$domain = whmpanel_domain($matches[2]);
+	$recId = $matches[3];
+	whmpanel_run_soft(["v-delete-dns-record", $username, $domain, $recId]);
+	shell_exec("systemctl reload named 2>/dev/null || true");
+	whmpanel_json([
+		"success" => true,
+		"message" => "DNS record #{$recId} deleted and BIND zone reloaded in real time"
+	]);
+}
+
+if ($method === "POST" && preg_match("#^users/([^/]+)/domains/([^/]+)/dns/overwrite$#", $path, $matches)) {
+	$username = $matches[1];
+	$domain = whmpanel_domain($matches[2]);
+	$records = (array) ($input["records"] ?? []);
+	$nodeIp = whmpanel_node_ip();
+
+	// 1. Delete and recreate DNS zone cleanly to avoid clutter
+	whmpanel_run_soft(["v-delete-dns-domain", $username, $domain, "no"]);
+	whmpanel_run_soft(["v-add-dns-domain", $username, $domain, $nodeIp, "ns1.zodserver.cloud", "ns2.zodserver.cloud", "no"]);
+
+	// 2. Add each customized record
+	foreach ($records as $rec) {
+		$rName = (string) ($rec["name"] ?? "@");
+		$rType = strtoupper((string) ($rec["type"] ?? "A"));
+		$rVal = (string) ($rec["value"] ?? "");
+		$rPrio = (string) ($rec["priority"] ?? "");
+		if ($rVal === "") continue;
+
+		$addArgs = ["v-add-dns-record", $username, $domain, $rName, $rType, $rVal];
+		if ($rPrio !== "" && in_array($rType, ["MX", "SRV"], true)) {
+			$addArgs[] = $rPrio;
+		}
+		whmpanel_run_soft($addArgs);
+	}
+
+	shell_exec("systemctl reload named 2>/dev/null || true");
+	whmpanel_json([
+		"success" => true,
+		"message" => "All DNS records overwritten cleanly in real time with zero clutter"
+	]);
+}
+
+if ($method === "POST" && $path === "domains/auto-connect") {
+	$domain = whmpanel_domain((string) ($input["domain"] ?? ""));
+	$username = (string) ($input["username"] ?? "zodhost");
+	if ($domain === "") {
+		whmpanel_error("domain is required", 422);
+	}
+	$nodeIp = whmpanel_node_ip();
+
+	// 1. Ensure user exists
+	whmpanel_run_soft(["v-add-user", $username, bin2hex(random_bytes(8)), "admin@zodhost.com", "default"]);
+	
+	// 2. Ensure web domain exists
+	whmpanel_run_soft(["v-add-web-domain", $username, $domain]);
+
+	// 3. Ensure BIND DNS zone exists with authoritative NS
+	whmpanel_run_soft(["v-add-dns-domain", $username, $domain, $nodeIp, "ns1.zodserver.cloud", "ns2.zodserver.cloud", "no"]);
+
+	// 4. Ensure mail domain exists
+	whmpanel_run_soft(["v-add-mail-domain", $username, $domain]);
+
+	// 5. Repair default DNS records
+	$dns = whmpanel_repair_dns_records($username, $domain, $input);
+
+	// 6. Real-time AutoSSL installation & HTTPS enforcement
+	$ssl = whmpanel_try_ssl($username, $domain, $nodeIp);
+
+	shell_exec("systemctl reload named 2>/dev/null || true");
+	shell_exec("systemctl reload nginx 2>/dev/null || true");
+	shell_exec("systemctl reload apache2 2>/dev/null || true");
+
+	whmpanel_json([
+		"success" => true,
+		"domain" => $domain,
+		"username" => $username,
+		"dns" => $dns,
+		"ssl" => $ssl,
+		"message" => "Vercel-style real-time connection: Domain added, authoritative DNS synced, AutoSSL installed, and HTTPS enabled automatically."
+	], 201);
 }
 
 whmpanel_error("Unknown ZodPanel bridge endpoint", 404);

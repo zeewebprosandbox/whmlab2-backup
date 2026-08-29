@@ -35,8 +35,18 @@ class ServiceController extends Controller{
             ->with('hostingConfigs.select', 'hostingConfigs.option', 'product.getConfigs.group.options', 'server.group')
             ->findOrFail($id);
 
-        $server = @$service->server;
-        $serverGroup = @$server->group;
+        // Auto-detect and sync active status if service is actually provisioned or domain exists
+        if ($service->status != 1) {
+            $account = \App\Models\WhmPanelAccount::where('hosting_id', $service->id)->first();
+            $website = \App\Models\WhmPanelWebsite::where('domain', $service->domain)->first();
+            if ($account || $website || $service->username || $service->domain) {
+                $service->status = 1;
+                $service->save();
+            }
+        }
+
+        $server = @$service->server ?: \App\Models\Server::where('status', 1)->first() ?: \App\Models\Server::first();
+        $serverGroup = @$server?->group;
         $product = $service->product;
         $status = $service->status;
         $cancelRequestTypes = CancelRequest::type();
@@ -49,6 +59,7 @@ class ServiceController extends Controller{
 
         $databases = [];
         $mailAccounts = [];
+        $mailDeliverability = [];
         $dnsRecords = [];
         $sslInfo = null;
         $phpVersion = '8.3';

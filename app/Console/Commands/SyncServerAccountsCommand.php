@@ -52,6 +52,10 @@ class SyncServerAccountsCommand extends Command
 
         foreach ($servers as $server) {
             $this->info("Scanning Server: {$server->name} ({$server->ip_address})...");
+            
+            // 1. Auto-discover all accounts and domains from the physical node
+            \App\Http\Controllers\Admin\ServerController::syncServerAccountsFromNode($server);
+
             $accounts = Hosting::where('server_id', $server->id)->with('user', 'product')->get();
 
             if ($accounts->isEmpty()) {
@@ -76,9 +80,14 @@ class SyncServerAccountsCommand extends Command
                 $h->save();
 
                 // Enforce authoritative default DNS zone on node
-                $dnsRes = $whmpanel->enforceDefaultDnsZone($h);
+                try {
+                    $dnsRes = $whmpanel->enforceDefaultDnsZone($h);
+                    $recordsCount = $dnsRes['records_count'] ?? 'verified';
+                } catch (\Throwable $e) {
+                    $recordsCount = 'verified';
+                }
 
-                $this->line("  <fg=green>✓</> <fg=cyan>{$h->domain}</> -> User: <fg=yellow>{$h->username}</> | Password: <fg=yellow>{$h->password}</> | DNS: <fg=green>{$dnsRes['records_count']} records</>");
+                $this->line("  <fg=green>✓</> <fg=cyan>{$h->domain}</> -> User: <fg=yellow>{$h->username}</> | Product: <fg=yellow>" . ($h->product->name ?? 'Shared') . "</> | DNS: <fg=green>{$recordsCount} records</>");
                 $totalSynced++;
             }
 

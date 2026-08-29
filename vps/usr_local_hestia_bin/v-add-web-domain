@@ -254,8 +254,33 @@ check_result $? "Web restart failed" > /dev/null
 $BIN/v-restart-proxy "$restart"
 check_result $? "Proxy restart failed" > /dev/null
 
+# Auto-DNS & Auto-Mail Domain Creation in Real-Time
+if [ -n "$DNS_SYSTEM" ] && [ -x "$BIN/v-add-dns-domain" ]; then
+	if ! $BIN/v-list-dns-domain "$user" "$domain" >/dev/null 2>&1; then
+		ns1_val=$(get_user_value "$user" '$NS1' 2>/dev/null || echo "ns1.zodserver.cloud")
+		ns2_val=$(get_user_value "$user" '$NS2' 2>/dev/null || echo "ns2.zodserver.cloud")
+		[ -n "$ns1_val" ] || ns1_val="ns1.zodserver.cloud"
+		[ -n "$ns2_val" ] || ns2_val="ns2.zodserver.cloud"
+		$BIN/v-add-dns-domain "$user" "$domain" "$local_ip" "$ns1_val" "$ns2_val" '' '' '' '' '' '' 'no' >/dev/null 2>&1 || true
+		$BIN/v-rebuild-dns-domain "$user" "$domain" 'no' >/dev/null 2>&1 || true
+		systemctl reload named 2>/dev/null || service named reload 2>/dev/null || systemctl reload bind9 2>/dev/null || true
+	fi
+fi
+
+if [ -n "$MAIL_SYSTEM" ] && [ -x "$BIN/v-add-mail-domain" ]; then
+	if ! $BIN/v-list-mail-domain "$user" "$domain" >/dev/null 2>&1; then
+		$BIN/v-add-mail-domain "$user" "$domain" >/dev/null 2>&1 || true
+	fi
+fi
+
+# Auto-provision SSL & HTTPS redirect instantly in real-time
+if [ -x "$BIN/v-configure-zodpanel-ssl-automation" ]; then
+	( $BIN/v-configure-zodpanel-ssl-automation "$user" "$domain" >/dev/null 2>&1 ) &
+fi
+
 # Logging
 $BIN/v-log-action "$user" "Info" "Web" "Added new web domain (Name: $domain)."
 log_event "$OK" "$ARGUMENTS"
 
 exit
+

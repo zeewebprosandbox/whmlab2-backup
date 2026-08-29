@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Successfully Launched — ZodHost Cloud</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+    <style>
+        :root {
+            --bg-base: #090A0F;
+            --card-bg: rgba(18, 20, 29, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #6366F1;
+            --accent-cyan: #06B6D4;
+            --accent-emerald: #10B981;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow Blobs */
+        .ambient-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(99, 102, 241, 0) 70%);
+            top: -150px;
+            left: -100px;
+        }
+        .blob-2 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0) 70%);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* Grid Texture */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            position: relative;
+            z-index: 10;
+            padding: 2.5rem 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: #FFFFFF;
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-logo .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #6366F1, #06B6D4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .brand-logo .logo-icon i {
+            color: #FFF;
+            font-size: 1.3rem;
+        }
+
+        .header-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.2s ease;
+        }
+        .header-link:hover {
+            color: #FFF;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        main {
+            position: relative;
+            z-index: 10;
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34D399;
+            font-size: 0.815rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-emerald);
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .domain-pill {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            padding: 0.2rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        /* Features Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.35rem;
+        }
+        .card-icon.ssl { background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); }
+        .card-icon.dns { background: rgba(99, 102, 241, 0.1); color: var(--accent-primary); }
+        .card-icon.speed { background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); }
+
+        .card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #FFF;
+            margin-bottom: 0.35rem;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Action CTA Bar */
+        .cta-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(6, 182, 212, 0.08));
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            sm-flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            backdrop-filter: blur(16px);
+        }
+
+        @media (min-width: 640px) {
+            .cta-box {
+                flex-direction: row;
+                text-align: left;
+            }
+        }
+
+        .cta-text h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #FFF;
+            margin-bottom: 0.25rem;
+        }
+
+        .cta-text p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #FFFFFF;
+            color: #090A0F;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.85rem 1.6rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            background: #F1F5F9;
+            box-shadow: 0 6px 25px rgba(255, 255, 255, 0.25);
+        }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-muted);
+            font-size: 0.815rem;
+        }
+
+        footer a {
+            color: #E2E8F0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer a:hover {
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+    <div class="grid-overlay"></div>
+
+    <header>
+        <a href="https://zodhost.com" class="brand-logo">
+            <div class="logo-icon">
+                <i class="las la-server"></i>
+            </div>
+            <span>ZodHost<span style="color: var(--accent-cyan);">.</span></span>
+        </a>
+        <a href="https://zodhost.com/user/login" class="header-link">
+            <i class="las la-user-shield"></i>
+            <span>Client Console</span>
+        </a>
+    </header>
+
+    <main>
+        <div class="status-badge">
+            <span class="pulse-dot"></span>
+            <span>Website Active & Provisioned in Real Time</span>
+        </div>
+
+        <h1>
+            Your website is live on <br>
+            <span class="domain-pill" id="domainNameDisplay">ZodHost Cloud</span>
+        </h1>
+
+        <p class="subtitle">
+            Authoritative DNS zones, NVMe web roots, and AutoSSL encryption are fully synchronized and answering worldwide.
+        </p>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon ssl">
+                    <i class="las la-shield-alt"></i>
+                </div>
+                <h3>Automated Zero-Wait SSL</h3>
+                <p>256-bit encryption with automated Let's Encrypt certificate renewals and forced HTTPS.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon dns">
+                    <i class="las la-globe-americas"></i>
+                </div>
+                <h3>Real-Time BIND DNS</h3>
+                <p>Propagated authoritative nameservers with full subzone mapping and mail routing.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon speed">
+                    <i class="las la-bolt"></i>
+                </div>
+                <h3>NVMe Cloud Cluster</h3>
+                <p>Isolated PHP runtime environments, MariaDB databases, and sub-10ms response times.</p>
+            </div>
+        </div>
+
+        <div class="cta-box">
+            <div class="cta-text">
+                <h4>Ready to build your website?</h4>
+                <p>Upload files via File Manager, configure databases, or install WordPress via the control panel.</p>
+            </div>
+            <a href="https://zodhost.com/user/login" class="btn-primary">
+                <span>Manage in Dashboard</span>
+                <i class="las la-arrow-right"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="currentYear"></span> ZodHost Cloud Infrastructure. All rights reserved. Powered by <a href="https://zodhost.com" target="_blank">ZodHost.com</a>.</p>
+    </footer>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        var host = window.location.hostname;
+        if (host && host !== 'localhost' && host !== '127.0.0.1') {
+            document.getElementById('domainNameDisplay').textContent = host;
+            document.title = host + ' — Active on ZodHost Cloud';
+        }
+    </script>
+</body>
+</html>

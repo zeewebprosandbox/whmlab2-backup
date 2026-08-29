@@ -358,17 +358,25 @@ class UserController extends Controller
     public function loginHosting($id){
         
         $service = Hosting::whereBelongsTo(auth()->user())->findOrFail($id);
+        
+        if ($service->status != 1) {
+            $statusNames = [1 => 'Active', 2 => 'Pending', 3 => 'Suspended', 4 => 'Terminated', 5 => 'Cancelled'];
+            $statusName = $statusNames[$service->status] ?? 'Inactive';
+            $notify[] = ['error', "This service is currently {$statusName}. Access to the control panel is disabled."];
+            return back()->withNotify($notify);
+        }
+
         $product = $service->product;
         $server = $service->server;
-        $serverGroup = $server->group;
+        $serverGroup = $server?->group;
 
         if(!$product->server_group_id){
             $notify[] = ['error', 'Unable to auto-login'];
             return back()->withNotify($notify);
         }
 
-        if(!$server){
-            $notify[] = ['error', 'There is no selected server to auto-login'];
+        if(!$server || !$serverGroup){
+            $notify[] = ['error', 'There is no selected active server to auto-login'];
             return back()->withNotify($notify); 
         }
 

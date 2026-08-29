@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# info: ZodPanel Enterprise Proactive Self-Healing Watchdog Daemon
+#
+# This script monitors all critical hosting services:
+# Nginx, PHP-FPM pools, MariaDB/MySQL, Exim4, Dovecot, and Hestia.
+# If any service is inactive or failed, it automatically restarts it
+# and logs the recovery action to /var/log/zodpanel-watchdog.log.
+
+LOG_FILE="/var/log/zodpanel-watchdog.log"
+
+log_msg() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $1" | tee -a "$LOG_FILE"
+}
+
+check_and_heal() {
+    local service="$1"
+    local systemd_name="$2"
+
+    if ! systemctl is-active --quiet "$systemd_name"; then
+        log_msg "⚠️ [ALERT] Service '$service' ($systemd_name) was DOWN. Initiating auto-recovery..."
+        systemctl restart "$systemd_name" >/dev/null 2>&1
+        sleep 1
+        if systemctl is-active --quiet "$systemd_name"; then
+            log_msg "✅ [RECOVERED] Service '$service' successfully revived and is ACTIVE."
+        else
+            log_msg "❌ [FAILED] Could not revive service '$service' ($systemd_name). Check systemctl status."
+        fi
+    fi
+}
+
+# 1. Nginx Web Server
+check_and_heal "Nginx" "nginx"
+
+# 2. MariaDB / MySQL Database
+if systemctl list-unit-files | grep -q "mariadb.service"; then
+    check_and_heal "MariaDB" "mariadb"
+elif systemctl list-unit-files | grep -q "mysql.service"; then
+    check_and_heal "MySQL" "mysql"
+fi
+
+# 3. PHP-FPM Pools (Checks all installed PHP-FPM versions, e.g., php8.1-fpm, php8.2-fpm, php8.3-fpm)
+for fpm in $(systemctl list-unit-files --type=service | grep -oE "php[0-9.]+-fpm" | sort -u); do
+    check_and_heal "PHP-FPM ($fpm)" "$fpm"
+done
+
+# 4. Mail Transport (Exim4)
+if systemctl list-unit-files | grep -q "exim4.service"; then
+    check_and_heal "Exim4 MTA" "exim4"
+fi
+
+# 5. IMAP/POP3 Mailbox (Dovecot)
+if systemctl list-unit-files | grep -q "dovecot.service"; then
+    check_and_heal "Dovecot IMAP" "dovecot"
+fi
+
+# 6. Hestia Control Panel Backend
+if systemctl list-unit-files | grep -q "hestia.service"; then
+    check_and_heal "Hestia Panel" "hestia"
+fi
+
+exit 0

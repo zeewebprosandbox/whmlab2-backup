@@ -205,11 +205,19 @@ class HostingModuleController extends Controller{
         ]);
 
         $hosting = Hosting::findOrFail($request->hosting_id);
-        $server = $hosting->server;
-        $serverGroup = $server->group;
+        
+        if ($hosting->status != 1) {
+            $statusNames = [1 => 'Active', 2 => 'Pending', 3 => 'Suspended', 4 => 'Terminated', 5 => 'Cancelled'];
+            $statusName = $statusNames[$hosting->status] ?? 'Inactive';
+            $notify[] = ['error', "This service is currently {$statusName}. SSO login to control panel is blocked."];
+            return back()->withNotify($notify);
+        }
 
-        if(!$server){
-            $notify[] = ['error', 'There is no selected server to auto-login'];
+        $server = $hosting->server;
+        $serverGroup = $server?->group;
+
+        if(!$server || !$serverGroup){
+            $notify[] = ['error', 'There is no selected active server to auto-login'];
             return back()->withNotify($notify); 
         }
 

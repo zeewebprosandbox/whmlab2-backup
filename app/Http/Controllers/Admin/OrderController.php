@@ -130,8 +130,14 @@ class OrderController extends Controller{
                             $service->status = 1; //1 means Active
                             $service->save();
                             if ($server) {
-                                $server->increment('current_accounts');
+                                 $server->increment('current_accounts');
                             }
+
+                            try {
+                                $whmpanel = new \App\HostingModule\Server\Whmpanel();
+                                $whmpanel->enforceDefaultDnsZone($service);
+                                $whmpanel->issueSsl(['domain' => $service->domain, 'hosting' => $service]);
+                            } catch (\Throwable $e) {}
  
                             if(@$hosting->send_email){
                                 SendServiceEmail::serviceNotify($service);

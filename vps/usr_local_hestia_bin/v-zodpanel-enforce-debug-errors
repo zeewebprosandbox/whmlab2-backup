@@ -1,0 +1,68 @@
+#!/bin/bash
+#===========================================================================#
+# ZodPanel Global Real Error & Stack Trace Pass-Through Enforcer            #
+# Ensures PHP fatal errors, Whoops, and stack traces render directly         #
+# without being masked by generic 500 error pages.                          #
+#===========================================================================#
+
+# 1. Update all php.ini files
+for ini in /etc/php/*/fpm/php.ini /etc/php/*/cli/php.ini; do
+    if [ -f "$ini" ]; then
+        sed -i 's/^display_errors\s*=.*/display_errors = On/' "$ini"
+        sed -i 's/^display_startup_errors\s*=.*/display_startup_errors = On/' "$ini"
+        sed -i 's/^error_reporting\s*=.*/error_reporting = E_ALL/' "$ini"
+        sed -i 's/^log_errors\s*=.*/log_errors = On/' "$ini"
+        sed -i 's/^html_errors\s*=.*/html_errors = On/' "$ini"
+    fi
+done
+
+# 2. Update all active PHP-FPM pools
+for pool in /etc/php/*/fpm/pool.d/*.conf; do
+    if [ -f "$pool" ]; then
+        sed -i '/php_flag\[display_errors\]/d' "$pool"
+        sed -i '/php_flag\[display_startup_errors\]/d' "$pool"
+        sed -i '/php_admin_value\[error_reporting\]/d' "$pool"
+        echo "php_flag[display_errors] = on" >> "$pool"
+        echo "php_flag[display_startup_errors] = on" >> "$pool"
+        echo "php_admin_value[error_reporting] = 32767" >> "$pool"
+    fi
+done
+
+# 3. Update Hestia PHP-FPM templates
+for tpl in /usr/local/hestia/data/templates/web/php-fpm/*.tpl; do
+    if [ -f "$tpl" ]; then
+        if ! grep -q "php_flag\[display_errors\]" "$tpl"; then
+            echo "" >> "$tpl"
+            echo "php_flag[display_errors] = on" >> "$tpl"
+            echo "php_flag[display_startup_errors] = on" >> "$tpl"
+            echo "php_admin_value[error_reporting] = 32767" >> "$tpl"
+        fi
+    fi
+done
+
+# 4. Disable ErrorDocument 50x in Apache configs
+if [ -f /etc/apache2/apache2.conf ]; then
+    sed -i 's/^ErrorDocument 50/#ErrorDocument 50/g' /etc/apache2/apache2.conf
+fi
+for c in /etc/apache2/conf-available/*.conf /etc/apache2/conf-enabled/*.conf; do
+    if [ -f "$c" ]; then
+        sed -i 's/^ErrorDocument 50/#ErrorDocument 50/g' "$c"
+    fi
+done
+
+# 5. Disable error_page 50x and enable error pass-through in Nginx
+if [ -f /etc/nginx/nginx.conf ]; then
+    sed -i 's/error_page\s*500/#error_page 500/g' /etc/nginx/nginx.conf
+    sed -i 's/proxy_intercept_errors on;/proxy_intercept_errors off;/g' /etc/nginx/nginx.conf
+    sed -i 's/fastcgi_intercept_errors on;/fastcgi_intercept_errors off;/g' /etc/nginx/nginx.conf
+    if ! grep -q "proxy_intercept_errors off;" /etc/nginx/nginx.conf; then
+        sed -i '/http {/a \    proxy_intercept_errors off;\n    fastcgi_intercept_errors off;' /etc/nginx/nginx.conf
+    fi
+fi
+
+# 6. Restart services
+systemctl restart php*-fpm 2>/dev/null || true
+systemctl restart apache2 2>/dev/null || true
+systemctl restart nginx 2>/dev/null || true
+
+exit 0

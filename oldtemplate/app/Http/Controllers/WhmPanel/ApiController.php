@@ -467,9 +467,10 @@ class ApiController extends Controller
             ]
         );
 
-        // If attached to a live ZodPanel hosting service, auto-trigger SSL provisioning & HTTPS force
+        // If attached to a live ZodPanel hosting service, auto-trigger domain, authoritative DNS & AutoSSL provisioning
         $hosting = $account->hosting ?? null;
         if ($hosting && @$hosting->server?->group?->type == 4) {
+            $this->zodPanelAction($hosting, 'addWebDomain', ['domain' => $domain]);
             $this->zodPanelAction($hosting, 'issueSsl', ['domain' => $domain]);
         }
 
